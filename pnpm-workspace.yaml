@@ -1,0 +1,10 @@
+packages:
+  - "."
+
+nodeLinker: hoisted
+storeDir: .pnpm-store/v11
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
