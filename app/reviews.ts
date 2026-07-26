@@ -57,4 +57,46 @@ export const storeReviews: StoreReview[] = [
     product: "Confused Puzzle Emboss Tee",
     handle: "confused-puzzle-emboss-tee",
   },
+  {
+    name: "Prashant",
+    rating: 4,
+    title: "Better than expected",
+    quote:
+      "Wasn’t sure at first, but honestly this turned out better than expected. The material feels nice on the skin and the back design really pops. Wore it once and already got compliments.",
+    product: "Ghost of Tsushima Oversized Tee — Cream",
+    handle: "ghost-of-tsushima-cream-men",
+  },
+  {
+    name: "Anmol",
+    rating: 5,
+    title: "Perfect oversized fit",
+    quote:
+      "Ordered XL and the fit is perfect. Comfortable fabric, great print quality, and the oversized style looks amazing. Very happy with the purchase!",
+    product: "Ghost of Tsushima Oversized Tee — Cream",
+    handle: "ghost-of-tsushima-cream-men",
+  },
+  {
+    name: "Tejas",
+    rating: 5,
+    title: "Superb quality",
+    quote: "Supppppppperrrrb quality",
+    product: "Neon Skull Illusion Puff Oversized Tee",
+    handle: "neon-skull-pop-oversized-tee-men",
+  },
+  {
+    name: "Isa",
+    rating: 5,
+    title: "Just wow",
+    quote: "THIS IS JUST WOW",
+    product: "Big Bang Sweatshirt",
+    handle: "big-bang-sweatshirt-men",
+  },
+  {
+    name: "Sanidhya",
+    rating: 5,
+    title: "Mr. Perfect",
+    quote: "This tshirt should be called as Mr. Perfect",
+    product: "Ghost of Tsushima Oversized Tee — Red",
+    handle: "ghost-of-tsushima-oversized-tee-men",
+  },
 ];

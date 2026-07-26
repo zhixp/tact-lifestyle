@@ -5110,3 +5110,510 @@ svg {
     animation: none;
   }
 }
+
+/* Homepage campaign carousel */
+
+.home-hero-carousel {
+  background: #e7ded4;
+  isolation: isolate;
+}
+
+.hero-carousel-viewport,
+.hero-carousel-slide,
+.hero-slide-media,
+.hero-carousel-shade {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.hero-carousel-slide {
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    opacity 900ms cubic-bezier(.22, .61, .36, 1),
+    visibility 900ms;
+  visibility: hidden;
+}
+
+.hero-carousel-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+.hero-slide-media {
+  overflow: hidden;
+}
+
+.hero-slide-media img,
+.hero-slide-media video {
+  display: block;
+  height: 100%;
+  object-position: center;
+  width: 100%;
+}
+
+.hero-slide-mobile-video,
+.hero-slide-mobile-image {
+  display: none !important;
+}
+
+.hero-carousel-slide--rotation {
+  background: #e7ded4;
+}
+
+.hero-carousel-slide--rotation .hero-slide-desktop-image {
+  object-fit: contain;
+  object-position: center bottom;
+  transform: scale(1.008);
+  transition: transform 6.8s linear;
+}
+
+.hero-carousel-slide--rotation.is-active .hero-slide-desktop-image {
+  transform: scale(1);
+}
+
+.hero-carousel-slide--rotation .hero-carousel-shade {
+  background:
+    linear-gradient(180deg, rgba(238, 230, 220, .18), transparent 34%),
+    linear-gradient(0deg, rgba(231, 222, 212, .88), transparent 39%);
+}
+
+.hero-carousel-slide--madison {
+  background: #f1efe9;
+}
+
+.hero-carousel-slide--madison .hero-slide-media {
+  background: #062b61;
+  left: 56%;
+  width: 44%;
+}
+
+.hero-carousel-slide--madison .hero-slide-desktop-image {
+  object-fit: contain;
+  object-position: center bottom;
+  transform: translate3d(18px, 0, 0);
+  transition: transform 1.15s cubic-bezier(.22, .61, .36, 1);
+}
+
+.hero-carousel-slide--madison.is-active .hero-slide-desktop-image {
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-carousel-slide--madison .hero-carousel-shade {
+  background: linear-gradient(90deg, rgba(241, 239, 233, .16), transparent 56%);
+}
+
+.hero-carousel-copy {
+  bottom: clamp(62px, 8vh, 96px);
+  color: #0a0a0a;
+  left: var(--page);
+  max-width: min(720px, 48vw);
+  position: absolute;
+  z-index: 2;
+}
+
+.hero-carousel-slide--rotation .hero-carousel-copy {
+  left: 50%;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.hero-carousel-slide--madison .hero-carousel-copy {
+  bottom: auto;
+  max-width: 43vw;
+  top: 51%;
+  transform: translateY(-50%);
+}
+
+.hero-carousel-copy > p {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .17em;
+  margin: 0 0 13px;
+  text-transform: uppercase;
+}
+
+.hero-carousel-copy h1,
+.hero-carousel-copy h2 {
+  font-size: clamp(58px, 7.4vw, 126px);
+  font-weight: 500;
+  letter-spacing: -.075em;
+  line-height: .86;
+  margin: 0 0 clamp(26px, 3vw, 44px);
+}
+
+.hero-carousel-slide--madison .hero-carousel-copy h2 {
+  max-width: 7ch;
+}
+
+.hero-carousel-copy a {
+  align-items: center;
+  border-bottom: 1px solid currentColor;
+  display: inline-flex;
+  font-size: 11px;
+  gap: 58px;
+  padding-bottom: 10px;
+}
+
+.hero-carousel-copy a svg {
+  height: 13px;
+  width: 13px;
+}
+
+.hero-carousel-navigation {
+  align-items: center;
+  bottom: clamp(30px, 4vh, 48px);
+  display: flex;
+  gap: 18px;
+  position: absolute;
+  right: var(--page);
+  z-index: 4;
+}
+
+.hero-carousel-navigation > span {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.hero-carousel-dots {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+}
+
+.hero-carousel-dots button {
+  background: rgba(10, 10, 10, .24);
+  border: 0;
+  border-radius: 999px;
+  height: 3px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  width: 25px;
+}
+
+.hero-carousel-dots button::after {
+  background: #0a0a0a;
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.hero-carousel-dots button.is-active::after {
+  animation: hero-progress 6.8s linear forwards;
+}
+
+.home-hero-carousel.is-paused .hero-carousel-dots button.is-active::after {
+  animation-play-state: paused;
+}
+
+.hero-carousel-arrows {
+  display: flex;
+  gap: 7px;
+}
+
+.hero-carousel-arrows button {
+  align-items: center;
+  background: rgba(250, 250, 248, .72);
+  border: 1px solid rgba(10, 10, 10, .18);
+  border-radius: 50%;
+  color: #0a0a0a;
+  display: flex;
+  height: 38px;
+  justify-content: center;
+  transition: background .22s ease, color .22s ease, transform .22s ease;
+  width: 38px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.hero-carousel-arrows button:first-child svg {
+  transform: rotate(180deg);
+}
+
+.hero-carousel-arrows button:hover {
+  background: #0a0a0a;
+  color: #fff;
+  transform: scale(1.04);
+}
+
+.home-hero-carousel:hover img {
+  transform: none;
+}
+
+@keyframes hero-progress {
+  to { transform: scaleX(1); }
+}
+
+/* Continuous customer review rail */
+
+.review-stories.review-stories-marquee {
+  display: block;
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.review-stories-marquee .review-stories-heading {
+  align-items: end;
+  display: grid;
+  gap: clamp(36px, 7vw, 120px);
+  grid-template-columns: minmax(0, 1fr) minmax(240px, .55fr);
+  margin-bottom: clamp(50px, 6vw, 88px);
+  padding: 0 var(--page);
+}
+
+.review-stories-marquee .review-stories-heading > p:not(.kicker) {
+  margin: 0 0 4px;
+}
+
+.review-marquee-window {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 5%,
+    #000 95%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 5%,
+    #000 95%,
+    transparent
+  );
+  overflow: hidden;
+}
+
+.review-marquee-track {
+  animation: reviews-flow-right 72s linear infinite;
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.review-marquee-window:focus-within .review-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (hover: hover) {
+  .review-marquee-window:hover .review-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+.review-marquee-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  padding-right: 10px;
+}
+
+.review-marquee-card {
+  background: rgba(255, 255, 255, .86);
+  border: 1px solid rgba(10, 10, 10, .07);
+  border-radius: 18px;
+  display: flex;
+  flex: 0 0 clamp(320px, 29vw, 470px);
+  flex-direction: column;
+  min-height: clamp(330px, 31vw, 450px);
+  padding: clamp(24px, 2.5vw, 38px);
+}
+
+.review-marquee-card-topline {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.review-marquee-card-topline > span {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+.review-marquee-card > p {
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .13em;
+  margin: clamp(44px, 5vw, 76px) 0 13px;
+  text-transform: uppercase;
+}
+
+.review-marquee-card blockquote {
+  font-size: clamp(27px, 2.6vw, 42px);
+  letter-spacing: -.052em;
+  line-height: 1.02;
+  margin: 0 0 42px;
+}
+
+.review-marquee-card footer {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: flex;
+  font-size: 9px;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.review-marquee-card footer a {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  max-width: 23ch;
+  text-align: right;
+}
+
+.review-marquee-card footer a svg {
+  flex: 0 0 auto;
+  height: 12px;
+  width: 12px;
+}
+
+@keyframes reviews-flow-right {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@media (max-width: 760px) {
+  .hero-slide-desktop-image {
+    display: none !important;
+  }
+
+  .hero-slide-mobile-video,
+  .hero-slide-mobile-image {
+    display: block !important;
+  }
+
+  .hero-carousel-slide--rotation .hero-slide-mobile-video {
+    object-fit: cover;
+    object-position: center 46%;
+  }
+
+  .hero-carousel-slide--rotation .hero-carousel-shade {
+    background: linear-gradient(180deg, rgba(0, 0, 0, .05) 38%, rgba(0, 0, 0, .7));
+  }
+
+  .hero-carousel-slide--madison .hero-slide-media {
+    inset: 0;
+    width: 100%;
+  }
+
+  .hero-carousel-slide--madison .hero-slide-mobile-image {
+    object-fit: cover;
+    object-position: center 32%;
+  }
+
+  .hero-carousel-slide--madison .hero-carousel-shade {
+    background: linear-gradient(180deg, transparent 38%, rgba(0, 0, 0, .7));
+  }
+
+  .hero-carousel-copy,
+  .hero-carousel-slide--rotation .hero-carousel-copy,
+  .hero-carousel-slide--madison .hero-carousel-copy {
+    bottom: 166px;
+    color: #fff;
+    left: 17px;
+    max-width: calc(100vw - 34px);
+    right: 17px;
+    text-align: left;
+    top: auto;
+    transform: none;
+  }
+
+  .hero-carousel-copy h1,
+  .hero-carousel-copy h2 {
+    font-size: clamp(50px, 15vw, 70px);
+    max-width: 7ch;
+  }
+
+  .hero-carousel-navigation {
+    bottom: 101px;
+    left: 17px;
+    right: 17px;
+  }
+
+  .hero-carousel-navigation > span {
+    color: #fff;
+    margin-right: auto;
+  }
+
+  .hero-carousel-dots button {
+    background: rgba(255, 255, 255, .34);
+  }
+
+  .hero-carousel-dots button::after {
+    background: #fff;
+  }
+
+  .hero-carousel-arrows button {
+    background: rgba(0, 0, 0, .18);
+    border-color: rgba(255, 255, 255, .34);
+    color: #fff;
+  }
+
+  .review-stories-marquee .review-stories-heading {
+    display: block;
+    margin-bottom: 48px;
+  }
+
+  .review-stories-marquee .review-stories-heading > p:not(.kicker) {
+    margin-top: 24px;
+  }
+
+  .review-marquee-window {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .review-marquee-track {
+    animation-duration: 64s;
+  }
+
+  .review-marquee-card {
+    flex-basis: min(82vw, 340px);
+    min-height: 350px;
+    padding: 25px 22px;
+  }
+
+  .review-marquee-card > p {
+    margin-top: 46px;
+  }
+
+  .review-marquee-card blockquote {
+    font-size: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-carousel-slide,
+  .hero-slide-media img,
+  .hero-carousel-arrows button {
+    transition: none;
+  }
+
+  .hero-carousel-dots button.is-active::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .review-marquee-window {
+    overflow-x: auto;
+  }
+
+  .review-marquee-track {
+    animation: none;
+  }
+
+  .review-marquee-group[aria-hidden="true"] {
+    display: none;
+  }
+}

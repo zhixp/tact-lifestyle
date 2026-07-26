@@ -3,7 +3,7 @@ import { Arrow } from "./components/Icons";
 import { ProductCard } from "./components/Storefront";
 import { ReviewStories } from "./components/ReviewStories";
 import { VideoStories } from "./components/VideoStories";
-import { HeroVideo } from "./components/HeroVideo";
+import { HeroCarousel } from "./components/HeroCarousel";
 import { featuredCollections, products } from "./data";
 
 const latest = [...products]
@@ -30,23 +30,7 @@ const collectionRail = featuredCollections.slice(4);
 export default function Home() {
   return (
     <main id="main">
-      <section className="home-hero home-hero-live" aria-labelledby="hero-title">
-        <picture className="home-hero-picture">
-          <img
-            src="/assets/hero/tact-editorial-desktop-v2.webp"
-            alt="TACT Lifestyle current collection campaign"
-          />
-        </picture>
-        <HeroVideo />
-        <div className="home-hero-shade" />
-        <div className="home-hero-copy home-hero-copy-live">
-          <p>Everyday streetwear</p>
-          <h1 id="hero-title">Wear Your Flex</h1>
-          <Link href="/collections/all">
-            Shop now <Arrow />
-          </Link>
-        </div>
-      </section>
+      <HeroCarousel />
 
       <section className="section category-intro">
         <div className="section-title">
