@@ -1,0 +1,69 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-faq",
+      "blocks": {
+        "processing": {
+          "type": "question",
+          "settings": {
+            "question": "When will my order be processed?",
+            "answer": "<p>TACT processes orders within two business days, Monday to Friday excluding holidays. Tracking information is shared after dispatch.</p>"
+          }
+        },
+        "delivery": {
+          "type": "question",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p>Standard shipping generally takes 3–4 business days. Expedited shipping generally takes 1–3 business days. Carrier delays can affect these estimates.</p>"
+          }
+        },
+        "free_shipping": {
+          "type": "question",
+          "settings": {
+            "question": "Is shipping free?",
+            "answer": "<p>Orders over ₹499 qualify for free standard shipping within India. Other shipping costs are shown at checkout.</p>"
+          }
+        },
+        "return": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return an item?",
+            "answer": "<p>Eligible items may be returned within seven days of delivery. They must be unworn, unwashed, in original condition, and have all tags attached. Sale items are excluded unless otherwise stated.</p>"
+          }
+        },
+        "fee": {
+          "type": "question",
+          "settings": {
+            "question": "How much does a return cost?",
+            "answer": "<p>Customers are responsible for return shipping and each return incurs a ₹125 fee, except when an incorrect or damaged item was received.</p>"
+          }
+        },
+        "refund": {
+          "type": "question",
+          "settings": {
+            "question": "When will I receive my refund?",
+            "answer": "<p>After the returned item is received and inspected, the refund is sent to the original payment method. It can take up to 10 business days to appear.</p>"
+          }
+        },
+        "help": {
+          "type": "question",
+          "settings": {
+            "question": "How can I get help with an order?",
+            "answer": "<p>Email info@tactlifestyle.store or call +91 98937 89469 with your order number.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "processing",
+        "delivery",
+        "free_shipping",
+        "return",
+        "fee",
+        "refund",
+        "help"
+      ],
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

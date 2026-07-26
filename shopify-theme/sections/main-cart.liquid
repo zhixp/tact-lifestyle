@@ -1,0 +1,44 @@
+<section class="t-cart">
+  <header>
+    <p class="t-kicker">TACT / Bag</p>
+    <h1>Your bag.</h1>
+  </header>
+  {% if cart.item_count == 0 %}
+    <div class="t-cart__empty">
+      <p>Your bag is ready for a new flex.</p>
+      <a class="t-button" href="{{ routes.all_products_collection_url }}">Shop new arrivals {% render 'icon', icon: 'arrow' %}</a>
+    </div>
+  {% else %}
+    <form action="{{ routes.cart_url }}" method="post" class="t-cart__form">
+      <div class="t-cart__lines">
+        {% for item in cart.items %}
+          <article class="t-cart__line">
+            <a href="{{ item.url }}">
+              {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.image.alt }}
+            </a>
+            <div>
+              <a href="{{ item.url }}"><h2>{{ item.product.title }}</h2></a>
+              <p>{{ item.variant.title }}</p>
+              <span>{{ item.final_line_price | money }}</span>
+              <label>
+                Quantity
+                <input type="number" name="updates[]" value="{{ item.quantity }}" min="0">
+              </label>
+              <a href="{{ item.url_to_remove }}">Remove</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+      <aside class="t-cart__summary">
+        <p>Subtotal <strong>{{ cart.total_price | money }}</strong></p>
+        <button type="submit" name="update">Update bag</button>
+        <button class="t-button" type="submit" name="checkout">Continue to checkout {% render 'icon', icon: 'arrow' %}</button>
+        <small>Taxes included. Shipping calculated at checkout.</small>
+      </aside>
+    </form>
+  {% endif %}
+</section>
+
+{% schema %}
+{"name": "Main cart", "settings": []}
+{% endschema %}

@@ -1,0 +1,52 @@
+<section class="t-account">
+  <header>
+    <p class="t-kicker">Customer account</p>
+    <h1>Welcome{% if customer.first_name != blank %}, {{ customer.first_name }}{% endif %}.</h1>
+    <p>Orders, addresses and personal details—kept in one clean place.</p>
+  </header>
+  <div class="t-account__grid">
+    <section>
+      <div class="t-account__heading">
+        <h2>Orders</h2>
+        <span>{{ customer.orders_count }} orders</span>
+      </div>
+      {% if customer.orders.size > 0 %}
+        <div class="t-account__orders">
+          {% for order in customer.orders %}
+            <a href="{{ order.customer_url }}">
+              <span>{{ order.name }}</span>
+              <span>{{ order.created_at | date: '%d %b %Y' }}</span>
+              <span>{{ order.financial_status_label }}</span>
+              <strong>{{ order.total_net_amount | money }}</strong>
+              {% render 'icon', icon: 'arrow' %}
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="t-account__empty">
+          <p>Your rotation is waiting.</p>
+          <a class="t-button t-button--dark" href="{{ routes.all_products_collection_url }}">
+            Shop new arrivals {% render 'icon', icon: 'arrow' %}
+          </a>
+        </div>
+      {% endif %}
+    </section>
+    <aside>
+      <h2>Account details</h2>
+      <dl>
+        <div><dt>Name</dt><dd>{{ customer.name }}</dd></div>
+        <div><dt>Email</dt><dd>{{ customer.email }}</dd></div>
+        <div><dt>Default address</dt><dd>{{ customer.default_address | format_address }}</dd></div>
+      </dl>
+      <a href="{{ routes.account_addresses_url }}">Manage addresses {% render 'icon', icon: 'arrow' %}</a>
+      <a href="{{ routes.account_logout_url }}">Sign out</a>
+    </aside>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Customer account",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,175 @@
+<header
+  class="t-header{% if request.page_type == 'index' %} t-header--overlay t-header--desktop-{{ section.settings.homepage_overlay_color }} t-header--mobile-{{ section.settings.homepage_mobile_overlay_color }}{% endif %}"
+  data-site-header
+>
+  <nav class="t-header__links" aria-label="Primary">
+    {% for link in section.settings.menu.links limit: 2 %}
+      <a href="{{ link.url }}">{{ link.title }}</a>
+    {% endfor %}
+  </nav>
+
+  <button class="t-icon-button t-header__menu" type="button" data-menu-open aria-label="Open menu">
+    {% render 'icon', icon: 'menu' %}
+  </button>
+
+  <a class="t-header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+    {% if settings.logo %}
+      {{
+        settings.logo
+        | image_url: width: settings.logo_width
+        | image_tag: class: 't-logo-dark', widths: '100, 132, 180, 240', alt: shop.name
+      }}
+    {% else %}
+      <img class="t-logo-dark" src="{{ 'logo-black.png' | asset_url }}" width="{{ settings.logo_width }}" alt="{{ shop.name }}">
+    {% endif %}
+    {% if settings.logo_light %}
+      {{
+        settings.logo_light
+        | image_url: width: settings.logo_width
+        | image_tag: class: 't-logo-light', widths: '100, 132, 180, 240', alt: shop.name
+      }}
+    {% else %}
+      <img class="t-logo-light" src="{{ 'logo-white.png' | asset_url }}" width="{{ settings.logo_width }}" alt="{{ shop.name }}">
+    {% endif %}
+  </a>
+
+  <div class="t-header__actions">
+    <a class="t-icon-button" href="{{ routes.search_url }}" aria-label="Search">
+      {% render 'icon', icon: 'search' %}
+    </a>
+    <a class="t-icon-button" href="{{ routes.account_url }}" aria-label="Account">
+      {% render 'icon', icon: 'user' %}
+    </a>
+    <a class="t-icon-button" href="{{ routes.cart_url }}" aria-label="Bag with {{ cart.item_count }} items">
+      {% render 'icon', icon: 'bag' %}
+      {% if cart.item_count > 0 %}<span>{{ cart.item_count }}</span>{% endif %}
+    </a>
+    <button class="t-icon-button t-header__desktop-menu" type="button" data-menu-open aria-label="Open menu">
+      {% render 'icon', icon: 'menu' %}
+    </button>
+  </div>
+</header>
+
+<nav class="t-mobile-dock" aria-label="Mobile navigation">
+  <a href="{{ routes.root_url }}">{% render 'icon', icon: 'home' %}<span>Home</span></a>
+  <a href="{{ routes.account_url }}">{% render 'icon', icon: 'user' %}<span>Account</span></a>
+  <a href="{{ routes.search_url }}">{% render 'icon', icon: 'search' %}<span>Search</span></a>
+  <a href="{{ routes.cart_url }}">
+    {% render 'icon', icon: 'bag' %}
+    <span>Bag{% if cart.item_count > 0 %} · {{ cart.item_count }}{% endif %}</span>
+  </a>
+</nav>
+
+<button class="t-overlay" type="button" data-overlay aria-label="Close menu"></button>
+<aside class="t-menu" data-menu aria-hidden="true">
+  <div class="t-menu__bar">
+    <a href="{{ routes.root_url }}">
+      {% if settings.logo %}
+        {{ settings.logo | image_url: width: settings.logo_width | image_tag: alt: shop.name }}
+      {% else %}
+        <img src="{{ 'logo-black.png' | asset_url }}" width="{{ settings.logo_width }}" alt="{{ shop.name }}">
+      {% endif %}
+    </a>
+    <button class="t-icon-button" type="button" data-menu-close aria-label="Close menu">
+      {% render 'icon', icon: 'close' %}
+    </button>
+  </div>
+  <div class="t-menu__panel">
+    <nav class="t-menu__primary" aria-label="Shop">
+      {% for link in section.settings.menu.links %}
+        <a href="{{ link.url }}"><small>0{{ forloop.index }}</small>{{ link.title }}</a>
+      {% else %}
+        <a href="{{ routes.all_products_collection_url }}"><small>01</small>Shop all</a>
+      {% endfor %}
+    </nav>
+    <div class="t-menu__secondary">
+      <div>
+        <p>Customer care</p>
+        {% for link in section.settings.support_menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </div>
+      <div>
+        <p>Collections</p>
+        {% for collection in collections limit: 5 %}
+          <a href="{{ collection.url }}">{{ collection.title }}</a>
+        {% endfor %}
+      </div>
+      {% liquid
+        assign promo_product = section.settings.promo_product
+        assign promo_link = section.settings.promo_link
+        if promo_product != blank
+          assign promo_link = promo_product.url
+        endif
+        assign promo_image = section.settings.promo_image
+        if promo_image == blank and promo_product != blank
+          assign promo_image = promo_product.featured_image
+        endif
+      %}
+      <div class="t-menu__promo">
+        {% if promo_image != blank %}
+          {{
+            promo_image
+            | image_url: width: 900
+            | image_tag: loading: 'lazy', widths: '360, 540, 720, 900', sizes: '(max-width: 749px) 100vw, 32vw', alt: section.settings.promo_heading
+          }}
+        {% else %}
+          <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" loading="lazy" alt="{{ section.settings.promo_heading | escape }}">
+        {% endif %}
+        <a href="{{ promo_link | default: routes.all_products_collection_url }}">
+          <span>
+            <small>{{ section.settings.promo_eyebrow }}</small>
+            <strong>{{ section.settings.promo_heading }}</strong>
+          </span>
+          {% render 'icon', icon: 'arrow' %}
+        </a>
+      </div>
+    </div>
+  </div>
+</aside>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "link_list",
+      "id": "support_menu",
+      "label": "Support menu",
+      "default": "footer"
+    },
+    {
+      "type": "select",
+      "id": "homepage_overlay_color",
+      "label": "Homepage desktop header colour",
+      "default": "dark",
+      "options": [
+        {"value": "dark", "label": "Dark"},
+        {"value": "light", "label": "Light"}
+      ]
+    },
+    {
+      "type": "select",
+      "id": "homepage_mobile_overlay_color",
+      "label": "Homepage mobile header colour",
+      "default": "light",
+      "options": [
+        {"value": "dark", "label": "Dark"},
+        {"value": "light", "label": "Light"}
+      ]
+    },
+    {"type": "header", "content": "Menu promotion"},
+    {"type": "image_picker", "id": "promo_image", "label": "Promo image"},
+    {"type": "product", "id": "promo_product", "label": "Promo product"},
+    {"type": "text", "id": "promo_eyebrow", "label": "Promo eyebrow", "default": "Latest from TACT"},
+    {"type": "text", "id": "promo_heading", "label": "Promo heading", "default": "8-Bit Attitude"},
+    {"type": "url", "id": "promo_link", "label": "Promo custom link"}
+  ]
+}
+{% endschema %}

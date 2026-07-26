@@ -1,0 +1,81 @@
+<section class="t-collection-tiles">
+  <div class="t-section-heading">
+    <div>
+      <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+      <h2>{{ section.settings.heading }}</h2>
+    </div>
+    <div>
+      <p>{{ section.settings.copy }}</p>
+      <a class="t-text-link" href="{{ routes.collections_url }}">
+        {{ section.settings.link_label }} {% render 'icon', icon: 'arrow' %}
+      </a>
+    </div>
+  </div>
+  <div class="t-collection-tiles__grid">
+    {% for block in section.blocks %}
+      {% liquid
+        assign chosen_collection = block.settings.collection
+        if chosen_collection == blank and block.settings.fallback_handle != blank
+          assign chosen_collection = collections[block.settings.fallback_handle]
+        endif
+      %}
+      <a
+        href="{{ chosen_collection.url | default: routes.all_products_collection_url }}"
+        class="t-collection-tile"
+        {{ block.shopify_attributes }}
+      >
+        {% if chosen_collection.featured_image %}
+          {{
+            chosen_collection.featured_image
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              widths: '320, 480, 640, 900',
+              sizes: '(max-width: 749px) 72vw, 25vw',
+              alt: chosen_collection.title
+          }}
+        {% else %}
+          {{ 'collection-1' | placeholder_svg_tag: 't-collection-tile__placeholder' }}
+        {% endif %}
+        <span class="t-collection-tile__number">0{{ forloop.index }}</span>
+        <strong>{{ chosen_collection.title | default: block.settings.title }}</strong>
+        {% render 'icon', icon: 'arrow' %}
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Compact collection tiles",
+  "max_blocks": 4,
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "01 / Find your everyday drip"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Explore streetwear by category."},
+    {"type": "text", "id": "copy", "label": "Copy", "default": "Men, women and unisex pieces from the current TACT catalog."},
+    {"type": "text", "id": "link_label", "label": "Link label", "default": "Shop all products"}
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {"type": "collection", "id": "collection", "label": "Collection"},
+        {"type": "text", "id": "fallback_handle", "label": "Current TACT collection handle"},
+        {"type": "text", "id": "title", "label": "Fallback title", "default": "Collection"}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Compact collection tiles",
+      "blocks": [
+        {"type": "collection", "settings": {"fallback_handle": "new-arrivals", "title": "New arrivals"}},
+        {"type": "collection", "settings": {"fallback_handle": "men", "title": "Men"}},
+        {"type": "collection", "settings": {"fallback_handle": "shop-womens", "title": "Women"}},
+        {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}}
+      ]
+    }
+  ]
+}
+{% endschema %}

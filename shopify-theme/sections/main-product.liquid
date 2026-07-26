@@ -1,0 +1,231 @@
+{% liquid
+  assign selected_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+  assign saving_percent = 0
+  if selected_variant.compare_at_price > selected_variant.price
+    assign saving_amount = selected_variant.compare_at_price | minus: selected_variant.price
+    assign saving_percent = saving_amount | times: 100.0 | divided_by: selected_variant.compare_at_price | round
+  endif
+%}
+
+<section class="t-product t-product--conversion">
+  <div class="t-product__gallery">
+    {% for media in product.media %}
+      <figure class="{% if forloop.first %}t-product__gallery-primary{% endif %}">
+        {{
+          media.preview_image
+          | image_url: width: 1800
+          | image_tag:
+            loading: 'lazy',
+            widths: '500, 750, 1000, 1300, 1600, 1800',
+            sizes: '(max-width: 749px) 92vw, (min-width: 1200px) 66vw, 58vw',
+            alt: media.alt
+        }}
+        <figcaption>
+          {{ forloop.index | prepend: '0' | slice: -2, 2 }} /
+          {{ product.media.size | prepend: '0' | slice: -2, 2 }}
+        </figcaption>
+      </figure>
+    {% endfor %}
+  </div>
+
+  <div class="t-product__detail">
+    <p class="t-product__type">{{ product.type | default: 'TACT Lifestyle' }}</p>
+    <h1>{{ product.title }}</h1>
+    <div class="t-product__price-row">
+      <p class="t-product__price" data-product-price>
+        {% if selected_variant.compare_at_price > selected_variant.price %}
+          <s>{{ selected_variant.compare_at_price | money }}</s>
+        {% endif %}
+        <strong>{{ selected_variant.price | money }}</strong>
+      </p>
+      {% if saving_percent > 0 %}
+        <span class="t-product__saving">Save {{ saving_percent }}%</span>
+      {% endif %}
+    </div>
+    <p class="t-product__tax">MRP inclusive of all taxes</p>
+    <p class="t-product__shipping-note">Shipping calculated at checkout.</p>
+
+    {% form 'product', product, id: product_form_id, class: 't-product-form' %}
+      {% unless product.has_only_default_variant %}
+        <div class="t-variant-heading">
+          <span>Available size</span>
+          <button type="button" data-size-guide-open>
+            {% render 'icon', icon: 'ruler' %} Sizing guide
+          </button>
+        </div>
+        <div class="t-variant-list">
+          {% for variant in product.variants %}
+            <label class="{% unless variant.available %}is-sold-out{% endunless %}">
+              <input
+                type="radio"
+                name="id"
+                value="{{ variant.id }}"
+                data-price="{{ variant.price | money | escape }}"
+                data-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money | escape }}{% endif %}"
+                {% if variant.id == selected_variant.id %}checked{% endif %}
+                {% unless variant.available %}disabled{% endunless %}
+              >
+              <span>{{ variant.title }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      {% else %}
+        <input type="hidden" name="id" value="{{ selected_variant.id }}">
+      {% endunless %}
+
+      <div class="t-product__purchase">
+        <label class="t-product__quantity">
+          <span class="visually-hidden">Quantity</span>
+          <button type="button" data-quantity-minus aria-label="Decrease quantity">−</button>
+          <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
+          <button type="button" data-quantity-plus aria-label="Increase quantity">+</button>
+        </label>
+        <button class="t-product__add" type="submit" name="add" {% unless selected_variant.available %}disabled{% endunless %}>
+          <span>{% if selected_variant.available %}Add to cart{% else %}Sold out{% endif %}</span>
+        </button>
+      </div>
+      <div class="t-product__buy">{{ form | payment_button }}</div>
+      <div class="t-product-form__message" data-product-message role="status"></div>
+    {% endform %}
+
+    <section class="t-product__offers" aria-label="Current offers">
+      <div class="t-product__offers-title">
+        <span>{{ section.settings.offer_heading }}</span>
+        <small>Available now</small>
+      </div>
+      <div class="t-product__offer-card">
+        {% render 'icon', icon: 'tag' %}
+        <div>
+          <strong>{{ section.settings.prepaid_offer }}</strong>
+          <span>{{ section.settings.prepaid_offer_note }}</span>
+        </div>
+      </div>
+      <div class="t-product__offer-foot">
+        <span>{{ section.settings.shipping_offer }}</span>
+        <span>{{ section.settings.return_offer }}</span>
+      </div>
+    </section>
+
+    <section class="t-product__value">
+      <p class="t-kicker">What you get</p>
+      <h2>Built into every order.</h2>
+      <div class="t-product__value-list">
+        <article>
+          {% render 'icon', icon: 'fabric' %}
+          <div>
+            <strong>{{ section.settings.fabric_heading }}</strong>
+            <span>{{ section.settings.fabric_copy }}</span>
+          </div>
+        </article>
+        <article>
+          {% render 'icon', icon: 'card' %}
+          <div>
+            <strong>Flexible payment options</strong>
+            <span>Prepaid savings available at checkout</span>
+          </div>
+        </article>
+        <article>
+          {% render 'icon', icon: 'truck' %}
+          <div>
+            <strong>Fast domestic delivery</strong>
+            <span>Standard delivery generally in 3–4 business days</span>
+          </div>
+        </article>
+        <article>
+          {% render 'icon', icon: 'return' %}
+          <div>
+            <strong>Seven-day eligible returns</strong>
+            <span>For unworn pieces with original tags</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="t-product__information">
+      <div class="t-product__tab-list" role="tablist">
+        <button class="is-active" type="button" data-product-tab="fit">Size & fit</button>
+        <button type="button" data-product-tab="care">Fabric & care</button>
+        <button type="button" data-product-tab="about">About</button>
+        <button type="button" data-product-tab="shipping">Shipping</button>
+        <button type="button" data-product-tab="returns">Returns</button>
+      </div>
+      <div class="t-product__tab-panel is-active" data-product-panel="fit">
+        <h3>Size & fit</h3>
+        <div class="rte">{{ section.settings.size_guide }}</div>
+      </div>
+      <div class="t-product__tab-panel" data-product-panel="care">
+        <h3>Fabric & care</h3>
+        <div class="rte">{{ section.settings.fabric_care }}</div>
+      </div>
+      <div class="t-product__tab-panel" data-product-panel="about">
+        <h3>Product details</h3>
+        <div class="rte">{{ product.description }}</div>
+      </div>
+      <div class="t-product__tab-panel" data-product-panel="shipping">
+        <h3>Shipping</h3>
+        <div class="rte">{{ section.settings.shipping_copy }}</div>
+        <a href="{{ shop.shipping_policy.url }}">Read the shipping policy</a>
+      </div>
+      <div class="t-product__tab-panel" data-product-panel="returns">
+        <h3>Returns & exchange</h3>
+        <div class="rte">{{ section.settings.return_copy }}</div>
+        <a href="{{ shop.refund_policy.url }}">Read the return policy</a>
+      </div>
+    </section>
+  </div>
+</section>
+
+<button class="t-overlay t-size-overlay" type="button" data-size-guide-close aria-label="Close size guide"></button>
+<aside class="t-size-guide" data-size-guide aria-hidden="true">
+  <div class="t-size-guide__bar">
+    <span>TACT size guide</span>
+    <button class="t-icon-button" type="button" data-size-guide-close aria-label="Close size guide">{% render 'icon', icon: 'close' %}</button>
+  </div>
+  <div class="t-size-guide__body">
+    <h2>Find your intended fit.</h2>
+    {{ section.settings.size_guide }}
+  </div>
+</aside>
+
+{% schema %}
+{
+  "name": "Main product",
+  "settings": [
+    {"type": "header", "content": "Offer card"},
+    {"type": "text", "id": "offer_heading", "label": "Heading", "default": "Special offers"},
+    {"type": "text", "id": "prepaid_offer", "label": "Prepaid offer", "default": "Extra 5% off prepaid orders"},
+    {"type": "text", "id": "prepaid_offer_note", "label": "Prepaid note", "default": "Applied to eligible prepaid orders at checkout."},
+    {"type": "text", "id": "shipping_offer", "label": "Shipping offer", "default": "Free shipping over ₹499"},
+    {"type": "text", "id": "return_offer", "label": "Return offer", "default": "7-day eligible returns"},
+    {"type": "header", "content": "Value highlights"},
+    {"type": "text", "id": "fabric_heading", "label": "Fabric highlight", "default": "Premium construction"},
+    {"type": "text", "id": "fabric_copy", "label": "Fabric highlight copy", "default": "Designed for everyday structure and comfort"},
+    {"type": "header", "content": "Product information"},
+    {
+      "type": "richtext",
+      "id": "size_guide",
+      "label": "Size and fit",
+      "default": "<p>Add the approved garment-specific size chart here. Sizes, prices and inventory remain controlled by each Shopify product.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "fabric_care",
+      "label": "Fabric and care",
+      "default": "<p>Follow the care label supplied with the garment. Wash similar colours together and avoid direct heat on print or embroidery.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "shipping_copy",
+      "label": "Shipping summary",
+      "default": "<p>Free standard shipping is available on Indian orders over ₹499. Orders are processed within two business days and standard delivery generally takes 3–4 business days.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "return_copy",
+      "label": "Return summary",
+      "default": "<p>Eligible unworn and unwashed items with original tags can be returned within seven days. A ₹125 return-shipping fee applies.</p>"
+    }
+  ]
+}
+{% endschema %}

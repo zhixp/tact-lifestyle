@@ -1,0 +1,28 @@
+{% if product != blank %}
+  <div class="t-video-product">
+    <a href="{{ product.url }}">
+      {% if product.featured_image %}
+        {{
+          product.featured_image
+          | image_url: width: 120
+          | image_tag: loading: 'lazy', widths: '60, 90, 120', sizes: '48px', alt: ''
+        }}
+      {% endif %}
+      <span>
+        <strong>{{ product.title }}</strong>
+        <small>{{ product.price | money }}</small>
+      </span>
+    </a>
+    <form method="post" action="{{ routes.cart_add_url }}" data-video-quick-add>
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <input type="hidden" name="quantity" value="1">
+      <button
+        type="submit"
+        aria-label="{% if product.available %}Quick add {{ product.title | escape }}{% else %}{{ product.title | escape }} is sold out{% endif %}"
+        {% unless product.available %}disabled{% endunless %}
+      >
+        {% if product.available %}+{% else %}×{% endif %}
+      </button>
+    </form>
+  </div>
+{% endif %}

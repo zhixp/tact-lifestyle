@@ -1,23 +1,73 @@
 # TACT media provenance
 
-Every image, logo, and video used by the demo was downloaded from TACT Lifestyle's own Shopify storefront. No BLUORNG media is included.
+The storefront contains only TACT Lifestyle content from:
 
-| Local asset | TACT source |
-| --- | --- |
-| `logo-black.png` | `https://www.tactlifestyle.store/cdn/shop/files/Tact_Logo_png.png?v=1755952496&width=520` |
-| `logo-white.png` | `https://www.tactlifestyle.store/cdn/shop/files/Tact_Logo_White_011b2713-8485-44e7-abef-61304978822b.png?v=1755594454&width=760` |
-| `hero-signature.jpg` | `https://www.tactlifestyle.store/cdn/shop/files/Signature-All-Over-Sweatshirt-Tactlifestyle-27805123641414.webp?v=1767907297&width=2000` |
-| `campaign-banner.webp` | `https://www.tactlifestyle.store/cdn/shop/files/banner.png?v=1769516115&width=2000` |
-| `category-men.jpg` | `https://www.tactlifestyle.store/cdn/shop/collections/DSC05822.webp?v=1766923549&width=1500` |
-| `category-coords.jpg` | `https://www.tactlifestyle.store/cdn/shop/collections/DSC05577.webp?v=1766933757&width=1500` |
-| `category-joggers.jpg` | `https://www.tactlifestyle.store/cdn/shop/collections/DSC05387.webp?v=1766693631&width=1500` |
-| `category-hoodies.jpg` | `https://www.tactlifestyle.store/cdn/shop/collections/DSC06010.webp?v=1766921211&width=1500` |
-| `category-neon.jpg` | `https://www.tactlifestyle.store/cdn/shop/collections/DSC06299.jpg?v=1766861058&width=1500` |
-| `category-sitcom.jpg` | `https://www.tactlifestyle.store/cdn/shop/collections/DSC05397.webp?v=1766932004&width=1500` |
-| `product-web-madison.webp` | `https://www.tactlifestyle.store/cdn/shop/files/Artboard_1_03d28397-1c98-4f76-8d7d-7c7c74d39708.png?v=1777193105&width=940` |
-| `product-pacman.webp` | `https://www.tactlifestyle.store/cdn/shop/files/Artboard5_1.png?v=1781103109&width=940` |
-| `product-enchantment.webp` | `https://www.tactlifestyle.store/cdn/shop/files/EnchantmentSl02.png?v=1784988789&width=940` |
-| `product-cosmic.webp` | `https://www.tactlifestyle.store/cdn/shop/files/Artboard1.png?v=1778259059&width=940` |
-| `product-classic-black.webp` | `https://www.tactlifestyle.store/cdn/shop/files/Artboard_1_4.png?v=1777541800&width=940` |
-| `product-puzzle.webp` | `https://www.tactlifestyle.store/cdn/shop/files/Artboard1_1.png?v=1777540254&width=940` |
-| `lookbook.mp4` | `https://www.tactlifestyle.store/cdn/shop/videos/c/vp/f394eadd80164f69adc267967492e765/f394eadd80164f69adc267967492e765.HD-1080p-7.2Mbps-68304001.mp4?v=0` |
+1. the approved Drive folder:
+   `https://drive.google.com/drive/folders/1-bvIinmrVqSPadekVdenvn2rckYmhfpa`
+2. the live store:
+   `https://www.tactlifestyle.store/`
+
+BLUORNG and Bonkers Corner were used only to study layout, navigation and
+commerce interaction patterns. Their media, code, legal text, product copy and
+branding are not bundled.
+
+## Live catalogue import
+
+The public Shopify catalogue feeds were used to capture the live store state:
+
+- 67 products;
+- 292 variants;
+- 408 product images;
+- 29 collections;
+- 265 product-to-collection memberships.
+
+`scripts/import-tact-store.mjs` stores the catalogue in `app/catalog.json` and
+optimizes the live media to local WebP files:
+
+- `public/assets/products/<product-handle>/<image-number>.webp`
+- `public/assets/collections/<collection-handle>.webp`
+
+Each product retains its live title, vendor, description HTML, prices,
+compare-at price, available sizes, SKU/variant information, tags and collection
+memberships.
+
+## Hero and logos
+
+- Desktop campaign: `public/assets/hero/tact-current-desktop.png`
+- Edited desktop derivative:
+  `public/assets/hero/tact-editorial-desktop-v2.webp`
+- Current mobile campaign: `public/assets/hero/tact-current-mobile.mp4`
+- Six current vertical campaign films:
+  `public/assets/videos/reel-01.mp4` through
+  `public/assets/videos/reel-06.mp4`
+- TACT black/white logos: `public/assets/logo-black.png` and
+  `public/assets/logo-white.png`
+
+The edited desktop derivative was produced from the TACT desktop campaign only:
+the people, garments and ordering were preserved while the sticker outlines
+and split background were replaced with a single studio scene. No reference
+brand media was used. The Shopify fallback is
+`shopify-theme/assets/hero-editorial-v2.webp`; the original source remains
+untouched.
+
+The 58.8 MB mobile video is not embedded in the ZIP because it would be
+inappropriate as a theme asset; the hero section provides desktop and mobile
+Shopify video pickers plus a live TACT mobile-video fallback.
+
+The six reel files are used by the local demo. They are intentionally not
+bundled into the theme ZIP; the Shopify video-story section supports up to 16
+video blocks with current TACT CDN fallbacks and two product pickers per block.
+
+## Reviews
+
+Homepage and demo product-page proof uses only approved Judge.me review records
+published by TACT on its live store. Bonkers Corner review copy is not used.
+The Shopify product template provides an app-block location for TACT’s existing
+Judge.me integration.
+
+## Policies and company copy
+
+`app/content.json` contains the exact live TACT privacy, shipping, refund, About
+and Contact content captured on 26 July 2026. Legal pages display TACT’s own
+published text. The Shopify theme continues to render the store’s native policy
+objects, so future edits in Shopify Admin appear automatically.

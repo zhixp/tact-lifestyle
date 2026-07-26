@@ -1,0 +1,18 @@
+<section class="t-apps">
+  {% for block in section.blocks %}
+    {% render block %}
+  {% endfor %}
+</section>
+
+{% schema %}
+{
+  "name": "App integrations",
+  "settings": [],
+  "blocks": [
+    {"type": "@app"}
+  ],
+  "presets": [
+    {"name": "App integrations"}
+  ]
+}
+{% endschema %}

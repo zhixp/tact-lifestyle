@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { StorefrontShell } from "./components/Storefront";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TACT Lifestyle — Own Your Flex",
+  title: "TACT Lifestyle — Wear Your Flex",
   description:
     "A responsive storefront concept for TACT Lifestyle, built with TACT-owned campaign and product media.",
   icons: {
@@ -23,7 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <StorefrontShell>{children}</StorefrontShell>
+      </body>
     </html>
   );
 }

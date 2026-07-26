@@ -1,0 +1,48 @@
+<section class="t-faq">
+  <header class="t-faq__hero">
+    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.intro }}</p>
+  </header>
+
+  <div class="t-faq__layout">
+    <aside>
+      <p>Customer care</p>
+      <a href="{{ shop.shipping_policy.url }}">Shipping</a>
+      <a href="{{ shop.refund_policy.url }}">Returns & exchange</a>
+      <a href="{{ shop.privacy_policy.url }}">Privacy</a>
+      <a href="/pages/contact">Still need help? {% render 'icon', icon: 'arrow' %}</a>
+    </aside>
+    <div class="t-faq__questions">
+      {% for block in section.blocks %}
+        <details {% if forloop.first %}open{% endif %} {{ block.shopify_attributes }}>
+          <summary>{{ block.settings.question }}</summary>
+          <div class="rte">{{ block.settings.answer }}</div>
+        </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "TACT / Help"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Questions, answered."},
+    {"type": "textarea", "id": "intro", "label": "Introduction", "default": "Everything important about ordering, delivery, returns and sizing."}
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        {"type": "text", "id": "question", "label": "Question"},
+        {"type": "richtext", "id": "answer", "label": "Answer"}
+      ]
+    }
+  ],
+  "max_blocks": 30,
+  "presets": [{"name": "FAQ"}]
+}
+{% endschema %}

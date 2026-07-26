@@ -1,0 +1,18 @@
+{
+  "current": {
+    "color_ink": "#0b0b0c",
+    "color_paper": "#f3f3f1",
+    "color_accent": "#1746ff",
+    "card_radius": 18,
+    "logo_width": 132
+  },
+  "presets": {
+    "TACT Editorial": {
+      "color_ink": "#0b0b0c",
+      "color_paper": "#f3f3f1",
+      "color_accent": "#1746ff",
+      "card_radius": 18,
+      "logo_width": 132
+    }
+  }
+}

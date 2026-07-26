@@ -1,0 +1,20 @@
+<section class="t-register">
+  <div>
+    <p class="t-kicker">Customer account</p>
+    <h1>Activate your account.</h1>
+    <p>Create a password to finish setting up your TACT account.</p>
+    {% form 'activate_customer_password' %}
+      {{ form.errors | default_errors }}
+      <label for="ActivatePassword">Password</label>
+      <input id="ActivatePassword" type="password" name="customer[password]" autocomplete="new-password" required>
+      <label for="ActivatePasswordConfirmation">Confirm password</label>
+      <input id="ActivatePasswordConfirmation" type="password" name="customer[password_confirmation]" autocomplete="new-password" required>
+      <button class="t-button t-button--dark" type="submit">Activate account {% render 'icon', icon: 'arrow' %}</button>
+      <button class="t-account-decline" type="submit" name="decline">Decline invitation</button>
+    {% endform %}
+  </div>
+</section>
+
+{% schema %}
+{"name":"Activate customer account","settings":[]}
+{% endschema %}

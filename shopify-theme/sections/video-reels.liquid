@@ -1,0 +1,114 @@
+<section class="t-video-stories" data-video-stories>
+  <div class="t-video-stories__intro">
+    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+    <h2>{{ section.settings.heading }}</h2>
+    <div>{{ section.settings.copy }}</div>
+    {% if section.settings.link_label != blank %}
+      <a class="t-text-link" href="{{ section.settings.link | default: routes.all_products_collection_url }}">
+        {{ section.settings.link_label }} {% render 'icon', icon: 'arrow' %}
+      </a>
+    {% endif %}
+    <div class="t-video-stories__controls" aria-label="Browse campaign films">
+      <button type="button" data-video-rail-prev aria-label="Previous films">{% render 'icon', icon: 'arrow' %}</button>
+      <button type="button" data-video-rail-next aria-label="Next films">{% render 'icon', icon: 'arrow' %}</button>
+    </div>
+  </div>
+
+  <div class="t-video-stories__rail" data-video-rail tabindex="0" role="region" aria-label="Shoppable campaign films">
+    {% for block in section.blocks %}
+      {% liquid
+        assign fallback_video = ''
+        case forloop.index
+          when 1
+            assign fallback_video = 'https://cdn.shopify.com/videos/c/vp/aa1ce13283a44814b35563c701fc3558/aa1ce13283a44814b35563c701fc3558.HD-1080p-7.2Mbps-68304723.mp4?v=0'
+          when 2
+            assign fallback_video = 'https://cdn.shopify.com/videos/c/vp/501200fba9844a6fbb4e8a8b2566246a/501200fba9844a6fbb4e8a8b2566246a.HD-1080p-7.2Mbps-68304241.mp4?v=0'
+          when 3
+            assign fallback_video = 'https://cdn.shopify.com/videos/c/vp/73cad94904e7413a86eded2e0287f1ef/73cad94904e7413a86eded2e0287f1ef.HD-1080p-7.2Mbps-68304242.mp4?v=0'
+          when 4
+            assign fallback_video = 'https://cdn.shopify.com/videos/c/vp/8813b5591ea74f4da9c75d6a2b07b60e/8813b5591ea74f4da9c75d6a2b07b60e.HD-1080p-7.2Mbps-68304244.mp4?v=0'
+          when 5
+            assign fallback_video = 'https://cdn.shopify.com/videos/c/vp/f394eadd80164f69adc267967492e765/f394eadd80164f69adc267967492e765.HD-1080p-7.2Mbps-68304001.mp4?v=0'
+          when 6
+            assign fallback_video = 'https://cdn.shopify.com/videos/c/vp/cf9c711010814858bac9fc77053ca824/cf9c711010814858bac9fc77053ca824.HD-1080p-7.2Mbps-65674832.mp4?v=0'
+        endcase
+        assign product_one = block.settings.product
+        if product_one == blank and block.settings.fallback_product_handle != blank
+          assign product_one = all_products[block.settings.fallback_product_handle]
+        endif
+        assign product_two = block.settings.product_2
+      %}
+      <article class="t-video-story" {{ block.shopify_attributes }}>
+        {% if block.settings.video %}
+          {{
+            block.settings.video
+            | video_tag:
+              image_size: '700x',
+              autoplay: false,
+              loop: true,
+              muted: true,
+              controls: false,
+              preload: 'metadata',
+              class: 't-video-story__video'
+          }}
+        {% elsif section.settings.use_tact_fallbacks and fallback_video != blank %}
+          <video class="t-video-story__video" src="{{ fallback_video }}" muted loop playsinline preload="metadata"></video>
+        {% else %}
+          {{ 'image' | placeholder_svg_tag: 't-video-story__placeholder' }}
+        {% endif %}
+        <div class="t-video-story__shade"></div>
+        <span>0{{ forloop.index }} / {{ block.settings.label }}</span>
+        <button class="t-video-story__toggle" type="button" data-video-toggle aria-label="Pause {{ block.settings.label | escape }}">
+          <span aria-hidden="true">Ⅱ</span>
+        </button>
+        {% if product_one != blank or product_two != blank %}
+          <div class="t-video-story__products">
+            {% render 'video-product-chip', product: product_one %}
+            {% render 'video-product-chip', product: product_two %}
+          </div>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TACT video stories",
+  "max_blocks": 16,
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "04 / In motion"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "TACT in motion."},
+    {"type": "richtext", "id": "copy", "label": "Copy", "default": "<p>Campaign films, close-up details and the pieces in each look.</p>"},
+    {"type": "url", "id": "link", "label": "Link"},
+    {"type": "text", "id": "link_label", "label": "Link label", "default": "Meet TACT"},
+    {"type": "checkbox", "id": "use_tact_fallbacks", "label": "Use current TACT campaign videos until uploads are selected", "default": true}
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Shoppable video",
+      "settings": [
+        {"type": "video", "id": "video", "label": "Video"},
+        {"type": "text", "id": "label", "label": "Label", "default": "Campaign film"},
+        {"type": "product", "id": "product", "label": "Featured product"},
+        {"type": "product", "id": "product_2", "label": "Second featured product"},
+        {"type": "text", "id": "fallback_product_handle", "label": "Demo product handle", "info": "Used only until a featured product is selected."}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TACT video stories",
+      "blocks": [
+        {"type": "video", "settings": {"label": "Pretty Annoying", "fallback_product_handle": "pretty-annoying-cropped-top-women"}},
+        {"type": "video", "settings": {"label": "Graphic state", "fallback_product_handle": "distracted-skull-sleeveless-tee"}},
+        {"type": "video", "settings": {"label": "Move in TACT", "fallback_product_handle": "ribbed-top-signature-shorts-co-ord-set-onion-women"}},
+        {"type": "video", "settings": {"label": "Two ways to flex", "fallback_product_handle": "neon-skull-pop-oversized-tee-men"}},
+        {"type": "video", "settings": {"label": "Built to stand out", "fallback_product_handle": "ghost-of-tsushima-cream-men"}},
+        {"type": "video", "settings": {"label": "Outside the lines", "fallback_product_handle": "tact-all-over-signature-tee"}}
+      ]
+    }
+  ]
+}
+{% endschema %}

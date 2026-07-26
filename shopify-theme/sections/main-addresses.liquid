@@ -1,0 +1,62 @@
+<section class="t-customer-page">
+  <header>
+    <p class="t-kicker">Customer account</p>
+    <h1>Your addresses.</h1>
+    <a href="{{ routes.account_url }}">Back to account {% render 'icon', icon: 'arrow' %}</a>
+  </header>
+  <div class="t-customer-page__grid">
+    <section>
+      <h2>Saved addresses</h2>
+      {% if customer.addresses_count > 0 %}
+        <div class="t-address-list">
+          {% for address in customer.addresses %}
+            <article>
+              {% if address == customer.default_address %}<span>Default</span>{% endif %}
+              {{ address | format_address }}
+              {% form 'customer_address', address %}
+                <label for="AddressFirstName_{{ form.id }}">First name</label>
+                <input id="AddressFirstName_{{ form.id }}" type="text" name="address[first_name]" value="{{ form.first_name }}">
+                <label for="AddressLastName_{{ form.id }}">Last name</label>
+                <input id="AddressLastName_{{ form.id }}" type="text" name="address[last_name]" value="{{ form.last_name }}">
+                <label for="AddressAddress1_{{ form.id }}">Address</label>
+                <input id="AddressAddress1_{{ form.id }}" type="text" name="address[address1]" value="{{ form.address1 }}">
+                <label for="AddressCity_{{ form.id }}">City</label>
+                <input id="AddressCity_{{ form.id }}" type="text" name="address[city]" value="{{ form.city }}">
+                <label for="AddressZip_{{ form.id }}">PIN code</label>
+                <input id="AddressZip_{{ form.id }}" type="text" name="address[zip]" value="{{ form.zip }}">
+                <label for="AddressPhone_{{ form.id }}">Phone</label>
+                <input id="AddressPhone_{{ form.id }}" type="tel" name="address[phone]" value="{{ form.phone }}">
+                <button class="t-button t-button--dark" type="submit">Update address</button>
+              {% endform %}
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No saved addresses yet.</p>
+      {% endif %}
+    </section>
+    <aside>
+      <h2>Add an address</h2>
+      {% form 'customer_address', customer.new_address %}
+        {{ form.errors | default_errors }}
+        <label for="AddressNewFirstName">First name</label>
+        <input id="AddressNewFirstName" type="text" name="address[first_name]" value="{{ form.first_name }}">
+        <label for="AddressNewLastName">Last name</label>
+        <input id="AddressNewLastName" type="text" name="address[last_name]" value="{{ form.last_name }}">
+        <label for="AddressNewAddress1">Address</label>
+        <input id="AddressNewAddress1" type="text" name="address[address1]" value="{{ form.address1 }}" required>
+        <label for="AddressNewCity">City</label>
+        <input id="AddressNewCity" type="text" name="address[city]" value="{{ form.city }}" required>
+        <label for="AddressNewZip">PIN code</label>
+        <input id="AddressNewZip" type="text" name="address[zip]" value="{{ form.zip }}" required>
+        <label for="AddressNewPhone">Phone</label>
+        <input id="AddressNewPhone" type="tel" name="address[phone]" value="{{ form.phone }}">
+        <button class="t-button t-button--dark" type="submit">Add address {% render 'icon', icon: 'arrow' %}</button>
+      {% endform %}
+    </aside>
+  </div>
+</section>
+
+{% schema %}
+{"name":"Customer addresses","settings":[]}
+{% endschema %}

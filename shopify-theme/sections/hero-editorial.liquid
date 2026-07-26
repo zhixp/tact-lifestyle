@@ -1,0 +1,149 @@
+{% liquid
+  assign hero_link = section.settings.link
+  if section.settings.product != blank
+    assign hero_link = section.settings.product.url
+  endif
+  assign desktop_overlay_alpha = section.settings.overlay_opacity | divided_by: 100.0
+  assign mobile_overlay_alpha = section.settings.mobile_overlay_opacity | divided_by: 100.0
+  assign desktop_overlay_color = section.settings.overlay_color | color_modify: 'alpha', desktop_overlay_alpha
+  assign mobile_overlay_color = section.settings.mobile_overlay_color | color_modify: 'alpha', mobile_overlay_alpha
+%}
+<section
+  class="t-hero t-hero--{{ section.settings.height }} t-hero--copy-{{ section.settings.content_alignment }}"
+  data-hero-speed="{{ section.settings.playback_speed }}"
+  style="
+    --hero-position: {{ section.settings.desktop_position }};
+    --hero-mobile-position: {{ section.settings.mobile_position }};
+    --hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --hero-mobile-overlay: {{ section.settings.mobile_overlay_opacity | divided_by: 100.0 }};
+    --hero-overlay-color: {{ desktop_overlay_color }};
+    --hero-mobile-overlay-color: {{ mobile_overlay_color }};
+    --hero-copy-color: {{ section.settings.text_color }};
+    --hero-mobile-copy-color: {{ section.settings.mobile_text_color }};
+  "
+>
+  <div class="t-hero__desktop-media">
+    {% if section.settings.desktop_video != blank %}
+      {{
+        section.settings.desktop_video
+        | video_tag:
+          class: 't-hero__desktop-video',
+          autoplay: true,
+          muted: true,
+          loop: true,
+          controls: false,
+          playsinline: true,
+          preload: 'auto',
+          image_size: '2400x'
+      }}
+    {% elsif section.settings.image != blank %}
+      {{
+        section.settings.image
+        | image_url: width: 2400
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '750, 1100, 1500, 2000, 2400',
+          sizes: '100vw',
+          alt: section.settings.image.alt
+      }}
+    {% else %}
+      <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="{{ section.settings.heading | escape }}" fetchpriority="high">
+    {% endif %}
+  </div>
+
+  <div class="t-hero__mobile-media">
+    {% if section.settings.mobile_video != blank %}
+      {{
+        section.settings.mobile_video
+        | video_tag:
+          class: 't-hero__mobile-video',
+          autoplay: true,
+          muted: true,
+          loop: true,
+          controls: false,
+          playsinline: true,
+          preload: 'auto',
+          image_size: '1000x'
+      }}
+    {% elsif section.settings.mobile_image != blank %}
+      {{
+        section.settings.mobile_image
+        | image_url: width: 1200
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '500, 750, 1000, 1200',
+          sizes: '100vw',
+          alt: section.settings.mobile_image.alt
+      }}
+    {% else %}
+      <video class="t-hero__mobile-video" autoplay muted loop playsinline preload="auto">
+        <source src="https://cdn.shopify.com/videos/c/o/v/86c1a15e84d04318bad0cd353bad88dd.mp4" type="video/mp4">
+      </video>
+    {% endif %}
+  </div>
+
+  <div class="t-hero__shade"></div>
+  <p class="t-hero__edition">{{ section.settings.edition }}</p>
+  <div class="t-hero__copy">
+    <p>{{ section.settings.eyebrow }}</p>
+    <h1>{{ section.settings.heading }}</h1>
+    {% if section.settings.button_label != blank %}
+      <a href="{{ hero_link | default: routes.all_products_collection_url }}">
+        {{ section.settings.button_label }} {% render 'icon', icon: 'arrow' %}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial hero",
+  "tag": "section",
+  "settings": [
+    {"type": "header", "content": "Desktop media"},
+    {"type": "video", "id": "desktop_video", "label": "Desktop video", "info": "Optional. A selected video takes priority over the desktop image."},
+    {"type": "image_picker", "id": "image", "label": "Desktop image or GIF"},
+    {"type": "header", "content": "Mobile media"},
+    {"type": "video", "id": "mobile_video", "label": "Mobile video", "info": "Optional. A selected video takes priority over the mobile image or GIF."},
+    {"type": "image_picker", "id": "mobile_image", "label": "Mobile image, GIF or video poster"},
+    {"type": "range", "id": "playback_speed", "label": "Video playback speed", "min": 0.5, "max": 2, "step": 0.25, "default": 1.5},
+    {"type": "select", "id": "height", "label": "Height", "default": "full", "options": [
+      {"value": "full", "label": "Full screen"},
+      {"value": "large", "label": "Large"},
+      {"value": "medium", "label": "Medium"}
+    ]},
+    {"type": "select", "id": "desktop_position", "label": "Desktop media position", "default": "center center", "options": [
+      {"value": "left center", "label": "Left"},
+      {"value": "center center", "label": "Center"},
+      {"value": "right center", "label": "Right"},
+      {"value": "center top", "label": "Top"}
+    ]},
+    {"type": "select", "id": "mobile_position", "label": "Mobile media position", "default": "center center", "options": [
+      {"value": "left center", "label": "Left"},
+      {"value": "center center", "label": "Center"},
+      {"value": "right center", "label": "Right"},
+      {"value": "center top", "label": "Top"}
+    ]},
+    {"type": "select", "id": "content_alignment", "label": "Text alignment", "default": "left", "options": [
+      {"value": "left", "label": "Left"},
+      {"value": "center", "label": "Center"},
+      {"value": "right", "label": "Right"}
+    ]},
+    {"type": "color", "id": "text_color", "label": "Desktop text colour", "default": "#0a0a0a"},
+    {"type": "color", "id": "mobile_text_color", "label": "Mobile text colour", "default": "#ffffff"},
+    {"type": "color", "id": "overlay_color", "label": "Desktop overlay colour", "default": "#f7f4ef"},
+    {"type": "color", "id": "mobile_overlay_color", "label": "Mobile overlay colour", "default": "#000000"},
+    {"type": "range", "id": "overlay_opacity", "label": "Desktop bottom overlay", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 20},
+    {"type": "range", "id": "mobile_overlay_opacity", "label": "Mobile bottom overlay", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 55},
+    {"type": "text", "id": "edition", "label": "Top label", "default": "TACT / Drop 06"},
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Everyday streetwear"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Wear Your Flex"},
+    {"type": "product", "id": "product", "label": "Featured product"},
+    {"type": "url", "id": "link", "label": "Custom link"},
+    {"type": "text", "id": "button_label", "label": "Button label", "default": "Shop now"}
+  ],
+  "presets": [{"name": "Editorial hero"}]
+}
+{% endschema %}

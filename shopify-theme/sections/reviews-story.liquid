@@ -1,0 +1,85 @@
+<section class="t-review-stories" data-review-stories data-review-interval="{{ section.settings.autoplay_seconds | times: 1000 }}">
+  <div class="t-review-stories__heading">
+    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+    <h2>{{ section.settings.heading }}</h2>
+    <p>{{ section.settings.copy }}</p>
+    <div class="t-review-stories__controls" aria-label="Review navigation">
+      <button type="button" data-review-prev aria-label="Previous review">{% render 'icon', icon: 'arrow' %}</button>
+      <button type="button" data-review-next aria-label="Next review">{% render 'icon', icon: 'arrow' %}</button>
+    </div>
+  </div>
+
+  <div class="t-review-carousel" aria-live="polite">
+    {% for block in section.blocks %}
+      <article class="t-review-slide{% if forloop.first %} is-active{% endif %}" data-review-slide {{ block.shopify_attributes }}>
+        <div class="t-review-slide__topline">
+          <span class="t-review-stars" aria-label="{{ block.settings.rating }} out of 5 stars">
+            {% for i in (1..block.settings.rating) %}{% render 'icon', icon: 'star' %}{% endfor %}
+          </span>
+          <span>0{{ forloop.index }} / 0{{ forloop.length }}</span>
+        </div>
+        <p>{{ block.settings.title }}</p>
+        <blockquote>“{{ block.settings.quote }}”</blockquote>
+        <footer>
+          <span>— {{ block.settings.name }}</span>
+          {% if block.settings.product %}
+            <a href="{{ block.settings.product.url }}">{{ block.settings.product.title }} {% render 'icon', icon: 'arrow' %}</a>
+          {% else %}
+            <span>{{ block.settings.product_name }}</span>
+          {% endif %}
+        </footer>
+      </article>
+    {% endfor %}
+  </div>
+
+  <div class="t-review-stories__dots" aria-label="Choose a review">
+    {% for block in section.blocks %}
+      <button
+        class="{% if forloop.first %}is-active{% endif %}"
+        type="button"
+        data-review-dot="{{ forloop.index0 }}"
+        aria-label="Show review {{ forloop.index }}"
+        {% if forloop.first %}aria-current="true"{% endif %}
+      ></button>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Customer review carousel",
+  "max_blocks": 16,
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "06 / Customer reviews"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "From the rotation."},
+    {"type": "text", "id": "copy", "label": "Copy", "default": "Product reviews from TACT customers."},
+    {"type": "range", "id": "autoplay_seconds", "label": "Seconds between reviews", "min": 3, "max": 12, "step": 1, "unit": "s", "default": 5}
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {"type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5},
+        {"type": "text", "id": "title", "label": "Short title", "default": "Amazing quality"},
+        {"type": "textarea", "id": "quote", "label": "Review", "default": "Amazinnggggg Quality!!! Loved every bit"},
+        {"type": "text", "id": "name", "label": "Customer name", "default": "Shahid"},
+        {"type": "product", "id": "product", "label": "Product link"},
+        {"type": "text", "id": "product_name", "label": "Fallback product name", "default": "Enchantment Chain Sleeveless Tee"}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer review carousel",
+      "blocks": [
+        {"type": "review", "settings": {"title": "Amazing quality", "quote": "Amazinnggggg Quality!!! Loved every bit", "name": "Shahid", "product_name": "Enchantment Chain Sleeveless Tee"}},
+        {"type": "review", "settings": {"title": "Best and minimalistic", "quote": "BESTTTT AND MINIMALISTIC", "name": "Gautam", "product_name": "Classic Tact Tee — White"}},
+        {"type": "review", "settings": {"title": "Absolutely loved it", "quote": "Absolutely loved it", "name": "Ritesh Jain", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        {"type": "review", "settings": {"title": "Worth it", "quote": "Goood and worth 100%", "name": "Keval", "product_name": "Ghost of Tsushima Oversized Tee — Beige"}},
+        {"type": "review", "settings": {"rating": 4, "title": "Fit and design", "quote": "Very good fit and slick design!", "name": "Darsh", "product_name": "Confused Puzzle Emboss Tee"}}
+      ]
+    }
+  ]
+}
+{% endschema %}

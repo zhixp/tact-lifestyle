@@ -1,0 +1,36 @@
+<section class="t-services">
+  {% for block in section.blocks %}
+    <article {{ block.shopify_attributes }}>
+      <small>0{{ forloop.index }}</small>
+      <h3>{{ block.settings.heading }}</h3>
+      <p>{{ block.settings.copy }}</p>
+    </article>
+  {% endfor %}
+</section>
+
+{% schema %}
+{
+  "name": "Service strip",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service",
+      "settings": [
+        {"type": "text", "id": "heading", "label": "Heading", "default": "Free shipping"},
+        {"type": "text", "id": "copy", "label": "Copy", "default": "Complimentary delivery on qualifying orders."}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Service strip",
+      "blocks": [
+        {"type": "service", "settings": {"heading": "Free shipping", "copy": "Complimentary delivery on qualifying orders."}},
+        {"type": "service", "settings": {"heading": "Seven-day returns", "copy": "Easy returns on unused pieces with original tags."}},
+        {"type": "service", "settings": {"heading": "Quick support", "copy": "Real help from the TACT team when you need it."}}
+      ]
+    }
+  ]
+}
+{% endschema %}

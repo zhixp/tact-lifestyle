@@ -1,0 +1,27 @@
+<section class="t-register">
+  <div>
+    <p class="t-kicker">Join TACT</p>
+    <h1>Create your account.</h1>
+    <p>Track orders, manage addresses and move through checkout faster.</p>
+    {% form 'create_customer' %}
+      {{ form.errors | default_errors }}
+      <label for="RegisterFirstName">First name</label>
+      <input id="RegisterFirstName" type="text" name="customer[first_name]" autocomplete="given-name">
+      <label for="RegisterLastName">Last name</label>
+      <input id="RegisterLastName" type="text" name="customer[last_name]" autocomplete="family-name">
+      <label for="RegisterEmail">Email</label>
+      <input id="RegisterEmail" type="email" name="customer[email]" autocomplete="email" required>
+      <label for="RegisterPassword">Password</label>
+      <input id="RegisterPassword" type="password" name="customer[password]" autocomplete="new-password" required>
+      <button class="t-button t-button--dark" type="submit">Create account {% render 'icon', icon: 'arrow' %}</button>
+    {% endform %}
+    <a href="{{ routes.account_login_url }}">Already have an account? Sign in.</a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Customer registration",
+  "settings": []
+}
+{% endschema %}

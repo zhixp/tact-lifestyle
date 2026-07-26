@@ -1,0 +1,71 @@
+<section class="t-account-login">
+  <div class="t-account-login__visual">
+    {% if section.settings.image %}
+      {{
+        section.settings.image
+        | image_url: width: 1600
+        | image_tag:
+          widths: '600, 900, 1200, 1600',
+          sizes: '(max-width: 749px) 100vw, 58vw',
+          alt: section.settings.heading
+      }}
+    {% else %}
+      <img src="{{ 'editorial-demo.webp' | asset_url }}" alt="TACT Lifestyle campaign">
+    {% endif %}
+    <div>
+      <p>Customer account</p>
+      <h2>{{ section.settings.visual_heading }}</h2>
+    </div>
+  </div>
+  <div class="t-account-login__panel">
+    <div class="t-account-login__card">
+      <p class="t-kicker">Member access</p>
+      <h1>{{ section.settings.heading }}</h1>
+      <p>{{ section.settings.copy }}</p>
+
+      {% form 'customer_login' %}
+        {{ form.errors | default_errors }}
+        <label for="CustomerEmail">Email</label>
+        <input id="CustomerEmail" type="email" name="customer[email]" autocomplete="email" required>
+        <label for="CustomerPassword">Password</label>
+        <input id="CustomerPassword" type="password" name="customer[password]" autocomplete="current-password" required>
+        <button class="t-button t-button--dark" type="submit">
+          Sign in {% render 'icon', icon: 'arrow' %}
+        </button>
+      {% endform %}
+
+      <div class="t-account-login__links">
+        <a href="#recover">Forgot your password?</a>
+        <a href="{{ routes.account_register_url }}">Create an account</a>
+      </div>
+
+      <div id="recover" class="t-account-recover">
+        <h2>Reset password</h2>
+        <p>We will send a reset link to your email.</p>
+        {% form 'recover_customer_password' %}
+          {{ form.errors | default_errors }}
+          <label for="RecoverEmail">Email</label>
+          <input id="RecoverEmail" type="email" name="email" autocomplete="email" required>
+          <button class="t-button t-button--dark" type="submit">Send reset link</button>
+        {% endform %}
+      </div>
+
+      <small>
+        Phone OTP remains available when the store's KiwiPass app is enabled.
+        Authentication and customer data stay inside Shopify.
+      </small>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Customer login",
+  "settings": [
+    {"type": "image_picker", "id": "image", "label": "Campaign image"},
+    {"type": "text", "id": "visual_heading", "label": "Campaign heading", "default": "One login. Every order."},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Your TACT account."},
+    {"type": "text", "id": "copy", "label": "Copy", "default": "Sign in to track orders, save addresses and move through checkout faster."}
+  ]
+}
+{% endschema %}

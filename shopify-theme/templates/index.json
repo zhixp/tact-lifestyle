@@ -1,0 +1,106 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-editorial",
+      "settings": {
+        "height": "full",
+        "desktop_position": "center center",
+        "mobile_position": "center center",
+        "content_alignment": "left",
+        "text_color": "#0a0a0a",
+        "mobile_text_color": "#ffffff",
+        "overlay_opacity": 20,
+        "mobile_overlay_opacity": 55,
+        "playback_speed": 1.5,
+        "edition": "TACT / Current drop",
+        "eyebrow": "Everyday streetwear",
+        "heading": "Wear Your Flex",
+        "button_label": "Shop now"
+      }
+    },
+    "new": {
+      "type": "product-grid",
+      "settings": {
+        "eyebrow": "01 / Just landed",
+        "heading": "Just landed.",
+        "copy": "New graphics, oversized tees and everyday layers from TACT.",
+        "link_label": "Shop all pieces",
+        "products_to_show": 4
+      }
+    },
+    "collections": {
+      "type": "collection-tiles",
+      "blocks": {
+        "new": {"type": "collection", "settings": {"fallback_handle": "new-arrivals", "title": "New arrivals"}},
+        "men": {"type": "collection", "settings": {"fallback_handle": "men", "title": "Men"}},
+        "women": {"type": "collection", "settings": {"fallback_handle": "shop-womens", "title": "Women"}},
+        "unisex": {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}}
+      },
+      "block_order": ["new", "men", "women", "unisex"],
+      "settings": {
+        "eyebrow": "01 / Find your everyday drip",
+        "heading": "Explore streetwear by category.",
+        "copy": "Men, women and unisex pieces from the current TACT catalog.",
+        "link_label": "Shop all products"
+      }
+    },
+    "editorial": {
+      "type": "editorial-image-text",
+      "settings": {
+        "layout": "image-left",
+        "eyebrow": "02 / Sleeveless society",
+        "heading": "Hard lines. Easy movement.",
+        "copy": "<p>A relaxed statement shaped by sharp graphics and tactile detail.</p>",
+        "button_label": "Discover the piece"
+      }
+    },
+    "videos": {
+      "type": "video-reels",
+      "blocks": {
+        "video1": {"type": "video", "settings": {"label": "Pretty Annoying", "fallback_product_handle": "pretty-annoying-cropped-top-women"}},
+        "video2": {"type": "video", "settings": {"label": "Graphic state", "fallback_product_handle": "distracted-skull-sleeveless-tee"}},
+        "video3": {"type": "video", "settings": {"label": "Move in TACT", "fallback_product_handle": "ribbed-top-signature-shorts-co-ord-set-onion-women"}},
+        "video4": {"type": "video", "settings": {"label": "Two ways to flex", "fallback_product_handle": "neon-skull-pop-oversized-tee-men"}},
+        "video5": {"type": "video", "settings": {"label": "Built to stand out", "fallback_product_handle": "ghost-of-tsushima-cream-men"}},
+        "video6": {"type": "video", "settings": {"label": "Outside the lines", "fallback_product_handle": "tact-all-over-signature-tee"}}
+      },
+      "block_order": ["video1", "video2", "video3", "video4", "video5", "video6"],
+      "settings": {
+        "eyebrow": "04 / In motion",
+        "heading": "TACT in motion.",
+        "copy": "<p>Campaign films, close-up details and the pieces in each look.</p>",
+        "link_label": "Meet TACT",
+        "use_tact_fallbacks": true
+      }
+    },
+    "reviews": {
+      "type": "reviews-story",
+      "blocks": {
+        "review1": {"type": "review", "settings": {"rating": 5, "title": "Amazing quality", "quote": "Amazinnggggg Quality!!! Loved every bit", "name": "Shahid", "product_name": "Enchantment Chain Sleeveless Tee"}},
+        "review3": {"type": "review", "settings": {"rating": 5, "title": "Best and minimalistic", "quote": "BESTTTT AND MINIMALISTIC", "name": "Gautam", "product_name": "Classic Tact Tee — White"}},
+        "review4": {"type": "review", "settings": {"rating": 5, "title": "Absolutely loved it", "quote": "Absolutely loved it", "name": "Ritesh Jain", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        "review5": {"type": "review", "settings": {"rating": 5, "title": "Worth it", "quote": "Goood and worth 100%", "name": "Keval", "product_name": "Ghost of Tsushima Oversized Tee — Beige"}},
+        "review6": {"type": "review", "settings": {"rating": 4, "title": "Fit and design", "quote": "Very good fit and slick design!", "name": "Darsh", "product_name": "Confused Puzzle Emboss Tee"}}
+      },
+      "block_order": ["review1", "review3", "review4", "review5", "review6"],
+      "settings": {
+        "eyebrow": "06 / Customer reviews",
+        "heading": "From the rotation.",
+        "copy": "Product reviews from TACT customers.",
+        "autoplay_seconds": 5
+      }
+    },
+    "services": {
+      "type": "service-strip",
+      "blocks": {
+        "shipping": {"type": "service", "settings": {"heading": "Free delivery", "copy": "Free standard shipping on Indian orders over ₹499."}},
+        "prepaid": {"type": "service", "settings": {"heading": "Five percent off", "copy": "Extra 5% savings on eligible prepaid orders."}},
+        "returns": {"type": "service", "settings": {"heading": "Seven-day returns", "copy": "Easy returns on unused pieces with original tags."}},
+        "support": {"type": "service", "settings": {"heading": "Quick support", "copy": "Real help from the TACT team when you need it."}}
+      },
+      "block_order": ["shipping", "prepaid", "returns", "support"],
+      "settings": {}
+    }
+  },
+  "order": ["hero", "collections", "new", "editorial", "videos", "reviews", "services"]
+}

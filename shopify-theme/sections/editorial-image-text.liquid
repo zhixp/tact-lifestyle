@@ -1,0 +1,46 @@
+<section class="t-editorial t-editorial--{{ section.settings.layout }}">
+  <div class="t-editorial__media">
+    {% if section.settings.image %}
+      {{
+        section.settings.image
+        | image_url: width: 1800
+        | image_tag:
+          loading: 'lazy',
+          widths: '500, 750, 1100, 1500, 1800',
+          sizes: '(max-width: 749px) 100vw, 65vw',
+          alt: section.settings.image.alt
+      }}
+    {% else %}
+      <img src="{{ 'editorial-demo.webp' | asset_url }}" loading="lazy" alt="{{ section.settings.heading | escape }}">
+    {% endif %}
+  </div>
+  <div class="t-editorial__copy">
+    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+    <h2>{{ section.settings.heading }}</h2>
+    <div>{{ section.settings.copy }}</div>
+    {% if section.settings.button_label != blank %}
+      <a class="t-button t-button--light" href="{{ section.settings.link | default: routes.all_products_collection_url }}">
+        {{ section.settings.button_label }} {% render 'icon', icon: 'arrow' %}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial image and text",
+  "settings": [
+    {"type": "image_picker", "id": "image", "label": "Image"},
+    {"type": "select", "id": "layout", "label": "Image position", "default": "image-left", "options": [
+      {"value": "image-left", "label": "Left"},
+      {"value": "image-right", "label": "Right"}
+    ]},
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "02 / Sleeveless society"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Hard lines. Easy movement."},
+    {"type": "richtext", "id": "copy", "label": "Copy", "default": "<p>A relaxed statement shaped by sharp graphics and tactile detail.</p>"},
+    {"type": "url", "id": "link", "label": "Link"},
+    {"type": "text", "id": "button_label", "label": "Button label", "default": "Discover the piece"}
+  ],
+  "presets": [{"name": "Editorial image and text"}]
+}
+{% endschema %}

@@ -1,0 +1,41 @@
+<section class="t-customer-page">
+  <header>
+    <p class="t-kicker">Order history</p>
+    <h1>{{ order.name }}.</h1>
+    <p>Placed {{ order.created_at | date: '%d %B %Y' }}</p>
+    <a href="{{ routes.account_url }}">Back to account {% render 'icon', icon: 'arrow' %}</a>
+  </header>
+  <div class="t-order">
+    <div class="t-order__lines">
+      {% for line_item in order.line_items %}
+        <article>
+          {% if line_item.image %}
+            {{ line_item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120, 180, 240', alt: line_item.title }}
+          {% endif %}
+          <div>
+            <h2>{{ line_item.title | link_to: line_item.product.url }}</h2>
+            {% unless line_item.variant.title == 'Default Title' %}<p>{{ line_item.variant.title }}</p>{% endunless %}
+            <span>Quantity {{ line_item.quantity }}</span>
+          </div>
+          <strong>{{ line_item.final_line_price | money }}</strong>
+        </article>
+      {% endfor %}
+    </div>
+    <aside>
+      <h2>Order summary</h2>
+      <p><span>Payment</span><strong>{{ order.financial_status_label }}</strong></p>
+      <p><span>Fulfilment</span><strong>{{ order.fulfillment_status_label }}</strong></p>
+      <p><span>Subtotal</span><strong>{{ order.line_items_subtotal_price | money }}</strong></p>
+      {% for shipping_method in order.shipping_methods %}
+        <p><span>{{ shipping_method.title }}</span><strong>{{ shipping_method.price | money }}</strong></p>
+      {% endfor %}
+      <p><span>Total</span><strong>{{ order.total_net_amount | money }}</strong></p>
+      <h3>Delivery address</h3>
+      {{ order.shipping_address | format_address }}
+    </aside>
+  </div>
+</section>
+
+{% schema %}
+{"name":"Customer order","settings":[]}
+{% endschema %}

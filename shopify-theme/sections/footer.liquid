@@ -1,0 +1,91 @@
+<footer class="t-footer">
+  <div class="t-footer__support">
+    <div class="t-footer__support-heading">
+      <p class="t-kicker">Customer care</p>
+      <h2>{{ section.settings.help_heading }}</h2>
+    </div>
+    <a href="{{ pages.faq.url | default: '/pages/faq' }}">
+      <span>01</span>
+      FAQ {% render 'icon', icon: 'arrow' %}
+    </a>
+    <a href="{{ shop.shipping_policy.url }}">
+      <span>02</span>
+      Shipping {% render 'icon', icon: 'arrow' %}
+    </a>
+    <a href="{{ shop.refund_policy.url }}">
+      <span>03</span>
+      Returns {% render 'icon', icon: 'arrow' %}
+    </a>
+  </div>
+
+  <div class="t-footer__main">
+    <div class="t-footer__brand">
+      {% if settings.logo_light %}
+        {{ settings.logo_light | image_url: width: 320 | image_tag: widths: '180, 240, 320', alt: shop.name }}
+      {% else %}
+        <img src="{{ 'logo-white.png' | asset_url }}" width="280" alt="{{ shop.name }}">
+      {% endif %}
+      <h2>{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.copy }}</p>
+    </div>
+
+    <div class="t-footer__signup">
+      <p>{{ section.settings.newsletter_heading }}</p>
+      {% form 'customer', class: 't-newsletter' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="visually-hidden" for="FooterEmail">Email address</label>
+        <input id="FooterEmail" type="email" name="contact[email]" value="{{ form.email }}" placeholder="Email address" required>
+        <button type="submit">Join {% render 'icon', icon: 'arrow' %}</button>
+        {% if form.posted_successfully? %}<strong>Welcome to TACT.</strong>{% endif %}
+        {{ form.errors | default_errors }}
+      {% endform %}
+      <small>By joining, you agree to receive TACT updates.</small>
+    </div>
+  </div>
+
+  <div class="t-footer__nav">
+    <div>
+      <h3>Shop</h3>
+      {% for link in section.settings.shop_menu.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+    <div>
+      <h3>Help</h3>
+      <a href="{{ pages.faq.url | default: '/pages/faq' }}">FAQ</a>
+      <a href="{{ shop.shipping_policy.url }}">Shipping</a>
+      <a href="{{ shop.refund_policy.url }}">Returns & exchange</a>
+      <a href="/pages/track-your-order">Track your order</a>
+    </div>
+    <div>
+      <h3>TACT</h3>
+      <a href="/pages/about-us">About us</a>
+      <a href="/pages/contact">Contact</a>
+      <a href="{{ shop.privacy_policy.url }}">Privacy policy</a>
+    </div>
+    <div>
+      <h3>Connect</h3>
+      {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}">Instagram</a>{% endif %}
+      {% if settings.youtube_url != blank %}<a href="{{ settings.youtube_url }}">YouTube</a>{% endif %}
+      <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>
+    </div>
+  </div>
+  <div class="t-footer__base">
+    <span>© {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
+    <span>{{ section.settings.footer_note }}</span>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {"type": "text", "id": "help_heading", "label": "Help heading", "default": "Help, when you need it."},
+    {"type": "text", "id": "heading", "label": "Brand heading", "default": "Wear your flex."},
+    {"type": "text", "id": "copy", "label": "Brand copy", "default": "Designed and printed in-house in India since 1989."},
+    {"type": "text", "id": "newsletter_heading", "label": "Newsletter heading", "default": "Drops, restocks and stories—sent first."},
+    {"type": "link_list", "id": "shop_menu", "label": "Shop menu", "default": "main-menu"},
+    {"type": "text", "id": "footer_note", "label": "Footer note", "default": "Free delivery over ₹499 / India"}
+  ]
+}
+{% endschema %}

@@ -1,0 +1,83 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "TACT Editorial",
+    "theme_version": "1.0.0",
+    "theme_author": "TACT Lifestyle",
+    "theme_documentation_url": "https://www.tactlifestyle.store/",
+    "theme_support_url": "mailto:info@tactlifestyle.store"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Dark logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_light",
+        "label": "Light logo"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 80,
+        "max": 240,
+        "step": 4,
+        "unit": "px",
+        "label": "Logo width",
+        "default": 132
+      }
+    ]
+  },
+  {
+    "name": "Colors and shape",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Ink",
+        "default": "#0b0b0c"
+      },
+      {
+        "type": "color",
+        "id": "color_paper",
+        "label": "Paper",
+        "default": "#f3f3f1"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent",
+        "default": "#1746ff"
+      },
+      {
+        "type": "range",
+        "id": "card_radius",
+        "min": 0,
+        "max": 36,
+        "step": 2,
+        "unit": "px",
+        "label": "Card corner radius",
+        "default": 18
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "url",
+        "id": "instagram_url",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "youtube_url",
+        "label": "YouTube"
+      }
+    ]
+  }
+]

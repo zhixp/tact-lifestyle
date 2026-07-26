@@ -1,0 +1,63 @@
+{% if section.settings.show_bar %}
+  <style>:root { --t-announcement-height: {{ section.settings.height }}px; }</style>
+  <aside
+    class="t-announcement"
+    style="--announcement-bg: {{ section.settings.background }}; --announcement-color: {{ section.settings.text_color }}; --announcement-speed: {{ section.settings.speed }}s;"
+    aria-label="Store announcements"
+  >
+    <div class="t-announcement__track">
+      {% for duplicate in (1..2) %}
+        <div class="t-announcement__group"{% if duplicate == 2 %} aria-hidden="true"{% endif %}>
+          {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+              {% if block.settings.link != blank %}<a href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{% else %}<span {{ block.shopify_attributes }}>{% endif %}
+                {{ block.settings.text }}
+              {% if block.settings.link != blank %}</a>{% else %}</span>{% endif %}
+              <i aria-hidden="true">↗</i>
+            {% endfor %}
+          {% else %}
+            <span>Free delivery over ₹499</span><i aria-hidden="true">↗</i>
+            <span>Extra 5% off prepaid orders</span><i aria-hidden="true">↗</i>
+            <span>New drops from TACT</span><i aria-hidden="true">↗</i>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </aside>
+{% else %}
+  <style>:root { --t-announcement-height: 0px; }</style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Announcement ticker",
+  "max_blocks": 8,
+  "settings": [
+    {"type": "checkbox", "id": "show_bar", "label": "Show announcement ticker", "default": true},
+    {"type": "range", "id": "height", "label": "Bar height", "min": 24, "max": 40, "step": 1, "unit": "px", "default": 30},
+    {"type": "range", "id": "speed", "label": "Ticker duration", "min": 12, "max": 50, "step": 1, "unit": "s", "default": 26},
+    {"type": "color", "id": "background", "label": "Background", "default": "#0a0a0a"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#ffffff"}
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {"type": "text", "id": "text", "label": "Text", "default": "Free delivery over ₹499"},
+        {"type": "url", "id": "link", "label": "Optional link"}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement ticker",
+      "blocks": [
+        {"type": "message", "settings": {"text": "Free delivery over ₹499"}},
+        {"type": "message", "settings": {"text": "Extra 5% off prepaid orders"}},
+        {"type": "message", "settings": {"text": "New drops from TACT"}}
+      ]
+    }
+  ]
+}
+{% endschema %}
