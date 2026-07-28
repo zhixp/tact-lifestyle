@@ -55,6 +55,7 @@ The client can manage without touching code:
 ```powershell
 pnpm typecheck
 pnpm build
+powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1
 ```
 
 Media provenance is documented in `ASSET_SOURCES.md`.
