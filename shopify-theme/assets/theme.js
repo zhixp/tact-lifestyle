@@ -13,6 +13,8 @@ class TactTheme {
     this.bindReviewStories();
     this.bindVideoQuickAdd();
     this.bindWishlist();
+    this.bindProductCardMotion();
+    this.bindRevealMotion();
     this.bindThemeMode();
     this.onScroll();
   }
@@ -333,8 +335,12 @@ class TactTheme {
   }
 
   bindWishlist() {
-    const storageKey = "tact-wishlist";
+    const authenticated = document.body.dataset.customerAuthenticated === "true";
+    const customerId = document.body.dataset.customerId || "guest";
+    const storageKey = `tact-wishlist:${customerId}`;
+    const pendingKey = "tact-wishlist-pending";
     const read = () => {
+      if (!authenticated) return [];
       try {
         const stored = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
         return Array.isArray(stored) ? stored : [];
@@ -343,6 +349,7 @@ class TactTheme {
       }
     };
     const write = (items) => {
+      if (!authenticated) return;
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(items));
       } catch {}
@@ -382,12 +389,39 @@ class TactTheme {
       });
     };
 
+    if (authenticated) {
+      try {
+        const pending = JSON.parse(window.localStorage.getItem(pendingKey) || "null");
+        if (pending?.handle) {
+          const items = read();
+          if (!items.some((item) => item.handle === pending.handle)) items.unshift(pending);
+          write(items.slice(0, 48));
+          window.localStorage.removeItem(pendingKey);
+        }
+      } catch {
+        window.localStorage.removeItem(pendingKey);
+      }
+    }
+
     if (!document.body.dataset.wishlistBound) {
       document.body.dataset.wishlistBound = "true";
       document.addEventListener("click", (event) => {
         const toggle = event.target.closest("[data-wishlist-toggle]");
         if (toggle) {
           event.preventDefault();
+          if (!authenticated) {
+            try {
+              window.localStorage.setItem(pendingKey, JSON.stringify({
+                handle: toggle.dataset.wishlistHandle,
+                title: toggle.dataset.wishlistTitle || "",
+                url: toggle.dataset.wishlistUrl || "#",
+                image: toggle.dataset.wishlistImage || "",
+                price: toggle.dataset.wishlistPrice || "",
+              }));
+            } catch {}
+            this.openWishlist();
+            return;
+          }
           const items = read();
           const handle = toggle.dataset.wishlistHandle;
           const index = items.findIndex((item) => item.handle === handle);
@@ -412,6 +446,71 @@ class TactTheme {
       });
     }
     render();
+  }
+
+  bindProductCardMotion() {
+    if (!window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
+    const cards = () => document.querySelectorAll("[data-product-card]");
+    const close = (except) => {
+      cards().forEach((card) => {
+        if (card === except) return;
+        card.classList.remove("is-quick-open");
+        card.querySelector("[data-card-quick-open]")?.setAttribute("aria-expanded", "false");
+      });
+    };
+
+    document.addEventListener("click", (event) => {
+      const trigger = event.target.closest("[data-card-quick-open]");
+      const media = event.target.closest(".t-product-card__media");
+      const card = event.target.closest("[data-product-card]");
+
+      if (trigger && card) {
+        event.preventDefault();
+        close(card);
+        card.classList.add("is-quick-open");
+        trigger.setAttribute("aria-expanded", "true");
+        return;
+      }
+      if (media && card && !card.classList.contains("is-quick-open")) {
+        event.preventDefault();
+        close(card);
+        card.classList.add("is-quick-open");
+        card.querySelector("[data-card-quick-open]")?.setAttribute("aria-expanded", "true");
+        return;
+      }
+      if (!card) close();
+    });
+  }
+
+  bindRevealMotion() {
+    const targets = document.querySelectorAll(
+      "#MainContent > section:not(.t-hero-carousel), #MainContent [data-product-card], #MainContent .t-collection-tile, .t-footer__support > a",
+    );
+    if (!targets.length) return;
+    targets.forEach((target, index) => {
+      target.dataset.reveal = "true";
+      target.style.setProperty("--reveal-delay", `${(index % 4) * 45}ms`);
+    });
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      targets.forEach((target) => target.classList.add("is-revealed"));
+      return;
+    }
+
+    document.documentElement.classList.add("t-motion-ready");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -7% 0px", threshold: 0.08 },
+    );
+    targets.forEach((target) => observer.observe(target));
   }
 
   bindThemeMode() {

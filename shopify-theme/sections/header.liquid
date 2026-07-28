@@ -202,13 +202,24 @@
         {% render 'icon', icon: 'close' %}
       </button>
     </div>
-    <div class="t-wishlist__items" data-wishlist-items></div>
-    <div class="t-wishlist__empty" data-wishlist-empty>
-      <p>{{ section.settings.wishlist_empty }}</p>
-      <a class="t-button t-button--interactive" href="{{ routes.all_products_collection_url }}">
-        {{ section.settings.wishlist_shop_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
-      </a>
-    </div>
+    {% if customer %}
+      <div class="t-wishlist__items" data-wishlist-items></div>
+      <div class="t-wishlist__empty" data-wishlist-empty>
+        <p>{{ section.settings.wishlist_empty }}</p>
+        <a class="t-button t-button--interactive" href="{{ routes.all_products_collection_url }}">
+          {{ section.settings.wishlist_shop_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+        </a>
+      </div>
+    {% else %}
+      <div class="t-wishlist__auth">
+        <p class="t-kicker">{{ section.settings.wishlist_login_eyebrow }}</p>
+        <h3>{{ section.settings.wishlist_login_heading }}</h3>
+        <p>{{ section.settings.wishlist_login_copy }}</p>
+        <a class="t-button t-button--interactive" href="{{ routes.account_login_url }}">
+          {{ section.settings.wishlist_login_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+        </a>
+      </div>
+    {% endif %}
   </aside>
 {% endif %}
 
@@ -251,6 +262,10 @@
     {"type": "text", "id": "wishlist_heading", "label": "Heading", "default": "Your wishlist."},
     {"type": "text", "id": "wishlist_empty", "label": "Empty message", "default": "Save the pieces you want to come back to."},
     {"type": "text", "id": "wishlist_shop_label", "label": "Shop button", "default": "Explore all pieces"},
+    {"type": "text", "id": "wishlist_login_eyebrow", "label": "Login eyebrow", "default": "Private rotation"},
+    {"type": "text", "id": "wishlist_login_heading", "label": "Login heading", "default": "Sign in to see your saved pieces."},
+    {"type": "textarea", "id": "wishlist_login_copy", "label": "Login copy", "default": "Your wishlist is connected to your customer profile, not a shared browser bag."},
+    {"type": "text", "id": "wishlist_login_label", "label": "Login button", "default": "Sign in or create account"},
     {"type": "text", "id": "close_wishlist_label", "label": "Close label", "default": "Close wishlist"},
     {"type": "header", "content": "Mobile dock"},
     {"type": "checkbox", "id": "show_mobile_dock", "label": "Show mobile navigation dock", "default": true},

@@ -67,7 +67,13 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [accountIntent, setAccountIntent] = useState<"account" | "wishlist">(
+    "account",
+  );
   const [accountStep, setAccountStep] = useState<"phone" | "code">("phone");
+  const [accountPhone, setAccountPhone] = useState("");
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [pendingWishlist, setPendingWishlist] = useState<Product | null>(null);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [darkMode, setDarkMode] = useState(false);
@@ -80,9 +86,13 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
       const savedCart = JSON.parse(
         window.localStorage.getItem("tact-cart") ?? "[]",
       ) as Array<{ handle: string; size: string; quantity: number }>;
-      const savedWishlist = JSON.parse(
-        window.localStorage.getItem("tact-wishlist") ?? "[]",
-      ) as string[];
+      const savedCustomerId = window.localStorage.getItem("tact-customer-id");
+      const savedWishlist = savedCustomerId
+        ? (JSON.parse(
+            window.localStorage.getItem(`tact-wishlist:${savedCustomerId}`) ??
+              "[]",
+          ) as string[])
+        : [];
       const savedTheme = window.localStorage.getItem("tact-theme");
 
       setCart(
@@ -92,6 +102,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
         }),
       );
       setWishlist(savedWishlist);
+      setCustomerId(savedCustomerId);
       setDarkMode(
         savedTheme
           ? savedTheme === "dark"
@@ -99,7 +110,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
       );
     } catch {
       window.localStorage.removeItem("tact-cart");
-      window.localStorage.removeItem("tact-wishlist");
+      window.localStorage.removeItem("tact-customer-id");
     }
     setStoreReady(true);
   }, []);
@@ -119,9 +130,12 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   }, [cart, storeReady]);
 
   useEffect(() => {
-    if (!storeReady) return;
-    window.localStorage.setItem("tact-wishlist", JSON.stringify(wishlist));
-  }, [storeReady, wishlist]);
+    if (!storeReady || !customerId) return;
+    window.localStorage.setItem(
+      `tact-wishlist:${customerId}`,
+      JSON.stringify(wishlist),
+    );
+  }, [customerId, storeReady, wishlist]);
 
   useEffect(() => {
     if (!storeReady) return;
@@ -146,6 +160,42 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        "main > section:not(.home-hero-carousel), main .collection-card, .footer-support > a",
+      ),
+    );
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    targets.forEach((target, index) => {
+      target.dataset.reveal = "true";
+      target.style.setProperty("--reveal-delay", `${(index % 4) * 45}ms`);
+    });
+
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      targets.forEach((target) => target.classList.add("is-revealed"));
+      return;
+    }
+
+    document.documentElement.classList.add("motion-ready");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -7% 0px", threshold: 0.08 },
+    );
+    targets.forEach((target) => observer.observe(target));
+
+    return () => observer.disconnect();
+  }, [pathname]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -202,11 +252,25 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     setCartOpen(false);
     setWishlistOpen(false);
     setAccountOpen(false);
+    setAccountIntent("account");
+    setPendingWishlist(null);
   }
 
   function openAccount() {
+    setAccountIntent("account");
+    setPendingWishlist(null);
     setAccountStep("phone");
     setAccountOpen(true);
+  }
+
+  function openWishlist() {
+    if (!customerId) {
+      setAccountIntent("wishlist");
+      setAccountStep("phone");
+      setAccountOpen(true);
+      return;
+    }
+    setWishlistOpen(true);
   }
 
   function addToCart(
@@ -243,11 +307,50 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   }
 
   function toggleWishlist(product: Product) {
+    if (!customerId) {
+      setPendingWishlist(product);
+      setAccountIntent("wishlist");
+      setAccountStep("phone");
+      setAccountOpen(true);
+      return;
+    }
     setWishlist((current) =>
       current.includes(product.handle)
         ? current.filter((handle) => handle !== product.handle)
         : [...current, product.handle],
     );
+  }
+
+  function completeLogin() {
+    const memberId = accountPhone.replace(/\D/g, "");
+    if (memberId.length !== 10) return;
+
+    let saved: string[] = [];
+    try {
+      saved = JSON.parse(
+        window.localStorage.getItem(`tact-wishlist:${memberId}`) ?? "[]",
+      ) as string[];
+    } catch {
+      saved = [];
+    }
+    if (pendingWishlist && !saved.includes(pendingWishlist.handle)) {
+      saved = [pendingWishlist.handle, ...saved];
+    }
+
+    window.localStorage.setItem("tact-customer-id", memberId);
+    setCustomerId(memberId);
+    setWishlist(saved);
+    setAccountOpen(false);
+    setPendingWishlist(null);
+    if (accountIntent === "wishlist") setWishlistOpen(true);
+    setAccountIntent("account");
+  }
+
+  function signOut() {
+    window.localStorage.removeItem("tact-customer-id");
+    setCustomerId(null);
+    setWishlist([]);
+    closeAll();
   }
 
   const storeValue = {
@@ -262,7 +365,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     toggleWishlist,
     openCart: () => setCartOpen(true),
     openSearch: () => setSearchOpen(true),
-    openWishlist: () => setWishlistOpen(true),
+    openWishlist,
   };
 
   return (
@@ -347,7 +450,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
             className="header-wishlist"
             type="button"
             aria-label={`Open wishlist with ${wishlist.length} items`}
-            onClick={() => setWishlistOpen(true)}
+            onClick={openWishlist}
           >
             <Heart />
             {wishlist.length > 0 ? <span>{wishlist.length}</span> : null}
@@ -726,13 +829,43 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
           <Close />
         </button>
         <img src="/assets/logo-black.png" alt="TACT Lifestyle" />
-        {accountStep === "phone" ? (
+        {customerId ? (
+          <div className="account-member">
+            <p className="kicker">Member profile</p>
+            <h2 id="account-modal-title">Your rotation is ready.</h2>
+            <p className="account-modal-copy">
+              Your saved pieces stay attached to this signed-in profile on this
+              device.
+            </p>
+            <button
+              className="button button-dark"
+              type="button"
+              onClick={() => {
+                setAccountOpen(false);
+                setWishlistOpen(true);
+              }}
+            >
+              View saved pieces <Heart />
+            </button>
+            <Link className="account-full-link" href="/account" onClick={closeAll}>
+              Open account and orders
+            </Link>
+            <button className="account-back" type="button" onClick={signOut}>
+              Sign out
+            </button>
+          </div>
+        ) : accountStep === "phone" ? (
           <>
             <p className="kicker">Member access</p>
-            <h2 id="account-modal-title">Login now to avail 10% off.</h2>
+            <h2 id="account-modal-title">
+              {accountIntent === "wishlist"
+                ? "Sign in to save your rotation."
+                : "Login now to avail 10% off."}
+            </h2>
             <p className="account-modal-copy">
-              Sign in to track orders, save addresses and move through checkout
-              faster.
+              {accountIntent === "wishlist"
+                ? "Saved pieces are private to your member profile, so they are ready when you come back."
+                : "Sign in to track orders, save addresses and move through checkout faster."}
             </p>
             <form
               onSubmit={(event) => {
@@ -749,6 +882,8 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   inputMode="numeric"
                   pattern="[0-9]{10}"
                   placeholder="Enter 10-digit number"
+                  value={accountPhone}
+                  onChange={(event) => setAccountPhone(event.target.value)}
                   required
                 />
               </div>
@@ -782,7 +917,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
-                closeAll();
+                completeLogin();
               }}
             >
               <label htmlFor="account-code">Six-digit code</label>
@@ -828,7 +963,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
           <button
             type="button"
             aria-label="Wishlist"
-            onClick={() => setWishlistOpen(true)}
+            onClick={openWishlist}
           >
             <Heart />
             {wishlist.length ? <i>{wishlist.length}</i> : null}
@@ -871,20 +1006,44 @@ export function ProductCard({
       : ["One size"];
   const [selectedSize, setSelectedSize] = useState(selectableSizes[0]);
   const [added, setAdded] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(false);
+  const cardRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!quickOpen) return;
+    const close = (event: PointerEvent) => {
+      if (!cardRef.current?.contains(event.target as Node)) setQuickOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [quickOpen]);
 
   function quickAdd() {
     addToCart(product, selectedSize);
     setAdded(true);
+    setQuickOpen(false);
     window.setTimeout(() => setAdded(false), 1200);
   }
 
   return (
-    <article className="product-card">
+    <article
+      className={`product-card ${quickOpen ? "is-quick-open" : ""}`}
+      ref={cardRef}
+    >
       <div className="product-card-visual">
         <Link
           className="product-card-media"
           href={`/products/${product.handle}`}
           aria-label={`View ${product.name}`}
+          onClick={(event) => {
+            if (
+              window.matchMedia("(hover: none), (pointer: coarse)").matches &&
+              !quickOpen
+            ) {
+              event.preventDefault();
+              setQuickOpen(true);
+            }
+          }}
         >
           {product.tag ? <span className="product-badge">{product.tag}</span> : null}
           <img
@@ -912,6 +1071,15 @@ export function ProductCard({
           onClick={() => toggleWishlist(product)}
         >
           <Heart />
+        </button>
+        <button
+          className="product-card-quick-trigger"
+          type="button"
+          aria-label={`Show quick add for ${product.name}`}
+          aria-expanded={quickOpen}
+          onClick={() => setQuickOpen(true)}
+        >
+          <Plus />
         </button>
         <div className="product-card-quick">
           <div className="product-card-sizes" aria-label="Choose size">

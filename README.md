@@ -16,8 +16,8 @@ The demo now includes:
 - a three-slide, auto-playing TACT campaign hero with responsive desktop and
   mobile art direction;
 - all 67 live products, 292 variants, 408 product images and 29 collections;
-- collection/category filtering, product search, persistent wishlist and cart
-  state, plus a complete local `/cart` route;
+- collection/category filtering, product search, login-gated per-member wishlist
+  state, persistent cart state, plus a complete local `/cart` route;
 - large contain-fit product galleries with every available product image;
 - compact size selection, quantity, Add to cart, Buy it now, current offers,
   benefits, product information and “Pairs well with” recommendations;

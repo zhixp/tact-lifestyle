@@ -59,6 +59,15 @@
   {% endif %}
 
   {% if card_quick_add and card_product.available %}
+    <button
+      class="t-product-card__quick-trigger"
+      type="button"
+      data-card-quick-open
+      aria-label="Show quick add for {{ card_product.title | escape }}"
+      aria-expanded="false"
+    >
+      {% render 'icon', icon: 'plus' %}
+    </button>
     <div class="t-product-card__actions">
       <form class="t-card-quick-add" method="post" action="{{ routes.cart_add_url }}" data-quick-add>
         <div class="t-card-quick-add__variants" aria-label="Choose a size">

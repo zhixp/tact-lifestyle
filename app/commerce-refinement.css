@@ -80,6 +80,19 @@ html[data-theme="dark"] .mobile-dock {
   color: #fff;
 }
 
+/* These are intentionally cinematic inverse surfaces in both colour modes. */
+.video-stories,
+.site-footer,
+html[data-theme="dark"] .video-stories,
+html[data-theme="dark"] .site-footer {
+  background: #0a0a0b;
+  color: #fff;
+}
+
+html[data-theme="dark"] .account-modal > img {
+  filter: invert(1);
+}
+
 .header-actions > button {
   position: relative;
 }
@@ -140,7 +153,33 @@ html[data-theme="dark"] .mobile-dock {
 }
 
 .product-card-visual {
+  border-radius: 12px;
+  overflow: hidden;
   position: relative;
+  transition:
+    box-shadow 420ms var(--ease),
+    transform 480ms var(--ease);
+}
+
+.product-card-media img {
+  transition:
+    opacity 440ms var(--ease),
+    transform 720ms var(--ease);
+}
+
+@media (hover: hover) {
+  .product-card:hover .product-card-visual {
+    box-shadow: 0 22px 46px rgba(0, 0, 0, 0.12);
+    transform: translateY(-6px);
+  }
+
+  .product-card:hover .product-card-media img {
+    transform: scale(1.022);
+  }
+
+  .product-card:hover .product-card-info h3 {
+    transform: translateX(3px);
+  }
 }
 
 .product-card-wishlist {
@@ -213,10 +252,42 @@ html[data-theme="dark"] .mobile-dock {
 }
 
 .product-card:hover .product-card-quick,
-.product-card:focus-within .product-card-quick {
+.product-card:focus-within .product-card-quick,
+.product-card.is-quick-open .product-card-quick {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+}
+
+.product-card-quick-trigger {
+  align-items: center;
+  background: rgba(250, 250, 248, 0.92);
+  border: 1px solid rgba(10, 10, 10, 0.12);
+  border-radius: 50%;
+  bottom: 8px;
+  color: #0a0a0a;
+  display: none;
+  height: 35px;
+  justify-content: center;
+  position: absolute;
+  right: 8px;
+  transition:
+    opacity 180ms ease,
+    transform 280ms var(--ease);
+  width: 35px;
+  z-index: 4;
+  backdrop-filter: blur(12px);
+}
+
+.product-card-quick-trigger svg {
+  height: 14px;
+  width: 14px;
+}
+
+.product-card.is-quick-open .product-card-quick-trigger {
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(45deg) scale(0.8);
 }
 
 .product-card-sizes {
@@ -291,6 +362,98 @@ html[data-theme="dark"] .mobile-dock {
 
 .product-card-info h3 {
   max-width: 34ch;
+  transition: transform 320ms var(--ease);
+}
+
+/* Lightweight reveal and tactile motion—no runtime animation library. */
+
+html.motion-ready [data-reveal="true"] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 620ms var(--ease) var(--reveal-delay, 0ms),
+    transform 720ms var(--ease) var(--reveal-delay, 0ms);
+}
+
+html.motion-ready [data-reveal="true"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+:where(.button, .text-link, .header-actions button, .video-story-controls button) {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    transform 260ms var(--ease);
+}
+
+:where(.button, .text-link, .header-actions button, .video-story-controls button):active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .header-actions button:hover {
+    transform: translateY(-2px);
+  }
+
+  .video-story-card {
+    transition:
+      box-shadow 440ms var(--ease),
+      transform 480ms var(--ease);
+  }
+
+  .video-story-card video {
+    transition: transform 900ms var(--ease);
+  }
+
+  .video-story-products {
+    transition: transform 420ms var(--ease);
+  }
+
+  .video-story-card:hover {
+    box-shadow: 0 28px 56px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px) scale(0.995);
+  }
+
+  .video-story-card:hover video {
+    transform: scale(1.028);
+  }
+
+  .video-story-card:hover .video-story-products {
+    transform: translateY(-4px);
+  }
+
+  .footer-support > a {
+    transition:
+      background-color 300ms ease,
+      color 300ms ease,
+      padding 380ms var(--ease);
+  }
+
+  .footer-support > a:hover {
+    background: #fff;
+    color: #0a0a0b;
+    padding-left: 26px;
+    padding-right: 16px;
+  }
+
+  .footer-support > a:hover > span {
+    color: rgba(10, 10, 11, 0.42);
+  }
+
+  .review-card-rail > article,
+  .review-marquee-card {
+    transition:
+      box-shadow 420ms var(--ease),
+      transform 480ms var(--ease);
+  }
+
+  .review-card-rail > article:hover,
+  .review-marquee-card:hover {
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+  }
 }
 
 /* Wishlist and cart drawers. */
@@ -1024,6 +1187,40 @@ html[data-theme="dark"] .mobile-dock {
 
 /* iOS-like navigation dock. */
 
+@media (min-width: 901px) and (max-width: 1100px) {
+  .product-gallery-v2 .product-image-primary {
+    aspect-ratio: auto;
+    min-height: min(70svh, 680px);
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 900px) {
+  .product-view-v2 {
+    display: block;
+  }
+
+  .product-gallery-v2 {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .product-gallery-v2 figure,
+  .product-gallery-v2 .product-image-primary {
+    aspect-ratio: 0.78;
+    flex: 0 0 min(78vw, 650px);
+    min-height: 0;
+    scroll-snap-align: start;
+  }
+
+  .product-detail-v2 {
+    padding: 48px clamp(30px, 8vw, 80px) 100px;
+  }
+}
+
 @media (max-width: 760px) {
   .header-theme-toggle,
   .header-wishlist {
@@ -1092,11 +1289,13 @@ html[data-theme="dark"] .mobile-dock {
     bottom: 6px;
     left: 6px;
     min-height: 42px;
-    opacity: 1;
     padding: 4px 4px 4px 7px;
-    pointer-events: auto;
     right: 6px;
-    transform: none;
+    transform: translateY(calc(100% + 10px));
+  }
+
+  .product-card-quick-trigger {
+    display: flex;
   }
 
   .product-card-sizes button {
@@ -1272,15 +1471,24 @@ html[data-theme="dark"] .mobile-dock {
 }
 
 @media (hover: none) {
-  .product-card-wishlist,
-  .product-card-quick {
+  .product-card-wishlist {
+    opacity: 1;
+    transform: none;
+  }
+
+  .product-card.is-quick-open .product-card-quick {
     opacity: 1;
     pointer-events: auto;
-    transform: none;
+    transform: translateY(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.motion-ready [data-reveal="true"] {
+    opacity: 1;
+    transform: none;
+  }
+
   .product-card-quick,
   .product-card-wishlist,
   .hero-carousel-slide,

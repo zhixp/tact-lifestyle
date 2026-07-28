@@ -95,4 +95,4 @@ Policy links read from **Settings → Policies**, so privacy, shipping, refund a
 11. Check all policy copy and shipping/return claims against the live checkout configuration.
 12. Publish only after phone and desktop QA.
 
-The built-in wishlist uses browser storage for a fast, app-free demo. It persists on the same browser. For a wishlist synchronized across devices/customer accounts, install a Shopify wishlist app and replace or disable the built-in drawer.
+The built-in wishlist requires customer sign-in and separates browser storage by Shopify customer ID, so saved items are not exposed as one shared anonymous list. It persists on the same browser. For a wishlist synchronized across devices and customer sessions, connect a Shopify wishlist app or app-backed customer metafield and replace or disable the built-in storage layer.
