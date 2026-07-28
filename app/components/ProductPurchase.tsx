@@ -8,6 +8,7 @@ import {
   Card,
   Close,
   Fabric,
+  Heart,
   Minus,
   Plus,
   ReturnBox,
@@ -48,7 +49,7 @@ export function ProductPurchase({
   const [activeDetail, setActiveDetail] = useState<DetailKey>("fit");
   const [stickyPurchaseVisible, setStickyPurchaseVisible] = useState(false);
   const purchaseActionsRef = useRef<HTMLDivElement>(null);
-  const { addToCart } = useStore();
+  const { addToCart, isWishlisted, toggleWishlist } = useStore();
 
   const saving = product.compareAt
     ? Math.max(0, Math.round((1 - product.price / product.compareAt) * 100))
@@ -181,7 +182,20 @@ export function ProductPurchase({
         <aside className="product-detail product-detail-v2">
           <div className="product-detail-top">
             <p className="product-category">{product.category}</p>
-            <h1>{product.name}</h1>
+            <div className="product-title-row">
+              <h1>{product.name}</h1>
+              <button
+                className={isWishlisted(product) ? "is-active" : ""}
+                type="button"
+                aria-label={`${
+                  isWishlisted(product) ? "Remove from" : "Add to"
+                } wishlist`}
+                aria-pressed={isWishlisted(product)}
+                onClick={() => toggleWishlist(product)}
+              >
+                <Heart />
+              </button>
+            </div>
             <div className="product-price-row">
               <p className="product-price">
                 {product.compareAt ? (
@@ -212,20 +226,31 @@ export function ProductPurchase({
                 </div>
               ) : null}
               <div className="size-selector size-selector-v2">
-                {product.sizes.map((size) => (
-                  <button
-                    className={selectedSize === size ? "is-active" : ""}
-                    type="button"
-                    onClick={() => {
-                      setSelectedSize(size);
-                      setSizeError(false);
-                    }}
-                    key={size}
-                    aria-pressed={selectedSize === size}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {product.sizes.map((size) => {
+                  const matchingVariants = product.variants.filter(
+                    (variant) =>
+                      variant.size.toLowerCase() === size.toLowerCase(),
+                  );
+                  const available =
+                    matchingVariants.length === 0 ||
+                    matchingVariants.some((variant) => variant.available);
+
+                  return (
+                    <button
+                      className={selectedSize === size ? "is-active" : ""}
+                      type="button"
+                      disabled={!available}
+                      onClick={() => {
+                        setSelectedSize(size);
+                        setSizeError(false);
+                      }}
+                      key={size}
+                      aria-pressed={selectedSize === size}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
               </div>
               {sizeError ? (
                 <p className="size-error" role="alert">
@@ -277,6 +302,39 @@ export function ProductPurchase({
             <div className="offer-foot">
               <span>Free standard shipping over ₹499</span>
               <span>7-day eligible returns</span>
+            </div>
+          </section>
+
+          <section
+            className="product-pairs"
+            aria-labelledby="product-pairs-title"
+          >
+            <div className="product-pairs-heading">
+              <div>
+                <p className="kicker">Complete the look</p>
+                <h2 id="product-pairs-title">Pairs well with.</h2>
+              </div>
+              <span>{recommendations.length} picks</span>
+            </div>
+            <div className="product-pairs-rail">
+              {recommendations.slice(0, 3).map((item) => (
+                <article key={item.handle}>
+                  <Link href={`/products/${item.handle}`}>
+                    <img src={item.images[0]} alt="" loading="lazy" />
+                    <span>
+                      <strong>{item.name}</strong>
+                      <small>{money.format(item.price)}</small>
+                    </span>
+                  </Link>
+                  <button
+                    type="button"
+                    aria-label={`Add ${item.name}`}
+                    onClick={() => addToCart(item)}
+                  >
+                    <Plus />
+                  </button>
+                </article>
+              ))}
             </div>
           </section>
 

@@ -25,6 +25,16 @@ const slides = [
     mobileImage: "/assets/drive/madison-1.png",
     alt: "Blue Web of Madison graphic tee by TACT",
   },
+  {
+    id: "signature",
+    eyebrow: "TACT signature",
+    title: "Made to move",
+    cta: "Shop signature",
+    href: "/products/tact-all-over-signature-tee",
+    desktopImage: "/assets/hero-signature.jpg",
+    mobileImage: "/assets/hero-signature.jpg",
+    alt: "TACT all-over signature co-ord",
+  },
 ] as const;
 
 export function HeroCarousel() {
@@ -49,7 +59,7 @@ export function HeroCarousel() {
 
     const timer = window.setInterval(() => {
       setActive((current) => (current + 1) % slides.length);
-    }, 6800);
+    }, 6200);
 
     return () => window.clearInterval(timer);
   }, [paused]);

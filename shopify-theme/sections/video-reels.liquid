@@ -14,8 +14,9 @@
     </div>
   </div>
 
-  <div class="t-video-stories__rail" data-video-rail tabindex="0" role="region" aria-label="Shoppable campaign films">
-    {% for block in section.blocks %}
+  <div class="t-video-stories__rail-wrap">
+    <div class="t-video-stories__rail" data-video-rail tabindex="0" role="region" aria-label="Shoppable campaign films">
+      {% for block in section.blocks %}
       {% liquid
         assign fallback_video = ''
         case forloop.index
@@ -38,7 +39,7 @@
         endif
         assign product_two = block.settings.product_2
       %}
-      <article class="t-video-story" {{ block.shopify_attributes }}>
+        <article class="t-video-story" {{ block.shopify_attributes }}>
         {% if block.settings.video %}
           {{
             block.settings.video
@@ -67,8 +68,15 @@
             {% render 'video-product-chip', product: product_two %}
           </div>
         {% endif %}
-      </article>
-    {% endfor %}
+        </article>
+      {% endfor %}
+    </div>
+    <button class="t-video-stories__edge t-video-stories__edge--back" type="button" data-video-edge-prev aria-label="Previous campaign films" aria-hidden="true">
+      {% render 'icon', icon: 'arrow' %}
+    </button>
+    <button class="t-video-stories__edge t-video-stories__edge--forward" type="button" data-video-edge-next aria-label="More campaign films" aria-hidden="true">
+      {% render 'icon', icon: 'arrow' %}<span>More</span>
+    </button>
   </div>
 </section>
 

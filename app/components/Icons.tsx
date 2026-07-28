@@ -121,6 +121,49 @@ export function User({ size = 20, className }: IconProps) {
   );
 }
 
+export function Heart({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      aria-hidden="true"
+    >
+      <path d="M20.8 5.8c-1.9-2.2-5.2-2.3-7.2-.2L12 7.2l-1.6-1.6a4.8 4.8 0 0 0-7.2.2c-1.7 2.1-1.4 5.2.5 7.1L12 21l8.3-8.1c1.9-1.9 2.2-5 .5-7.1Z" />
+    </svg>
+  );
+}
+
+export function Moon({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      aria-hidden="true"
+    >
+      <path d="M20 15.2A8.4 8.4 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z" />
+    </svg>
+  );
+}
+
+export function Sun({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3.5" />
+      <path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1" />
+    </svg>
+  );
+}
+
 export function Star({ size = 18, className }: IconProps) {
   return (
     <svg

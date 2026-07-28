@@ -45,6 +45,10 @@ const films = [
 export function VideoStories() {
   const railRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState<Record<number, boolean>>({});
+  const [railPosition, setRailPosition] = useState({
+    canGoBack: false,
+    canGoForward: true,
+  });
   const { addToCart } = useStore();
 
   useEffect(() => {
@@ -74,6 +78,27 @@ export function VideoStories() {
 
     videos.forEach((video) => observer.observe(video));
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const update = () => {
+      setRailPosition({
+        canGoBack: rail.scrollLeft > 8,
+        canGoForward:
+          rail.scrollLeft + rail.clientWidth < rail.scrollWidth - 8,
+      });
+    };
+
+    update();
+    rail.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    return () => {
+      rail.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   function toggleVideo(index: number) {
@@ -123,18 +148,19 @@ export function VideoStories() {
           </button>
         </div>
       </div>
-      <div
-        className="video-story-rail"
-        ref={railRef}
-        role="region"
-        aria-label="Shoppable campaign films"
-        tabIndex={0}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowLeft") scrollRail(-1);
-          if (event.key === "ArrowRight") scrollRail(1);
-        }}
-      >
-        {films.map((film, index) => {
+      <div className="video-story-rail-shell">
+        <div
+          className="video-story-rail"
+          ref={railRef}
+          role="region"
+          aria-label="Shoppable campaign films"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") scrollRail(-1);
+            if (event.key === "ArrowRight") scrollRail(1);
+          }}
+        >
+          {films.map((film, index) => {
           const linkedProducts = film.products
             .map((handle) =>
               products.find((product) => product.handle === handle),
@@ -144,8 +170,8 @@ export function VideoStories() {
                 Boolean(product),
             );
 
-          return (
-            <article className="video-story-card" key={film.src}>
+            return (
+              <article className="video-story-card" key={film.src}>
               <video
                 src={film.src}
                 data-video-index={index}
@@ -192,9 +218,35 @@ export function VideoStories() {
                   </div>
                 ))}
               </div>
-            </article>
-          );
-        })}
+              </article>
+            );
+          })}
+        </div>
+        <button
+          className={`video-rail-edge video-rail-edge--back ${
+            railPosition.canGoBack ? "is-visible" : ""
+          }`}
+          type="button"
+          aria-label="Previous campaign films"
+          aria-hidden={!railPosition.canGoBack}
+          tabIndex={railPosition.canGoBack ? 0 : -1}
+          onClick={() => scrollRail(-1)}
+        >
+          <Arrow />
+        </button>
+        <button
+          className={`video-rail-edge video-rail-edge--forward ${
+            railPosition.canGoForward ? "is-visible" : ""
+          }`}
+          type="button"
+          aria-label="More campaign films"
+          aria-hidden={!railPosition.canGoForward}
+          tabIndex={railPosition.canGoForward ? 0 : -1}
+          onClick={() => scrollRail(1)}
+        >
+          <Arrow />
+          <span>More</span>
+        </button>
       </div>
     </section>
   );

@@ -12,8 +12,20 @@ import {
   useRef,
   useState,
 } from "react";
-import { money, Product, products } from "../data";
-import { Arrow, Bag, Close, Home, Menu, Plus, Search, User } from "./Icons";
+import { featuredCollections, money, Product, products } from "../data";
+import {
+  Arrow,
+  Bag,
+  Close,
+  Heart,
+  Home,
+  Menu,
+  Moon,
+  Plus,
+  Search,
+  Sun,
+  User,
+} from "./Icons";
 
 type CartLine = {
   product: Product;
@@ -24,9 +36,16 @@ type CartLine = {
 type StoreContextValue = {
   cart: CartLine[];
   cartCount: number;
+  cartSubtotal: number;
   addToCart: (product: Product, size?: string, quantity?: number) => void;
+  updateCartLine: (index: number, amount: number) => void;
+  wishlist: string[];
+  wishlistCount: number;
+  isWishlisted: (product: Product) => boolean;
+  toggleWishlist: (product: Product) => void;
   openCart: () => void;
   openSearch: () => void;
+  openWishlist: () => void;
 };
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -46,11 +65,69 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountStep, setAccountStep] = useState<"phone" | "code">("phone");
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const [storeReady, setStoreReady] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    try {
+      const savedCart = JSON.parse(
+        window.localStorage.getItem("tact-cart") ?? "[]",
+      ) as Array<{ handle: string; size: string; quantity: number }>;
+      const savedWishlist = JSON.parse(
+        window.localStorage.getItem("tact-wishlist") ?? "[]",
+      ) as string[];
+      const savedTheme = window.localStorage.getItem("tact-theme");
+
+      setCart(
+        savedCart.flatMap((line) => {
+          const product = products.find((item) => item.handle === line.handle);
+          return product ? [{ ...line, product }] : [];
+        }),
+      );
+      setWishlist(savedWishlist);
+      setDarkMode(
+        savedTheme
+          ? savedTheme === "dark"
+          : window.matchMedia("(prefers-color-scheme: dark)").matches,
+      );
+    } catch {
+      window.localStorage.removeItem("tact-cart");
+      window.localStorage.removeItem("tact-wishlist");
+    }
+    setStoreReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!storeReady) return;
+    window.localStorage.setItem(
+      "tact-cart",
+      JSON.stringify(
+        cart.map(({ product, size, quantity }) => ({
+          handle: product.handle,
+          size,
+          quantity,
+        })),
+      ),
+    );
+  }, [cart, storeReady]);
+
+  useEffect(() => {
+    if (!storeReady) return;
+    window.localStorage.setItem("tact-wishlist", JSON.stringify(wishlist));
+  }, [storeReady, wishlist]);
+
+  useEffect(() => {
+    if (!storeReady) return;
+    document.documentElement.dataset.theme = darkMode ? "dark" : "light";
+    window.localStorage.setItem("tact-theme", darkMode ? "dark" : "light");
+  }, [darkMode, storeReady]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -73,16 +150,17 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMenuOpen(false);
     setSearchOpen(false);
+    setWishlistOpen(false);
     setAccountOpen(false);
   }, [pathname]);
 
   useEffect(() => {
     document.body.classList.toggle(
       "has-overlay",
-      menuOpen || searchOpen || cartOpen || accountOpen,
+      menuOpen || searchOpen || cartOpen || wishlistOpen || accountOpen,
     );
     return () => document.body.classList.remove("has-overlay");
-  }, [menuOpen, searchOpen, cartOpen, accountOpen]);
+  }, [menuOpen, searchOpen, cartOpen, wishlistOpen, accountOpen]);
 
   const cartCount = cart.reduce((count, line) => count + line.quantity, 0);
   const subtotal = cart.reduce(
@@ -91,11 +169,21 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   );
   const shippingTarget = 499;
   const shippingProgress = Math.min(100, (subtotal / shippingTarget) * 100);
-  const overlayActive = menuOpen || searchOpen || cartOpen || accountOpen;
+  const overlayActive =
+    menuOpen || searchOpen || cartOpen || wishlistOpen || accountOpen;
   const overlayHeader = pathname === "/" && !scrolled && !menuOpen;
   const menuPromo =
     products.find((product) => product.handle === "pacman-oversized-tee-mocha") ??
     products[0];
+  const cartSuggestions = products
+    .filter(
+      (product) =>
+        !cart.some((line) => line.product.handle === product.handle),
+    )
+    .slice(0, 5);
+  const wishlistProducts = wishlist
+    .map((handle) => products.find((product) => product.handle === handle))
+    .filter((product): product is Product => Boolean(product));
 
   const searchResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -112,6 +200,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     setMenuOpen(false);
     setSearchOpen(false);
     setCartOpen(false);
+    setWishlistOpen(false);
     setAccountOpen(false);
   }
 
@@ -153,12 +242,27 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     );
   }
 
+  function toggleWishlist(product: Product) {
+    setWishlist((current) =>
+      current.includes(product.handle)
+        ? current.filter((handle) => handle !== product.handle)
+        : [...current, product.handle],
+    );
+  }
+
   const storeValue = {
     cart,
     cartCount,
+    cartSubtotal: subtotal,
     addToCart,
+    updateCartLine: updateQuantity,
+    wishlist,
+    wishlistCount: wishlist.length,
+    isWishlisted: (product: Product) => wishlist.includes(product.handle),
+    toggleWishlist,
     openCart: () => setCartOpen(true),
     openSearch: () => setSearchOpen(true),
+    openWishlist: () => setWishlistOpen(true),
   };
 
   return (
@@ -176,11 +280,11 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
               key={group}
             >
               <span>Free delivery over ₹499</span>
-              <i aria-hidden="true">↗</i>
+              <i aria-hidden="true">•</i>
               <span>Extra 5% off prepaid orders</span>
-              <i aria-hidden="true">↗</i>
+              <i aria-hidden="true">•</i>
               <span>New drops from TACT</span>
-              <i aria-hidden="true">↗</i>
+              <i aria-hidden="true">•</i>
             </div>
           ))}
         </div>
@@ -228,8 +332,25 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
           >
             <Search />
           </button>
+          <button
+            className="header-theme-toggle"
+            type="button"
+            aria-label={`Use ${darkMode ? "light" : "dark"} mode`}
+            onClick={() => setDarkMode((current) => !current)}
+          >
+            {darkMode ? <Sun /> : <Moon />}
+          </button>
           <button type="button" aria-label="Account" onClick={openAccount}>
             <User />
+          </button>
+          <button
+            className="header-wishlist"
+            type="button"
+            aria-label={`Open wishlist with ${wishlist.length} items`}
+            onClick={() => setWishlistOpen(true)}
+          >
+            <Heart />
+            {wishlist.length > 0 ? <span>{wishlist.length}</span> : null}
           </button>
           <button
             type="button"
@@ -330,6 +451,14 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
               <a href="https://www.tactlifestyle.store/pages/track-your-order">
                 Track your order
               </a>
+              <button
+                className="menu-theme-toggle"
+                type="button"
+                onClick={() => setDarkMode((current) => !current)}
+              >
+                {darkMode ? <Sun /> : <Moon />}
+                {darkMode ? "Light mode" : "Dark mode"}
+              </button>
             </div>
             <div className="menu-feature">
               <img
@@ -394,6 +523,55 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
       </aside>
 
       <aside
+        className={`side-drawer wishlist-drawer ${
+          wishlistOpen ? "is-open" : ""
+        }`}
+        aria-hidden={!wishlistOpen}
+      >
+        <div className="drawer-heading">
+          <span>Saved pieces ({wishlist.length})</span>
+          <button type="button" aria-label="Close wishlist" onClick={closeAll}>
+            <Close />
+          </button>
+        </div>
+        {wishlistProducts.length ? (
+          <div className="wishlist-lines">
+            {wishlistProducts.map((product) => (
+              <article className="wishlist-line" key={product.handle}>
+                <Link href={`/products/${product.handle}`} onClick={closeAll}>
+                  <img src={product.images[0]} alt="" />
+                  <span>
+                    <strong>{product.name}</strong>
+                    <small>{money.format(product.price)}</small>
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  aria-label={`Remove ${product.name} from wishlist`}
+                  onClick={() => toggleWishlist(product)}
+                >
+                  <Close />
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="wishlist-empty">
+            <Heart size={28} />
+            <h2>Save it for the next rotation.</h2>
+            <p>Tap the heart on any piece to keep it close.</p>
+            <Link
+              className="button button-dark"
+              href="/collections/all"
+              onClick={closeAll}
+            >
+              Explore the collection <Arrow />
+            </Link>
+          </div>
+        )}
+      </aside>
+
+      <aside
         className={`side-drawer cart-drawer ${cartOpen ? "is-open" : ""}`}
         aria-hidden={!cartOpen}
       >
@@ -403,23 +581,58 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
             <Close />
           </button>
         </div>
-        <div className="shipping-progress">
-          <p>
-            {subtotal >= shippingTarget
-              ? "You unlocked free shipping."
-              : `${money.format(shippingTarget - subtotal)} away from free shipping.`}
-          </p>
-          <span>
-            <i style={{ width: `${shippingProgress}%` }} />
-          </span>
-        </div>
+        {cart.length ? (
+          <div className="shipping-progress">
+            <p>
+              {subtotal >= shippingTarget
+                ? "Free shipping unlocked."
+                : `${money.format(shippingTarget - subtotal)} away from free shipping.`}
+            </p>
+            <span>
+              <i style={{ width: `${shippingProgress}%` }} />
+            </span>
+          </div>
+        ) : null}
 
         {cart.length === 0 ? (
-          <div className="empty-cart">
-            <p>Your bag is ready for a new flex.</p>
-            <Link className="button button-dark" href="/collections/all" onClick={closeAll}>
-              Shop new arrivals <Arrow />
-            </Link>
+          <div className="empty-cart empty-cart-showcase">
+            <div className="empty-cart-intro">
+              <h2>Your bag is empty.</h2>
+              <p>Let&apos;s find your next everyday flex.</p>
+              <Link href="/collections/all" onClick={closeAll}>
+                Shop now <Arrow />
+              </Link>
+            </div>
+            <section className="empty-cart-products">
+              <h3>Pieces you may like</h3>
+              <div>
+                {cartSuggestions.map((product) => (
+                  <Link
+                    href={`/products/${product.handle}`}
+                    key={product.handle}
+                    onClick={closeAll}
+                  >
+                    <img src={product.images[0]} alt={product.name} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+            <section className="empty-cart-collections">
+              <h3>Collections</h3>
+              {featuredCollections.slice(0, 4).map((collection) => (
+                <Link
+                  href={`/collections/all?collection=${collection.handle}`}
+                  key={collection.handle}
+                  onClick={closeAll}
+                >
+                  {collection.image ? (
+                    <img src={collection.image} alt="" />
+                  ) : null}
+                  <span>{collection.name}</span>
+                  <Arrow />
+                </Link>
+              ))}
+            </section>
           </div>
         ) : (
           <>
@@ -455,6 +668,32 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                 </article>
               ))}
             </div>
+            <section className="cart-upsell">
+              <div className="cart-upsell-heading">
+                <span>Pairs well with</span>
+                <small>Quick add</small>
+              </div>
+              <div className="cart-upsell-rail">
+                {cartSuggestions.slice(0, 3).map((product) => (
+                  <article key={product.handle}>
+                    <Link href={`/products/${product.handle}`} onClick={closeAll}>
+                      <img src={product.images[0]} alt="" />
+                      <span>
+                        <strong>{product.name}</strong>
+                        <small>{money.format(product.price)}</small>
+                      </span>
+                    </Link>
+                    <button
+                      type="button"
+                      aria-label={`Add ${product.name}`}
+                      onClick={() => addToCart(product)}
+                    >
+                      <Plus /> Add
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </section>
             <div className="cart-summary">
               <p>
                 Subtotal <strong>{money.format(subtotal)}</strong>
@@ -574,20 +813,34 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
 
       {!pathname.startsWith("/products/") ? (
         <nav className="mobile-dock" aria-label="Mobile navigation">
-          <Link href="/" aria-label="Home">
+          <Link
+            className={pathname === "/" ? "is-active" : ""}
+            href="/"
+            aria-label="Home"
+          >
             <Home />
             <span>Home</span>
           </Link>
-          <button type="button" aria-label="Account" onClick={openAccount}>
-            <User />
-            <span>Account</span>
-          </button>
           <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>
             <Search />
             <span>Search</span>
           </button>
+          <button
+            type="button"
+            aria-label="Wishlist"
+            onClick={() => setWishlistOpen(true)}
+          >
+            <Heart />
+            {wishlist.length ? <i>{wishlist.length}</i> : null}
+            <span>Saved</span>
+          </button>
+          <button type="button" aria-label="Account" onClick={openAccount}>
+            <User />
+            <span>Account</span>
+          </button>
           <button type="button" aria-label="Open bag" onClick={() => setCartOpen(true)}>
             <Bag />
+            {cartCount ? <i>{cartCount}</i> : null}
             <span>Bag{cartCount ? ` · ${cartCount}` : ""}</span>
           </button>
         </nav>
@@ -603,28 +856,88 @@ export function ProductCard({
   product: Product;
   priority?: boolean;
 }) {
-  const { addToCart } = useStore();
+  const { addToCart, isWishlisted, toggleWishlist } = useStore();
+  const cardSizes = Array.from(
+    new Set(
+      product.variants
+        .filter((variant) => variant.available)
+        .map((variant) => variant.size),
+    ),
+  );
+  const selectableSizes = cardSizes.length
+    ? cardSizes
+    : product.sizes.length
+      ? product.sizes
+      : ["One size"];
+  const [selectedSize, setSelectedSize] = useState(selectableSizes[0]);
+  const [added, setAdded] = useState(false);
+
+  function quickAdd() {
+    addToCart(product, selectedSize);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1200);
+  }
+
   return (
     <article className="product-card">
-      <Link
-        className="product-card-media"
-        href={`/products/${product.handle}`}
-        aria-label={`View ${product.name}`}
-      >
-        {product.tag ? <span className="product-badge">{product.tag}</span> : null}
-        <img
-          className="product-card-primary"
-          src={product.images[0]}
-          alt={product.name}
-          loading={priority ? "eager" : "lazy"}
-        />
-        <img
-          className="product-card-secondary"
-          src={product.images[1] ?? product.images[0]}
-          alt=""
-          loading="lazy"
-        />
-      </Link>
+      <div className="product-card-visual">
+        <Link
+          className="product-card-media"
+          href={`/products/${product.handle}`}
+          aria-label={`View ${product.name}`}
+        >
+          {product.tag ? <span className="product-badge">{product.tag}</span> : null}
+          <img
+            className="product-card-primary"
+            src={product.images[0]}
+            alt={product.name}
+            loading={priority ? "eager" : "lazy"}
+          />
+          <img
+            className="product-card-secondary"
+            src={product.images[1] ?? product.images[0]}
+            alt=""
+            loading="lazy"
+          />
+        </Link>
+        <button
+          className={`product-card-wishlist ${
+            isWishlisted(product) ? "is-active" : ""
+          }`}
+          type="button"
+          aria-label={`${
+            isWishlisted(product) ? "Remove" : "Add"
+          } ${product.name} ${isWishlisted(product) ? "from" : "to"} wishlist`}
+          aria-pressed={isWishlisted(product)}
+          onClick={() => toggleWishlist(product)}
+        >
+          <Heart />
+        </button>
+        <div className="product-card-quick">
+          <div className="product-card-sizes" aria-label="Choose size">
+            {selectableSizes.slice(0, 4).map((size) => (
+                <button
+                  className={selectedSize === size ? "is-active" : ""}
+                  type="button"
+                  aria-pressed={selectedSize === size}
+                  onClick={() => setSelectedSize(size)}
+                  key={size}
+                >
+                  {size === "One size" ? "OS" : size}
+                </button>
+              ))}
+          </div>
+          <button
+            className={added ? "is-added" : ""}
+            type="button"
+            onClick={quickAdd}
+            aria-label={`Add ${product.name} in ${selectedSize}`}
+          >
+            <span>{added ? "Added" : "Add"}</span>
+            <i>{added ? "✓" : <Plus />}</i>
+          </button>
+        </div>
+      </div>
       <div className="product-card-info">
         <Link href={`/products/${product.handle}`}>
           <h3>{product.name}</h3>
@@ -634,13 +947,6 @@ export function ProductCard({
           </p>
           <small>{product.color}</small>
         </Link>
-        <button
-          type="button"
-          aria-label={`Quick add ${product.name}`}
-          onClick={() => addToCart(product)}
-        >
-          <Plus />
-        </button>
       </div>
     </article>
   );

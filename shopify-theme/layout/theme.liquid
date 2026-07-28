@@ -1,5 +1,10 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}">
+<html
+  lang="{{ request.locale.iso_code }}"
+  data-theme="{% if settings.default_color_mode == 'dark' %}dark{% else %}light{% endif %}"
+  data-theme-default="{{ settings.default_color_mode }}"
+  data-theme-enabled="{{ settings.enable_dark_mode }}"
+>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,6 +21,20 @@
     </title>
     {% if page_description %}
       <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    {% if settings.enable_dark_mode %}
+      <script>
+        (() => {
+          try {
+            const saved = localStorage.getItem('tact-theme');
+            const fallback = document.documentElement.dataset.themeDefault;
+            const theme = saved || (fallback === 'system'
+              ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+              : fallback);
+            document.documentElement.dataset.theme = theme;
+          } catch (_) {}
+        })();
+      </script>
     {% endif %}
 
     {{ content_for_header }}
@@ -59,6 +78,12 @@
         --tact-icon-stroke: {{ settings.icon_stroke }};
         --tact-logo-width: {{ settings.logo_width }}px;
         --tact-logo-width-mobile: {{ settings.logo_width_mobile }}px;
+      }
+      html[data-theme="dark"] {
+        --tact-ink: {{ settings.dark_color_ink }};
+        --tact-paper: {{ settings.dark_color_paper }};
+        --tact-surface: {{ settings.dark_color_surface }};
+        --tact-muted: {{ settings.dark_color_muted }};
       }
       @media (max-width: 749px) {
         :root { --tact-page: {{ settings.page_padding_mobile }}px; }

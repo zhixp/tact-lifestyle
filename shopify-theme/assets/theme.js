@@ -13,6 +13,7 @@ class TactTheme {
     this.bindReviewStories();
     this.bindVideoQuickAdd();
     this.bindWishlist();
+    this.bindThemeMode();
     this.onScroll();
   }
 
@@ -98,8 +99,24 @@ class TactTheme {
           behavior: "smooth",
         });
       };
+      const edgeBack = section.querySelector("[data-video-edge-prev]");
+      const edgeNext = section.querySelector("[data-video-edge-next]");
+      const updateEdges = () => {
+        if (!rail) return;
+        const back = rail.scrollLeft > 8;
+        const next = rail.scrollLeft + rail.clientWidth < rail.scrollWidth - 8;
+        edgeBack?.classList.toggle("is-visible", back);
+        edgeNext?.classList.toggle("is-visible", next);
+        edgeBack?.setAttribute("aria-hidden", String(!back));
+        edgeNext?.setAttribute("aria-hidden", String(!next));
+      };
       section.querySelector("[data-video-rail-prev]")?.addEventListener("click", () => scrollRail(-1));
       section.querySelector("[data-video-rail-next]")?.addEventListener("click", () => scrollRail(1));
+      edgeBack?.addEventListener("click", () => scrollRail(-1));
+      edgeNext?.addEventListener("click", () => scrollRail(1));
+      rail?.addEventListener("scroll", updateEdges, { passive: true });
+      window.addEventListener("resize", updateEdges, { passive: true });
+      updateEdges();
       rail?.addEventListener("keydown", (event) => {
         if (event.key === "ArrowLeft") scrollRail(-1);
         if (event.key === "ArrowRight") scrollRail(1);
@@ -395,6 +412,46 @@ class TactTheme {
       });
     }
     render();
+  }
+
+  bindThemeMode() {
+    const root = document.documentElement;
+    if (root.dataset.themeEnabled !== "true") return;
+
+    const storageKey = "tact-theme";
+    const system = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = (theme) => {
+      root.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute(
+        "content",
+        theme === "dark" ? "#0c0c0d" : "#0b0b0c",
+      );
+      document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        const next = theme === "dark" ? "light" : "dark";
+        button.setAttribute("aria-label", `Use ${next} mode`);
+        const label = button.querySelector("[data-theme-toggle-label]");
+        if (label) label.textContent = `${next[0].toUpperCase()}${next.slice(1)} mode`;
+      });
+    };
+    const stored = window.localStorage.getItem(storageKey);
+    const preferred =
+      root.dataset.themeDefault === "system"
+        ? (system.matches ? "dark" : "light")
+        : root.dataset.themeDefault;
+
+    apply(stored || preferred || "light");
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const next = root.dataset.theme === "dark" ? "light" : "dark";
+        window.localStorage.setItem(storageKey, next);
+        apply(next);
+      });
+    });
+    system.addEventListener?.("change", (event) => {
+      if (!window.localStorage.getItem(storageKey)) {
+        apply(event.matches ? "dark" : "light");
+      }
+    });
   }
 
   openMenu() {

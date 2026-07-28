@@ -25,9 +25,9 @@
               {% if section.settings.show_separator %}<i aria-hidden="true">{{ section.settings.separator }}</i>{% endif %}
             {% endfor %}
           {% else %}
-            <span>Free delivery over ₹499</span><i aria-hidden="true">↗</i>
-            <span>Extra 5% off prepaid orders</span><i aria-hidden="true">↗</i>
-            <span>New drops from TACT</span><i aria-hidden="true">↗</i>
+            <span>Free delivery over ₹499</span><i aria-hidden="true">•</i>
+            <span>Extra 5% off prepaid orders</span><i aria-hidden="true">•</i>
+            <span>New drops from TACT</span><i aria-hidden="true">•</i>
           {% endif %}
         </div>
       {% endfor %}
@@ -53,7 +53,7 @@
     ]},
     {"type": "checkbox", "id": "pause_on_hover", "label": "Pause on hover", "default": true},
     {"type": "checkbox", "id": "show_separator", "label": "Show separator", "default": true},
-    {"type": "text", "id": "separator", "label": "Separator", "default": "↗"},
+    {"type": "text", "id": "separator", "label": "Separator", "default": "•"},
     {"type": "color", "id": "background", "label": "Background", "default": "#0a0a0a"},
     {"type": "color", "id": "text_color", "label": "Text", "default": "#ffffff"},
     {"type": "text", "id": "aria_label", "label": "Accessibility label", "default": "Store announcements"}

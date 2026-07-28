@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { StorefrontShell } from "./components/Storefront";
 import "./globals.css";
+import "./commerce-refinement.css";
 
 export const metadata: Metadata = {
   title: "TACT Lifestyle — Wear Your Flex",

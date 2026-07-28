@@ -12,18 +12,22 @@ From **Online Store → Themes → Customize**, the client can:
 - upload separate desktop/mobile hero images, GIFs or Shopify-hosted videos;
 - create up to six hero slides and control height, crop, focal point, overlay, typography, copy, links, autoplay and navigation;
 - change global Shopify fonts, typography scale, colors, page width, spacing, button/card radius and icon sizing;
+- configure the storefront light/dark palette and let shoppers switch modes from the header;
 - upload dark/light logos, resize desktop/mobile logos and upload replacement navigation icons;
 - edit the announcement marquee, messages, icons, direction, speed, spacing and colors;
 - edit header menus, action visibility, mobile dock, sticky behavior and mega-menu campaign tile;
 - add/reorder/resize homepage categories and connect each tile to a collection;
 - choose product collections, columns, mobile product rails, quick add and wishlist;
 - add/reorder video stories and connect products worn in each video;
+- show automatic edge arrows on long video rails so touch and mouse users can discover more stories;
 - edit, add, remove and reorder continuous customer-review cards;
 - edit all product-page offer, highlight, size guide, care, shipping and returns content;
 - toggle product information, offers, dynamic checkout, wishlist and complementary products;
 - select up to eight “Pairs well with” products per product template;
 - edit the empty-cart showcase, cart note and collection-based cart upsell;
 - change footer logo, content, newsletter, support cards, menus, colors and spacing.
+
+The mobile dock is a five-action layout for Home, Search, Wishlist, Account and Bag. Its visibility and individual header actions remain controlled from the header section settings.
 
 Products, titles, descriptions, variants, sizes, inventory and product media remain managed from **Products**. Collections remain managed from **Products → Collections**. The owner does not edit theme code when adding normal products.
 

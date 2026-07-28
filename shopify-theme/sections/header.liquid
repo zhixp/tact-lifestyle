@@ -59,6 +59,12 @@
         {% render 'icon', icon: 'search' %}
       </a>
     {% endif %}
+    {% if settings.enable_dark_mode and section.settings.show_theme_toggle %}
+      <button class="t-icon-button t-theme-toggle" type="button" data-theme-toggle aria-label="Use dark mode">
+        <span class="t-theme-toggle__moon" aria-hidden="true">◐</span>
+        <span class="t-theme-toggle__sun" aria-hidden="true">☼</span>
+      </button>
+    {% endif %}
     {% if section.settings.show_account %}
       <a class="t-icon-button" href="{{ routes.account_url }}" aria-label="{{ section.settings.account_label | escape }}">
         {% render 'icon', icon: 'user' %}
@@ -85,8 +91,15 @@
 {% if section.settings.show_mobile_dock %}
   <nav class="t-mobile-dock" aria-label="Mobile navigation">
     <a href="{{ routes.root_url }}">{% render 'icon', icon: 'home' %}<span>{{ section.settings.home_label }}</span></a>
-    <a href="{{ routes.account_url }}">{% render 'icon', icon: 'user' %}<span>{{ section.settings.account_label }}</span></a>
     <a href="{{ routes.search_url }}">{% render 'icon', icon: 'search' %}<span>{{ section.settings.search_label }}</span></a>
+    {% if section.settings.show_wishlist %}
+      <button type="button" data-wishlist-open>
+        {% render 'icon', icon: 'heart' %}
+        <i data-wishlist-count hidden>0</i>
+        <span>{{ section.settings.wishlist_label }}</span>
+      </button>
+    {% endif %}
+    <a href="{{ routes.account_url }}">{% render 'icon', icon: 'user' %}<span>{{ section.settings.account_label }}</span></a>
     <a href="{{ routes.cart_url }}">
       {% render 'icon', icon: 'bag' %}
       <span>{{ section.settings.bag_label }}{% if cart.item_count > 0 %} · {{ cart.item_count }}{% endif %}</span>
@@ -122,6 +135,13 @@
         {% for link in section.settings.support_menu.links %}
           <a href="{{ link.url }}">{{ link.title }}</a>
         {% endfor %}
+        {% if settings.enable_dark_mode and section.settings.show_theme_toggle %}
+          <button class="t-menu__theme-toggle" type="button" data-theme-toggle>
+            <span class="t-theme-toggle__moon" aria-hidden="true">◐</span>
+            <span class="t-theme-toggle__sun" aria-hidden="true">☼</span>
+            <i data-theme-toggle-label>Dark mode</i>
+          </button>
+        {% endif %}
       </div>
       <div>
         <p>{{ section.settings.collections_heading }}</p>
@@ -218,6 +238,7 @@
     {"type": "checkbox", "id": "show_account", "label": "Show account", "default": true},
     {"type": "checkbox", "id": "show_wishlist", "label": "Show wishlist", "default": true},
     {"type": "checkbox", "id": "show_cart", "label": "Show cart", "default": true},
+    {"type": "checkbox", "id": "show_theme_toggle", "label": "Show light / dark mode toggle", "default": true},
     {"type": "text", "id": "open_menu_label", "label": "Open menu label", "default": "Open menu"},
     {"type": "text", "id": "close_menu_label", "label": "Close menu label", "default": "Close menu"},
     {"type": "text", "id": "search_label", "label": "Search label", "default": "Search"},
