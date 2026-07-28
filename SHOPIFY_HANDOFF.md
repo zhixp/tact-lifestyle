@@ -1,8 +1,14 @@
 # TACT Shopify theme handoff
 
-`tact-shopify-theme.zip` is an Online Store 2.0 theme for Shopify Basic.
+`tact-editorial-1.6.0.zip` is the Shopify CLI-built Online Store 2.0 package
+for Shopify Basic. Do not reuse an older `tact-shopify-theme.zip` upload.
 
 Upload it from **Shopify admin → Online Store → Themes → Import theme → Upload zip file**. Keep it unpublished while testing.
+
+After uploading, verify the draft theme is named **tact-editorial-1.6.0** and open
+**Theme settings > Advanced**. It must show
+**TACT Editorial 1.6.0 · Full Online Store 2.0 package**. If it does not, the
+wrong archive or an older draft theme is open.
 
 ## What the client controls without code
 

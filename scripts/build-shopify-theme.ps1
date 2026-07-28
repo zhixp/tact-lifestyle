@@ -1,64 +1,77 @@
 param(
   [string]$SourceDirectory = "shopify-theme",
-  [string]$DestinationFile = "tact-shopify-theme.zip"
+  [string]$DestinationFile
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-Add-Type -AssemblyName System.IO.Compression
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-
 $repository = Split-Path -Parent $PSScriptRoot
 $source = (Resolve-Path -LiteralPath (Join-Path $repository $SourceDirectory)).Path
-$destination = Join-Path $repository $DestinationFile
+$schema = Get-Content -Raw -LiteralPath (Join-Path $source "config\settings_schema.json") |
+  ConvertFrom-Json
+$themeInfo = $schema | Where-Object name -eq "theme_info" | Select-Object -First 1
 
-$stream = [System.IO.File]::Open(
-  $destination,
-  [System.IO.FileMode]::Create,
-  [System.IO.FileAccess]::ReadWrite,
-  [System.IO.FileShare]::None
-)
-
-try {
-  $archive = New-Object System.IO.Compression.ZipArchive(
-    $stream,
-    [System.IO.Compression.ZipArchiveMode]::Create,
-    $false
-  )
-  try {
-    Get-ChildItem -LiteralPath $source -Recurse -File | ForEach-Object {
-      $entryName = $_.FullName.Substring($source.Length + 1).Replace("\", "/")
-      [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
-        $archive,
-        $_.FullName,
-        $entryName,
-        [System.IO.Compression.CompressionLevel]::Optimal
-      ) | Out-Null
-    }
-  } finally {
-    $archive.Dispose()
-  }
-} finally {
-  $stream.Dispose()
+if (-not $themeInfo.theme_name -or -not $themeInfo.theme_version) {
+  throw "Theme name and version are required in config/settings_schema.json."
 }
 
+$generatedName = "$($themeInfo.theme_name)-$($themeInfo.theme_version).zip"
+$generated = Join-Path $source $generatedName
+
+if (-not $DestinationFile) {
+  $slug = ($themeInfo.theme_name.ToLowerInvariant() -replace "[^a-z0-9]+", "-").Trim("-")
+  $DestinationFile = "$slug-$($themeInfo.theme_version).zip"
+}
+
+$destination = Join-Path $repository $DestinationFile
+if (Test-Path -LiteralPath $generated) {
+  Remove-Item -LiteralPath $generated -Force
+}
+
+$shopify = Get-Command shopify -ErrorAction SilentlyContinue
+$pnpm = Get-Command pnpm -ErrorAction SilentlyContinue
+$npx = Get-Command npx -ErrorAction SilentlyContinue
+
+if ($shopify) {
+  & $shopify.Source theme package --path $source
+} elseif ($pnpm) {
+  & $pnpm.Source dlx @shopify/cli@latest theme package --path $source
+} elseif ($npx) {
+  & $npx.Source --yes @shopify/cli@latest theme package --path $source
+} else {
+  throw "Shopify CLI is required. Install it or make pnpm/npx available."
+}
+
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $generated)) {
+  throw "Shopify CLI did not create $generatedName."
+}
+
+if (Test-Path -LiteralPath $destination) {
+  Remove-Item -LiteralPath $destination -Force
+}
+Move-Item -LiteralPath $generated -Destination $destination
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive = [System.IO.Compression.ZipFile]::OpenRead($destination)
 try {
   $requiredEntries = @(
     "layout/theme.liquid",
     "config/settings_schema.json",
     "config/settings_data.json",
-    "templates/index.json"
+    "sections/header-group.json",
+    "sections/footer-group.json",
+    "sections/main-404.liquid",
+    "templates/index.json",
+    "templates/404.json"
   )
+
   foreach ($entryName in $requiredEntries) {
     if (-not $archive.GetEntry($entryName)) {
       throw "Invalid Shopify package: missing $entryName"
     }
   }
-  if ($archive.Entries.FullName -match "\\") {
-    throw "Invalid Shopify package: ZIP entries contain Windows path separators"
-  }
+
   $entryCount = $archive.Entries.Count
 } finally {
   $archive.Dispose()
@@ -67,6 +80,7 @@ try {
 $file = Get-Item -LiteralPath $destination
 $hash = Get-FileHash -LiteralPath $destination -Algorithm SHA256
 Write-Output "Created $($file.FullName)"
+Write-Output "Theme: $($themeInfo.theme_name) $($themeInfo.theme_version)"
 Write-Output "Entries: $entryCount"
 Write-Output "Size: $($file.Length) bytes"
 Write-Output "SHA256: $($hash.Hash)"

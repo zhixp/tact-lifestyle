@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "TACT Editorial",
-    "theme_version": "1.5.0",
+    "theme_version": "1.6.0",
     "theme_author": "TACT Lifestyle",
     "theme_documentation_url": "https://www.tactlifestyle.store/",
     "theme_support_url": "https://www.tactlifestyle.store/pages/contact"
@@ -422,6 +422,10 @@
   {
     "name": "Advanced",
     "settings": [
+      {
+        "type": "paragraph",
+        "content": "TACT Editorial 1.6.0 · Full Online Store 2.0 package"
+      },
       {
         "type": "textarea",
         "id": "custom_css",
