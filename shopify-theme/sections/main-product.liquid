@@ -8,7 +8,18 @@
   endif
 %}
 
-<section class="t-product t-product--conversion">
+<section
+  class="t-product t-product--conversion{% unless section.settings.sticky_details %} t-product--static-details{% endunless %}"
+  style="
+    --product-title-size: {{ section.settings.title_size }}px;
+    --product-title-mobile: {{ section.settings.title_size_mobile }}px;
+    --product-panel-width: {{ section.settings.panel_width }}px;
+    --product-image-ratio: {{ section.settings.image_ratio }};
+    --product-image-fit: {{ section.settings.image_fit }};
+    --product-background: {{ section.settings.background }};
+    --product-panel-background: {{ section.settings.panel_background }};
+  "
+>
   <div class="t-product__gallery">
     {% for media in product.media %}
       <figure class="{% if forloop.first %}t-product__gallery-primary{% endif %}">
@@ -26,12 +37,37 @@
           {{ product.media.size | prepend: '0' | slice: -2, 2 }}
         </figcaption>
       </figure>
+    {% else %}
+      <figure>{{ 'product-1' | placeholder_svg_tag }}</figure>
     {% endfor %}
   </div>
 
   <div class="t-product__detail">
-    <p class="t-product__type">{{ product.type | default: 'TACT Lifestyle' }}</p>
-    <h1>{{ product.title }}</h1>
+    <div class="t-product__heading">
+      <div>
+        {% if section.settings.show_product_type %}
+          <p class="t-product__type">{{ product.type | default: shop.name }}</p>
+        {% endif %}
+        <h1>{{ product.title }}</h1>
+      </div>
+      {% if section.settings.show_wishlist %}
+        <button
+          class="t-product__wishlist"
+          type="button"
+          data-wishlist-toggle
+          data-wishlist-handle="{{ product.handle }}"
+          data-wishlist-title="{{ product.title | escape }}"
+          data-wishlist-url="{{ product.url }}"
+          data-wishlist-image="{{ product.featured_image | image_url: width: 360 }}"
+          data-wishlist-price="{{ product.price | money | escape }}"
+          aria-label="Save {{ product.title | escape }}"
+          aria-pressed="false"
+        >
+          {% render 'icon', icon: 'heart' %}
+        </button>
+      {% endif %}
+    </div>
+
     <div class="t-product__price-row">
       <p class="t-product__price" data-product-price>
         {% if selected_variant.compare_at_price > selected_variant.price %}
@@ -39,20 +75,22 @@
         {% endif %}
         <strong>{{ selected_variant.price | money }}</strong>
       </p>
-      {% if saving_percent > 0 %}
+      {% if saving_percent > 0 and section.settings.show_savings %}
         <span class="t-product__saving">Save {{ saving_percent }}%</span>
       {% endif %}
     </div>
-    <p class="t-product__tax">MRP inclusive of all taxes</p>
-    <p class="t-product__shipping-note">Shipping calculated at checkout.</p>
+    {% if section.settings.tax_copy != blank %}<p class="t-product__tax">{{ section.settings.tax_copy }}</p>{% endif %}
+    {% if section.settings.shipping_note != blank %}<p class="t-product__shipping-note">{{ section.settings.shipping_note }}</p>{% endif %}
 
     {% form 'product', product, id: product_form_id, class: 't-product-form' %}
       {% unless product.has_only_default_variant %}
         <div class="t-variant-heading">
-          <span>Available size</span>
-          <button type="button" data-size-guide-open>
-            {% render 'icon', icon: 'ruler' %} Sizing guide
-          </button>
+          <span>{{ section.settings.size_label }}</span>
+          {% if section.settings.show_size_guide %}
+            <button type="button" data-size-guide-open>
+              {% render 'icon', icon: 'ruler' %} {{ section.settings.size_guide_label }}
+            </button>
+          {% endif %}
         </div>
         <div class="t-variant-list">
           {% for variant in product.variants %}
@@ -82,149 +120,203 @@
           <button type="button" data-quantity-plus aria-label="Increase quantity">+</button>
         </label>
         <button class="t-product__add" type="submit" name="add" {% unless selected_variant.available %}disabled{% endunless %}>
-          <span>{% if selected_variant.available %}Add to cart{% else %}Sold out{% endif %}</span>
+          <span>{% if selected_variant.available %}{{ section.settings.add_label }}{% else %}Sold out{% endif %}</span>
         </button>
       </div>
-      <div class="t-product__buy">{{ form | payment_button }}</div>
+      {% if section.settings.show_dynamic_checkout %}
+        <div class="t-product__buy">{{ form | payment_button }}</div>
+      {% endif %}
       <div class="t-product-form__message" data-product-message role="status"></div>
     {% endform %}
 
-    <section class="t-product__offers" aria-label="Current offers">
-      <div class="t-product__offers-title">
-        <span>{{ section.settings.offer_heading }}</span>
-        <small>Available now</small>
-      </div>
-      <div class="t-product__offer-card">
-        {% render 'icon', icon: 'tag' %}
-        <div>
-          <strong>{{ section.settings.prepaid_offer }}</strong>
-          <span>{{ section.settings.prepaid_offer_note }}</span>
+    {% if section.settings.show_offers %}
+      <section class="t-product__offers" aria-label="{{ section.settings.offer_heading | escape }}">
+        <div class="t-product__offers-title">
+          <span>{{ section.settings.offer_heading }}</span>
+          <small>Available now</small>
         </div>
-      </div>
-      <div class="t-product__offer-foot">
-        <span>{{ section.settings.shipping_offer }}</span>
-        <span>{{ section.settings.return_offer }}</span>
-      </div>
-    </section>
+        <div class="t-product__offer-card">
+          {% render 'icon', icon: 'tag' %}
+          <div>
+            <strong>{{ section.settings.prepaid_offer }}</strong>
+            <span>{{ section.settings.prepaid_offer_note }}</span>
+          </div>
+        </div>
+        <div class="t-product__offer-foot">
+          <span>{{ section.settings.shipping_offer }}</span>
+          <span>{{ section.settings.return_offer }}</span>
+        </div>
+      </section>
+    {% endif %}
 
-    <section class="t-product__value">
-      <p class="t-kicker">What you get</p>
-      <h2>Built into every order.</h2>
-      <div class="t-product__value-list">
-        <article>
-          {% render 'icon', icon: 'fabric' %}
-          <div>
-            <strong>{{ section.settings.fabric_heading }}</strong>
-            <span>{{ section.settings.fabric_copy }}</span>
-          </div>
-        </article>
-        <article>
-          {% render 'icon', icon: 'card' %}
-          <div>
-            <strong>Flexible payment options</strong>
-            <span>Prepaid savings available at checkout</span>
-          </div>
-        </article>
-        <article>
-          {% render 'icon', icon: 'truck' %}
-          <div>
-            <strong>Fast domestic delivery</strong>
-            <span>Standard delivery generally in 3–4 business days</span>
-          </div>
-        </article>
-        <article>
-          {% render 'icon', icon: 'return' %}
-          <div>
-            <strong>Seven-day eligible returns</strong>
-            <span>For unworn pieces with original tags</span>
-          </div>
-        </article>
-      </div>
-    </section>
+    {% if section.settings.show_value_highlights %}
+      <section class="t-product__value">
+        <p class="t-kicker">{{ section.settings.value_eyebrow }}</p>
+        <h2>{{ section.settings.value_heading }}</h2>
+        <div class="t-product__value-list">
+          {% for block in section.blocks %}
+            <article {{ block.shopify_attributes }}>
+              {% if block.settings.icon != blank %}
+                {{ block.settings.icon | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
+              {% else %}
+                {% render 'icon', icon: block.settings.fallback_icon %}
+              {% endif %}
+              <div><strong>{{ block.settings.heading }}</strong><span>{{ block.settings.copy }}</span></div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
 
-    <section class="t-product__information">
-      <div class="t-product__tab-list" role="tablist">
-        <button class="is-active" type="button" data-product-tab="fit">Size & fit</button>
-        <button type="button" data-product-tab="care">Fabric & care</button>
-        <button type="button" data-product-tab="about">About</button>
-        <button type="button" data-product-tab="shipping">Shipping</button>
-        <button type="button" data-product-tab="returns">Returns</button>
-      </div>
-      <div class="t-product__tab-panel is-active" data-product-panel="fit">
-        <h3>Size & fit</h3>
-        <div class="rte">{{ section.settings.size_guide }}</div>
-      </div>
-      <div class="t-product__tab-panel" data-product-panel="care">
-        <h3>Fabric & care</h3>
-        <div class="rte">{{ section.settings.fabric_care }}</div>
-      </div>
-      <div class="t-product__tab-panel" data-product-panel="about">
-        <h3>Product details</h3>
-        <div class="rte">{{ product.description }}</div>
-      </div>
-      <div class="t-product__tab-panel" data-product-panel="shipping">
-        <h3>Shipping</h3>
-        <div class="rte">{{ section.settings.shipping_copy }}</div>
-        <a href="{{ shop.shipping_policy.url }}">Read the shipping policy</a>
-      </div>
-      <div class="t-product__tab-panel" data-product-panel="returns">
-        <h3>Returns & exchange</h3>
-        <div class="rte">{{ section.settings.return_copy }}</div>
-        <a href="{{ shop.refund_policy.url }}">Read the return policy</a>
-      </div>
-    </section>
+    {% if section.settings.show_information %}
+      <section class="t-product__information">
+        <div class="t-product__tab-list" role="tablist">
+          <button class="is-active" type="button" data-product-tab="fit">{{ section.settings.fit_tab_label }}</button>
+          <button type="button" data-product-tab="care">{{ section.settings.care_tab_label }}</button>
+          <button type="button" data-product-tab="about">{{ section.settings.about_tab_label }}</button>
+          <button type="button" data-product-tab="shipping">{{ section.settings.shipping_tab_label }}</button>
+          <button type="button" data-product-tab="returns">{{ section.settings.returns_tab_label }}</button>
+        </div>
+        <div class="t-product__tab-panel is-active" data-product-panel="fit">
+          <h3>{{ section.settings.fit_tab_label }}</h3>
+          <div class="rte">{{ section.settings.size_guide }}</div>
+        </div>
+        <div class="t-product__tab-panel" data-product-panel="care">
+          <h3>{{ section.settings.care_tab_label }}</h3>
+          <div class="rte">{{ section.settings.fabric_care }}</div>
+        </div>
+        <div class="t-product__tab-panel" data-product-panel="about">
+          <h3>{{ section.settings.about_tab_label }}</h3>
+          <div class="rte">{{ product.description }}</div>
+        </div>
+        <div class="t-product__tab-panel" data-product-panel="shipping">
+          <h3>{{ section.settings.shipping_tab_label }}</h3>
+          <div class="rte">{{ section.settings.shipping_copy }}</div>
+          {% if shop.shipping_policy.url != blank %}<a href="{{ shop.shipping_policy.url }}">Read the shipping policy</a>{% endif %}
+        </div>
+        <div class="t-product__tab-panel" data-product-panel="returns">
+          <h3>{{ section.settings.returns_tab_label }}</h3>
+          <div class="rte">{{ section.settings.return_copy }}</div>
+          {% if shop.refund_policy.url != blank %}<a href="{{ shop.refund_policy.url }}">Read the return policy</a>{% endif %}
+        </div>
+      </section>
+    {% endif %}
   </div>
 </section>
 
-<button class="t-overlay t-size-overlay" type="button" data-size-guide-close aria-label="Close size guide"></button>
-<aside class="t-size-guide" data-size-guide aria-hidden="true">
-  <div class="t-size-guide__bar">
-    <span>TACT size guide</span>
-    <button class="t-icon-button" type="button" data-size-guide-close aria-label="Close size guide">{% render 'icon', icon: 'close' %}</button>
-  </div>
-  <div class="t-size-guide__body">
-    <h2>Find your intended fit.</h2>
-    {{ section.settings.size_guide }}
-  </div>
-</aside>
+{% if section.settings.show_complementary and section.settings.complementary_products != blank %}
+  <section
+    class="t-complementary"
+    style="
+      --complementary-background: {{ section.settings.complementary_background }};
+      --complementary-heading-size: {{ section.settings.complementary_title_size }}px;
+    "
+  >
+    <header>
+      {% if section.settings.complementary_eyebrow != blank %}<p class="t-kicker">{{ section.settings.complementary_eyebrow }}</p>{% endif %}
+      <h2>{{ section.settings.complementary_heading }}</h2>
+    </header>
+    <div class="t-complementary__rail">
+      {% for card_product in section.settings.complementary_products %}
+        {% render 'product-card', card_product: card_product, quick_add: section.settings.complementary_quick_add, wishlist: section.settings.show_wishlist %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% if section.settings.show_size_guide %}
+  <button class="t-overlay t-size-overlay" type="button" data-size-guide-close aria-label="Close size guide"></button>
+  <aside class="t-size-guide" data-size-guide aria-hidden="true">
+    <div class="t-size-guide__bar">
+      <span>TACT size guide</span>
+      <button class="t-icon-button" type="button" data-size-guide-close aria-label="Close size guide">{% render 'icon', icon: 'close' %}</button>
+    </div>
+    <div class="t-size-guide__body">
+      <h2>Find your intended fit.</h2>
+      {{ section.settings.size_guide }}
+    </div>
+  </aside>
+{% endif %}
 
 {% schema %}
 {
   "name": "Main product",
   "settings": [
+    {"type": "header", "content": "Layout and gallery"},
+    {"type": "checkbox", "id": "sticky_details", "label": "Keep product details visible on desktop", "default": false, "info": "Leave off for one continuous page scroll."},
+    {"type": "select", "id": "image_ratio", "label": "Gallery image ratio", "default": "1 / 1", "options": [
+      {"value": "1 / 1", "label": "Square"},
+      {"value": "4 / 5", "label": "Portrait"},
+      {"value": "3 / 4", "label": "Tall"},
+      {"value": "auto", "label": "Natural"}
+    ]},
+    {"type": "select", "id": "image_fit", "label": "Gallery image fit", "default": "contain", "options": [
+      {"value": "contain", "label": "Contain"},
+      {"value": "cover", "label": "Cover"}
+    ]},
+    {"type": "range", "id": "panel_width", "label": "Desktop details width", "min": 380, "max": 680, "step": 10, "unit": "px", "default": 520},
+    {"type": "range", "id": "title_size", "label": "Desktop title size", "min": 32, "max": 72, "step": 2, "unit": "px", "default": 48},
+    {"type": "range", "id": "title_size_mobile", "label": "Mobile title size", "min": 30, "max": 54, "step": 2, "unit": "px", "default": 40},
+    {"type": "color", "id": "background", "label": "Gallery background", "default": "#e8e8e5"},
+    {"type": "color", "id": "panel_background", "label": "Details background", "default": "#ffffff"},
+    {"type": "header", "content": "Product heading and purchase"},
+    {"type": "checkbox", "id": "show_product_type", "label": "Show product type", "default": true},
+    {"type": "checkbox", "id": "show_wishlist", "label": "Show wishlist", "default": true},
+    {"type": "checkbox", "id": "show_savings", "label": "Show savings badge", "default": true},
+    {"type": "text", "id": "tax_copy", "label": "Tax copy", "default": "MRP inclusive of all taxes"},
+    {"type": "text", "id": "shipping_note", "label": "Checkout note", "default": "Shipping calculated at checkout."},
+    {"type": "text", "id": "size_label", "label": "Variant label", "default": "Available size"},
+    {"type": "text", "id": "add_label", "label": "Add button label", "default": "Add to bag"},
+    {"type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout button", "default": true, "info": "Shopify displays the best available accelerated checkout method."},
     {"type": "header", "content": "Offer card"},
+    {"type": "checkbox", "id": "show_offers", "label": "Show offers", "default": true},
     {"type": "text", "id": "offer_heading", "label": "Heading", "default": "Special offers"},
     {"type": "text", "id": "prepaid_offer", "label": "Prepaid offer", "default": "Extra 5% off prepaid orders"},
     {"type": "text", "id": "prepaid_offer_note", "label": "Prepaid note", "default": "Applied to eligible prepaid orders at checkout."},
     {"type": "text", "id": "shipping_offer", "label": "Shipping offer", "default": "Free shipping over ₹499"},
     {"type": "text", "id": "return_offer", "label": "Return offer", "default": "7-day eligible returns"},
     {"type": "header", "content": "Value highlights"},
-    {"type": "text", "id": "fabric_heading", "label": "Fabric highlight", "default": "Premium construction"},
-    {"type": "text", "id": "fabric_copy", "label": "Fabric highlight copy", "default": "Designed for everyday structure and comfort"},
+    {"type": "checkbox", "id": "show_value_highlights", "label": "Show value highlights", "default": true},
+    {"type": "text", "id": "value_eyebrow", "label": "Eyebrow", "default": "What you get"},
+    {"type": "text", "id": "value_heading", "label": "Heading", "default": "Built into every order."},
     {"type": "header", "content": "Product information"},
+    {"type": "checkbox", "id": "show_information", "label": "Show information tabs", "default": true},
+    {"type": "checkbox", "id": "show_size_guide", "label": "Show size guide", "default": true},
+    {"type": "text", "id": "size_guide_label", "label": "Size guide link", "default": "Sizing guide"},
+    {"type": "text", "id": "fit_tab_label", "label": "Fit tab", "default": "Size & fit"},
+    {"type": "text", "id": "care_tab_label", "label": "Care tab", "default": "Fabric & care"},
+    {"type": "text", "id": "about_tab_label", "label": "Description tab", "default": "About"},
+    {"type": "text", "id": "shipping_tab_label", "label": "Shipping tab", "default": "Shipping"},
+    {"type": "text", "id": "returns_tab_label", "label": "Returns tab", "default": "Returns"},
+    {"type": "richtext", "id": "size_guide", "label": "Size and fit", "default": "<p>Add the approved garment-specific size chart here. Sizes, prices and inventory remain controlled by each Shopify product.</p>"},
+    {"type": "richtext", "id": "fabric_care", "label": "Fabric and care", "default": "<p>Follow the care label supplied with the garment. Wash similar colours together and avoid direct heat on print or embroidery.</p>"},
+    {"type": "richtext", "id": "shipping_copy", "label": "Shipping summary", "default": "<p>Free standard shipping is available on Indian orders over ₹499. Orders are processed within two business days and standard delivery generally takes 3–4 business days.</p>"},
+    {"type": "richtext", "id": "return_copy", "label": "Return summary", "default": "<p>Eligible unworn and unwashed items with original tags can be returned within seven days. A ₹125 return-shipping fee applies.</p>"},
+    {"type": "header", "content": "Pairs well with"},
+    {"type": "checkbox", "id": "show_complementary", "label": "Show complementary products", "default": true},
+    {"type": "product_list", "id": "complementary_products", "label": "Products", "limit": 8},
+    {"type": "text", "id": "complementary_eyebrow", "label": "Eyebrow", "default": "Complete the look"},
+    {"type": "text", "id": "complementary_heading", "label": "Heading", "default": "Pairs well with."},
+    {"type": "checkbox", "id": "complementary_quick_add", "label": "Show quick add", "default": true},
+    {"type": "range", "id": "complementary_title_size", "label": "Heading size", "min": 34, "max": 90, "step": 2, "unit": "px", "default": 56},
+    {"type": "color", "id": "complementary_background", "label": "Background", "default": "#f3f3f1"}
+  ],
+  "max_blocks": 4,
+  "blocks": [
     {
-      "type": "richtext",
-      "id": "size_guide",
-      "label": "Size and fit",
-      "default": "<p>Add the approved garment-specific size chart here. Sizes, prices and inventory remain controlled by each Shopify product.</p>"
-    },
-    {
-      "type": "richtext",
-      "id": "fabric_care",
-      "label": "Fabric and care",
-      "default": "<p>Follow the care label supplied with the garment. Wash similar colours together and avoid direct heat on print or embroidery.</p>"
-    },
-    {
-      "type": "richtext",
-      "id": "shipping_copy",
-      "label": "Shipping summary",
-      "default": "<p>Free standard shipping is available on Indian orders over ₹499. Orders are processed within two business days and standard delivery generally takes 3–4 business days.</p>"
-    },
-    {
-      "type": "richtext",
-      "id": "return_copy",
-      "label": "Return summary",
-      "default": "<p>Eligible unworn and unwashed items with original tags can be returned within seven days. A ₹125 return-shipping fee applies.</p>"
+      "type": "value_highlight",
+      "name": "Value highlight",
+      "settings": [
+        {"type": "image_picker", "id": "icon", "label": "Custom icon"},
+        {"type": "select", "id": "fallback_icon", "label": "Built-in icon", "default": "fabric", "options": [
+          {"value": "fabric", "label": "Fabric"},
+          {"value": "card", "label": "Payment"},
+          {"value": "truck", "label": "Delivery"},
+          {"value": "return", "label": "Returns"}
+        ]},
+        {"type": "text", "id": "heading", "label": "Heading", "default": "Premium construction"},
+        {"type": "text", "id": "copy", "label": "Copy", "default": "Designed for everyday structure and comfort"}
+      ]
     }
   ]
 }

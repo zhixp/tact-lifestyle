@@ -1,88 +1,94 @@
-# TACT Shopify handoff
+# TACT Shopify theme handoff
 
-`tact-shopify-theme.zip` is an Online Store 2.0 theme compatible with Shopify
-Basic. Upload it from **Online Store → Themes → Add theme → Upload zip file**.
+`tact-shopify-theme.zip` is an Online Store 2.0 theme for Shopify Basic.
 
-## What remains native to Shopify
+Upload it from **Shopify admin → Online Store → Themes → Import theme → Upload zip file**. Keep it unpublished while testing.
 
-- Products, prices, descriptions, sizes, variants, inventory and product media
-  are managed under **Products**.
-- Collections and product membership are managed under **Products →
-  Collections**.
-- Navigation is managed under **Content → Menus**.
-- Privacy, shipping and refund policies remain under **Settings → Policies**.
-  Uploading the theme does not replace the store’s policy text.
-- Orders, customers, discounts, payment methods and checkout remain Shopify
-  data.
+## What the client controls without code
 
-Changing themes does not remove the current 67-product catalogue or require
-the owner to upload it again.
+From **Online Store → Themes → Customize**, the client can:
 
-## Theme editor controls
+- add, remove and reorder homepage sections;
+- upload separate desktop/mobile hero images, GIFs or Shopify-hosted videos;
+- create up to six hero slides and control height, crop, focal point, overlay, typography, copy, links, autoplay and navigation;
+- change global Shopify fonts, typography scale, colors, page width, spacing, button/card radius and icon sizing;
+- upload dark/light logos, resize desktop/mobile logos and upload replacement navigation icons;
+- edit the announcement marquee, messages, icons, direction, speed, spacing and colors;
+- edit header menus, action visibility, mobile dock, sticky behavior and mega-menu campaign tile;
+- add/reorder/resize homepage categories and connect each tile to a collection;
+- choose product collections, columns, mobile product rails, quick add and wishlist;
+- add/reorder video stories and connect products worn in each video;
+- edit, add, remove and reorder continuous customer-review cards;
+- edit all product-page offer, highlight, size guide, care, shipping and returns content;
+- toggle product information, offers, dynamic checkout, wishlist and complementary products;
+- select up to eight “Pairs well with” products per product template;
+- edit the empty-cart showcase, cart note and collection-based cart upsell;
+- change footer logo, content, newsletter, support cards, menus, colors and spacing.
 
-From **Online Store → Themes → Customize**, the owner can change:
+Products, titles, descriptions, variants, sizes, inventory and product media remain managed from **Products**. Collections remain managed from **Products → Collections**. The owner does not edit theme code when adding normal products.
 
-- a desktop image, GIF or Shopify-hosted video;
-- a separate mobile image, GIF or Shopify-hosted video;
-- desktop/mobile crop, hero height, playback speed, overlay colour/strength,
-  text colour, heading, eyebrow, CTA and destination;
-- announcement ticker messages, links, speed and colours;
-- mega-menu promo image, product, eyebrow, heading and link;
-- homepage collections, product grids, editorial media/copy and services;
-- up to 16 vertical story videos, their labels and two linked products per
-  video;
-- rotating review slides and their product links;
-- product-page offer, value highlights, size guide, care, shipping and return
-  content;
-- logos, colours, menus, footer content and newsletter message.
+## Customer accounts
 
-The uploaded theme includes an editorial desktop fallback made only from TACT
-campaign assets and the current mobile campaign-video URL as a temporary
-fallback. The original desktop asset remains untouched. Upload the approved
-desktop and mobile media into Shopify and select each one in the hero section
-before publishing.
+The account icon uses Shopify’s native `routes.account_url`. The package includes legacy Shopify templates for:
 
-Each story block has a Shopify video picker and two product pickers. Add,
-remove or reorder up to 16 blocks; the scroll rail and its controls update
-without code. Quick add uses the product’s first available variant, so link
-shoppers to the product page when a size choice is required.
+- login and registration;
+- account profile and order history;
+- addresses;
+- individual order details;
+- password reset and account activation.
 
-## Accounts, KiwiPass and reviews
+For current Shopify customer accounts, enable them in **Settings → Customer accounts** and turn on **Show sign-in links**. Shopify can host the account experience and still use the theme’s account link. If TACT keeps KiwiPass for phone OTP, re-enable its app embed after changing themes; KiwiPass—not the theme—owns that modal and authentication data.
 
-- The header and mobile dock link to Shopify Customer Accounts. Login,
-  registration, profile, orders, addresses, activation and password-reset
-  templates are included.
-- TACT’s existing KiwiPass app can continue providing phone-number OTP. Keep
-  its app embed enabled after switching themes; the theme does not store or
-  simulate customer credentials.
-- The product template includes an **App integrations** section. Add the
-  existing Judge.me widget there. Homepage review slides remain editable in
-  the theme editor.
+The header editor includes independent toggles for the account, search, wishlist, cart and mobile navigation dock. Hiding the account icon does not delete customer data.
 
-## FAQ setup
+## Cart and checkout
 
-1. In **Online Store → Pages**, create a page called `FAQ`.
-2. Assign the `faq` theme template.
-3. Add, remove or reorder FAQ blocks in the theme editor.
+The theme includes a native `/cart` page with:
 
-The default FAQ answers match TACT’s current published delivery and return
-terms. Recheck them whenever policy terms change.
+- line-item editing and removal;
+- cart notes;
+- an editable empty-bag campaign;
+- collection-based upsells with size-aware quick add;
+- a native Shopify checkout submission.
 
-## Before publishing
+The product page uses a native Shopify product form plus `payment_button`, so accelerated methods supported by the store can appear as **Buy it now**.
 
-1. Duplicate the live theme as a backup.
-2. Upload this ZIP and keep it unpublished during review.
-3. Select the approved logos and desktop/mobile hero media.
-4. Select the New Arrivals collection in the homepage product grid.
-5. Confirm every product’s images, sizes, stock and description in Shopify.
-6. Upload/select story videos and connect the products worn in each film.
-7. Re-enable KiwiPass and add Judge.me to **App integrations**.
-8. Replace the presentation size guide with the approved production chart.
-9. Confirm offer wording, discounts and shipping rates match checkout.
-10. Test account login, add-to-cart, Buy it now, discounts, delivery rates,
-    return links and transactional emails on phone and desktop.
-11. Publish only after storefront and checkout QA.
+Checkout is Shopify-hosted on Shopify Basic. It is intentionally not duplicated as a Liquid page: a fake theme checkout would break payments, order creation, discount logic, inventory reservation, checkout events and recovery automation. Configure checkout branding and payment methods under **Settings → Checkout** and **Settings → Payments**. The cart, product forms and dynamic checkout preserve Shopify order and abandoned-checkout data.
 
-Shopify Basic supports the storefront theme and standard Shopify checkout.
-Structural checkout customization is controlled by Shopify and is outside the
-storefront theme.
+## Meta Pixel and ad tracking
+
+Do not paste the same Meta Pixel into `theme.liquid`. That commonly duplicates `PageView`, misses sandboxed checkout events or creates inconsistent attribution.
+
+Preferred setup:
+
+1. In Shopify admin, open **Sales channels** and install/open **Facebook & Instagram by Meta**.
+2. Connect the correct Meta Business Manager, ad account and Pixel/Dataset.
+3. In that channel’s **Settings → Data sharing**, choose the level approved by the client.
+4. Verify events with Meta Events Manager’s Test Events view.
+
+If the client has a custom tracking stack, use **Settings → Customer events → Add custom pixel** instead. Shopify Customer Events is the supported place for storefront and checkout event subscriptions. Use only one implementation per Meta dataset and remove old duplicate scripts/app embeds.
+
+Because the theme submits native Shopify cart and checkout forms, standard events and checkout state remain available to Shopify’s Meta integration. The six-hour WhatsApp recovery should be triggered from Shopify’s abandoned-checkout/cart automation or the client’s approved recovery app—not browser-only theme JavaScript.
+
+## Included pages and templates
+
+The ZIP includes templates for home, product, collection, list of collections, cart, search, standard pages, FAQ, contact, blog, article, 404 and all legacy customer-account routes. Shopify checkout itself is not a theme template.
+
+Policy links read from **Settings → Policies**, so privacy, shipping, refund and terms content stays centrally managed. Create a page with handle `faq` and assign the `faq` template if it does not already exist.
+
+## Before presenting or publishing
+
+1. Duplicate the current live theme.
+2. Upload this ZIP and preview it unpublished.
+3. Select the approved hero media and check focal points at desktop and mobile sizes.
+4. Connect homepage collections and product-grid collections.
+5. Select “Pairs well with” products in the product template.
+6. Select an upsell collection in the cart template.
+7. Re-enable required app embeds: KiwiPass, Judge.me and any recovery/WhatsApp app.
+8. Confirm customer accounts are enabled and test login, registration, orders and addresses.
+9. Test every size, add-to-cart, quick add, cart update, discount, dynamic checkout and payment method.
+10. Connect Meta through the official channel or Customer Events and verify no duplicate events.
+11. Check all policy copy and shipping/return claims against the live checkout configuration.
+12. Publish only after phone and desktop QA.
+
+The built-in wishlist uses browser storage for a fast, app-free demo. It persists on the same browser. For a wishlist synchronized across devices/customer accounts, install a Shopify wishlist app and replace or disable the built-in drawer.

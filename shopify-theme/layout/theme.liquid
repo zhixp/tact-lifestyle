@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="{{ settings.color_ink }}">
     <link rel="canonical" href="{{ canonical_url }}">
+    {% if settings.favicon != blank %}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64 }}">
+    {% endif %}
     <title>
       {{ page_title }}
       {%- if current_tags %} — {{ current_tags | join: ', ' }}{% endif -%}
@@ -14,16 +17,53 @@
     {% if page_description %}
       <meta name="description" content="{{ page_description | escape }}">
     {% endif %}
+
     {{ content_for_header }}
+
+    {% liquid
+      assign body_font_bold = settings.body_font | font_modify: 'weight', '700'
+      assign heading_font_bold = settings.heading_font | font_modify: 'weight', '700'
+    %}
+    {{ settings.body_font | font_face: font_display: 'swap' }}
+    {{ body_font_bold | font_face: font_display: 'swap' }}
+    {{ settings.heading_font | font_face: font_display: 'swap' }}
+    {{ heading_font_bold | font_face: font_display: 'swap' }}
+    {{ settings.accent_font | font_face: font_display: 'swap' }}
+
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'refinement.css' | asset_url | stylesheet_tag }}
     <style>
       :root {
         --tact-ink: {{ settings.color_ink }};
         --tact-paper: {{ settings.color_paper }};
+        --tact-surface: {{ settings.color_surface }};
+        --tact-muted: {{ settings.color_muted }};
         --tact-accent: {{ settings.color_accent }};
+        --tact-button: {{ settings.color_button }};
+        --tact-button-text: {{ settings.color_button_text }};
         --tact-radius: {{ settings.card_radius }}px;
+        --tact-button-radius: {{ settings.button_radius }}px;
+        --tact-button-height: {{ settings.button_height }}px;
+        --tact-page: max({{ settings.page_padding }}px, calc((100vw - {{ settings.page_width }}px) / 2 + {{ settings.page_padding }}px));
+        --tact-space: {{ settings.section_spacing }}px;
+        --tact-grid-gap: {{ settings.grid_gap }}px;
+        --tact-font-body: {{ settings.body_font.family }}, {{ settings.body_font.fallback_families }};
+        --tact-font-heading: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+        --tact-font-accent: {{ settings.accent_font.family }}, {{ settings.accent_font.fallback_families }};
+        --tact-body-size: {{ settings.body_font_size }}px;
+        --tact-body-line: {{ settings.body_line_height }};
+        --tact-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
+        --tact-heading-tracking: {{ settings.heading_letter_spacing | divided_by: 100.0 }}em;
+        --tact-label-tracking: {{ settings.label_letter_spacing | divided_by: 100.0 }}em;
+        --tact-icon-size: {{ settings.icon_size }}px;
+        --tact-icon-stroke: {{ settings.icon_stroke }};
+        --tact-logo-width: {{ settings.logo_width }}px;
+        --tact-logo-width-mobile: {{ settings.logo_width_mobile }}px;
       }
+      @media (max-width: 749px) {
+        :root { --tact-page: {{ settings.page_padding_mobile }}px; }
+      }
+      {{ settings.custom_css }}
     </style>
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
   </head>

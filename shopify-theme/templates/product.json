@@ -2,6 +2,41 @@
   "sections": {
     "main": {
       "type": "main-product",
+      "blocks": {
+        "fabric": {
+          "type": "value_highlight",
+          "settings": {
+            "fallback_icon": "fabric",
+            "heading": "Premium construction",
+            "copy": "Designed for everyday structure and comfort"
+          }
+        },
+        "payment": {
+          "type": "value_highlight",
+          "settings": {
+            "fallback_icon": "card",
+            "heading": "Flexible payment options",
+            "copy": "Prepaid savings available at checkout"
+          }
+        },
+        "delivery": {
+          "type": "value_highlight",
+          "settings": {
+            "fallback_icon": "truck",
+            "heading": "Fast domestic delivery",
+            "copy": "Standard delivery generally in 3–4 business days"
+          }
+        },
+        "returns": {
+          "type": "value_highlight",
+          "settings": {
+            "fallback_icon": "return",
+            "heading": "Seven-day eligible returns",
+            "copy": "For unworn pieces with original tags"
+          }
+        }
+      },
+      "block_order": ["fabric", "payment", "delivery", "returns"],
       "settings": {}
     },
     "apps": {

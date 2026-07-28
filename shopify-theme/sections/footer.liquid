@@ -1,75 +1,86 @@
-<footer class="t-footer">
-  <div class="t-footer__support">
-    <div class="t-footer__support-heading">
-      <p class="t-kicker">Customer care</p>
-      <h2>{{ section.settings.help_heading }}</h2>
+<footer
+  class="t-footer"
+  style="
+    --footer-background: {{ section.settings.background }};
+    --footer-text: {{ section.settings.text_color }};
+    --footer-muted: {{ section.settings.muted_color }};
+    --footer-padding: {{ section.settings.padding }}px;
+    --footer-logo-width: {{ section.settings.logo_width }}px;
+  "
+>
+  {% if section.settings.show_support %}
+    <div class="t-footer__support">
+      <div class="t-footer__support-heading">
+        {% if section.settings.help_eyebrow != blank %}<p class="t-kicker">{{ section.settings.help_eyebrow }}</p>{% endif %}
+        <h2>{{ section.settings.help_heading }}</h2>
+      </div>
+      {% for block in section.blocks %}
+        {% if block.type == 'support_link' %}
+          <a href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+            <span>{{ forloop.index | prepend: '0' }}</span>
+            {{ block.settings.label }} {% render 'icon', icon: 'arrow' %}
+          </a>
+        {% endif %}
+      {% else %}
+        <a href="{{ pages.faq.url | default: '/pages/faq' }}"><span>01</span>FAQ {% render 'icon', icon: 'arrow' %}</a>
+        <a href="{{ shop.shipping_policy.url }}"><span>02</span>Shipping {% render 'icon', icon: 'arrow' %}</a>
+        <a href="{{ shop.refund_policy.url }}"><span>03</span>Returns {% render 'icon', icon: 'arrow' %}</a>
+      {% endfor %}
     </div>
-    <a href="{{ pages.faq.url | default: '/pages/faq' }}">
-      <span>01</span>
-      FAQ {% render 'icon', icon: 'arrow' %}
-    </a>
-    <a href="{{ shop.shipping_policy.url }}">
-      <span>02</span>
-      Shipping {% render 'icon', icon: 'arrow' %}
-    </a>
-    <a href="{{ shop.refund_policy.url }}">
-      <span>03</span>
-      Returns {% render 'icon', icon: 'arrow' %}
-    </a>
-  </div>
+  {% endif %}
 
   <div class="t-footer__main">
     <div class="t-footer__brand">
-      {% if settings.logo_light %}
-        {{ settings.logo_light | image_url: width: 320 | image_tag: widths: '180, 240, 320', alt: shop.name }}
+      {% if section.settings.custom_logo != blank %}
+        {{ section.settings.custom_logo | image_url: width: 560 | image_tag: widths: '160, 240, 360, 560', alt: shop.name }}
+      {% elsif settings.logo_light %}
+        {{ settings.logo_light | image_url: width: 560 | image_tag: widths: '160, 240, 360, 560', alt: shop.name }}
       {% else %}
         <img src="{{ 'logo-white.png' | asset_url }}" width="280" alt="{{ shop.name }}">
       {% endif %}
-      <h2>{{ section.settings.heading }}</h2>
-      <p>{{ section.settings.copy }}</p>
+      {% if section.settings.heading != blank %}<h2>{{ section.settings.heading }}</h2>{% endif %}
+      {% if section.settings.copy != blank %}<p>{{ section.settings.copy }}</p>{% endif %}
     </div>
 
-    <div class="t-footer__signup">
-      <p>{{ section.settings.newsletter_heading }}</p>
-      {% form 'customer', class: 't-newsletter' %}
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <label class="visually-hidden" for="FooterEmail">Email address</label>
-        <input id="FooterEmail" type="email" name="contact[email]" value="{{ form.email }}" placeholder="Email address" required>
-        <button type="submit">Join {% render 'icon', icon: 'arrow' %}</button>
-        {% if form.posted_successfully? %}<strong>Welcome to TACT.</strong>{% endif %}
-        {{ form.errors | default_errors }}
-      {% endform %}
-      <small>By joining, you agree to receive TACT updates.</small>
-    </div>
+    {% if section.settings.show_newsletter %}
+      <div class="t-footer__signup">
+        <p>{{ section.settings.newsletter_heading }}</p>
+        {% form 'customer', class: 't-newsletter' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="visually-hidden" for="FooterEmail">{{ section.settings.email_label }}</label>
+          <input id="FooterEmail" type="email" name="contact[email]" value="{{ form.email }}" placeholder="{{ section.settings.email_placeholder | escape }}" required>
+          <button type="submit">{{ section.settings.join_label }} {% render 'icon', icon: 'arrow' %}</button>
+          {% if form.posted_successfully? %}<strong>{{ section.settings.success_message }}</strong>{% endif %}
+          {{ form.errors | default_errors }}
+        {% endform %}
+        <small>{{ section.settings.newsletter_note }}</small>
+      </div>
+    {% endif %}
   </div>
 
-  <div class="t-footer__nav">
-    <div>
-      <h3>Shop</h3>
-      {% for link in section.settings.shop_menu.links %}
-        <a href="{{ link.url }}">{{ link.title }}</a>
-      {% endfor %}
+  {% if section.settings.show_navigation %}
+    <div class="t-footer__nav">
+      <div>
+        <h3>{{ section.settings.menu_heading_1 }}</h3>
+        {% for link in section.settings.menu_1.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+      </div>
+      <div>
+        <h3>{{ section.settings.menu_heading_2 }}</h3>
+        {% for link in section.settings.menu_2.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+      </div>
+      <div>
+        <h3>{{ section.settings.menu_heading_3 }}</h3>
+        {% for link in section.settings.menu_3.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+      </div>
+      <div>
+        <h3>{{ section.settings.connect_heading }}</h3>
+        {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}">{{ section.settings.instagram_label }}</a>{% endif %}
+        {% if settings.youtube_url != blank %}<a href="{{ settings.youtube_url }}">{{ section.settings.youtube_label }}</a>{% endif %}
+        {% if shop.email != blank %}<a href="mailto:{{ shop.email }}">{{ shop.email }}</a>{% endif %}
+      </div>
     </div>
-    <div>
-      <h3>Help</h3>
-      <a href="{{ pages.faq.url | default: '/pages/faq' }}">FAQ</a>
-      <a href="{{ shop.shipping_policy.url }}">Shipping</a>
-      <a href="{{ shop.refund_policy.url }}">Returns & exchange</a>
-      <a href="/pages/track-your-order">Track your order</a>
-    </div>
-    <div>
-      <h3>TACT</h3>
-      <a href="/pages/about-us">About us</a>
-      <a href="/pages/contact">Contact</a>
-      <a href="{{ shop.privacy_policy.url }}">Privacy policy</a>
-    </div>
-    <div>
-      <h3>Connect</h3>
-      {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}">Instagram</a>{% endif %}
-      {% if settings.youtube_url != blank %}<a href="{{ settings.youtube_url }}">YouTube</a>{% endif %}
-      <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>
-    </div>
-  </div>
+  {% endif %}
+
   <div class="t-footer__base">
     <span>© {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
     <span>{{ section.settings.footer_note }}</span>
@@ -79,13 +90,51 @@
 {% schema %}
 {
   "name": "Footer",
+  "max_blocks": 3,
   "settings": [
-    {"type": "text", "id": "help_heading", "label": "Help heading", "default": "Help, when you need it."},
+    {"type": "header", "content": "Style"},
+    {"type": "color", "id": "background", "label": "Background", "default": "#0a0a0a"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#ffffff"},
+    {"type": "color", "id": "muted_color", "label": "Muted text", "default": "#9b9b9b"},
+    {"type": "range", "id": "padding", "label": "Vertical padding", "min": 20, "max": 100, "step": 4, "unit": "px", "default": 48},
+    {"type": "image_picker", "id": "custom_logo", "label": "Footer logo"},
+    {"type": "range", "id": "logo_width", "label": "Logo width", "min": 80, "max": 300, "step": 10, "unit": "px", "default": 150},
+    {"type": "header", "content": "Support links"},
+    {"type": "checkbox", "id": "show_support", "label": "Show support links", "default": true},
+    {"type": "text", "id": "help_eyebrow", "label": "Eyebrow", "default": "Customer care"},
+    {"type": "text", "id": "help_heading", "label": "Heading", "default": "Help, when you need it."},
+    {"type": "header", "content": "Brand and newsletter"},
     {"type": "text", "id": "heading", "label": "Brand heading", "default": "Wear your flex."},
     {"type": "text", "id": "copy", "label": "Brand copy", "default": "Designed and printed in-house in India since 1989."},
+    {"type": "checkbox", "id": "show_newsletter", "label": "Show newsletter", "default": true},
     {"type": "text", "id": "newsletter_heading", "label": "Newsletter heading", "default": "Drops, restocks and stories—sent first."},
-    {"type": "link_list", "id": "shop_menu", "label": "Shop menu", "default": "main-menu"},
+    {"type": "text", "id": "email_label", "label": "Email accessibility label", "default": "Email address"},
+    {"type": "text", "id": "email_placeholder", "label": "Email placeholder", "default": "Email address"},
+    {"type": "text", "id": "join_label", "label": "Join button", "default": "Join"},
+    {"type": "text", "id": "success_message", "label": "Success message", "default": "Welcome to TACT."},
+    {"type": "text", "id": "newsletter_note", "label": "Newsletter note", "default": "By joining, you agree to receive TACT updates."},
+    {"type": "header", "content": "Navigation"},
+    {"type": "checkbox", "id": "show_navigation", "label": "Show footer menus", "default": true},
+    {"type": "text", "id": "menu_heading_1", "label": "First menu heading", "default": "Shop"},
+    {"type": "link_list", "id": "menu_1", "label": "First menu", "default": "main-menu"},
+    {"type": "text", "id": "menu_heading_2", "label": "Second menu heading", "default": "Help"},
+    {"type": "link_list", "id": "menu_2", "label": "Second menu", "default": "footer"},
+    {"type": "text", "id": "menu_heading_3", "label": "Third menu heading", "default": "TACT"},
+    {"type": "link_list", "id": "menu_3", "label": "Third menu"},
+    {"type": "text", "id": "connect_heading", "label": "Connect heading", "default": "Connect"},
+    {"type": "text", "id": "instagram_label", "label": "Instagram label", "default": "Instagram"},
+    {"type": "text", "id": "youtube_label", "label": "YouTube label", "default": "YouTube"},
     {"type": "text", "id": "footer_note", "label": "Footer note", "default": "Free delivery over ₹499 / India"}
+  ],
+  "blocks": [
+    {
+      "type": "support_link",
+      "name": "Support link",
+      "settings": [
+        {"type": "text", "id": "label", "label": "Label", "default": "FAQ"},
+        {"type": "url", "id": "link", "label": "Link"}
+      ]
+    }
   ]
 }
 {% endschema %}

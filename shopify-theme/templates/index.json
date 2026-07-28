@@ -2,30 +2,76 @@
   "sections": {
     "hero": {
       "type": "hero-editorial",
+      "blocks": {
+        "group_campaign": {
+          "type": "slide",
+          "settings": {
+            "fallback_media": "group",
+            "layout": "full",
+            "desktop_fit": "contain",
+            "mobile_fit": "cover",
+            "desktop_position": "center center",
+            "mobile_position": "center center",
+            "background": "#f4f4f2",
+            "edition": "TACT / CURRENT DROP",
+            "eyebrow": "Everyday streetwear",
+            "heading": "Wear Your Flex",
+            "button_label": "Shop the edit",
+            "content_position": "center",
+            "content_vertical": "bottom",
+            "text_color": "#ffffff",
+            "mobile_text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 20,
+            "mobile_overlay_opacity": 38,
+            "heading_size": 74,
+            "heading_size_mobile": 48
+          }
+        },
+        "madison_campaign": {
+          "type": "slide",
+          "settings": {
+            "fallback_media": "madison",
+            "layout": "full",
+            "desktop_fit": "cover",
+            "mobile_fit": "cover",
+            "desktop_position": "center center",
+            "mobile_position": "center center",
+            "background": "#03295e",
+            "edition": "TACT / DROP 06",
+            "eyebrow": "New release",
+            "heading": "Web of Madison",
+            "button_label": "Shop the story",
+            "content_position": "center",
+            "content_vertical": "bottom",
+            "text_color": "#ffffff",
+            "mobile_text_color": "#ffffff",
+            "overlay_color": "#000000",
+            "overlay_opacity": 18,
+            "mobile_overlay_opacity": 34,
+            "heading_size": 74,
+            "heading_size_mobile": 48
+          }
+        }
+      },
+      "block_order": ["group_campaign", "madison_campaign"],
       "settings": {
-        "height": "full",
-        "desktop_position": "center center",
-        "mobile_position": "center center",
-        "content_alignment": "left",
-        "text_color": "#0a0a0a",
-        "mobile_text_color": "#ffffff",
-        "overlay_opacity": 20,
-        "mobile_overlay_opacity": 55,
+        "autoplay": true,
+        "autoplay_seconds": 7,
         "playback_speed": 1.5,
-        "edition": "TACT / Current drop",
-        "eyebrow": "Everyday streetwear",
-        "heading": "Wear Your Flex",
-        "button_label": "Shop now"
-      }
-    },
-    "new": {
-      "type": "product-grid",
-      "settings": {
-        "eyebrow": "01 / Just landed",
-        "heading": "Just landed.",
-        "copy": "New graphics, oversized tees and everyday layers from TACT.",
-        "link_label": "Shop all pieces",
-        "products_to_show": 4
+        "transition_speed": 9,
+        "pause_on_hover": true,
+        "show_arrows": true,
+        "show_dots": true,
+        "show_counter": true,
+        "navigation_bottom": 95,
+        "height": "full",
+        "custom_height": 900,
+        "custom_height_mobile": 820,
+        "accessibility_label": "Featured campaigns",
+        "dots_label": "Choose a campaign",
+        "previous_label": "Previous campaign",
+        "next_label": "Next campaign"
       }
     },
     "collections": {
@@ -38,17 +84,54 @@
       },
       "block_order": ["new", "men", "women", "unisex"],
       "settings": {
+        "show_heading": true,
         "eyebrow": "01 / Find your everyday drip",
         "heading": "Explore streetwear by category.",
         "copy": "Men, women and unisex pieces from the current TACT catalog.",
-        "link_label": "Shop all products"
+        "link_label": "Shop all products",
+        "show_numbers": true,
+        "columns": 4,
+        "mobile_card_width": 72,
+        "image_ratio": "4 / 5",
+        "card_radius": 18,
+        "heading_size": 78,
+        "heading_size_mobile": 54,
+        "padding_top": 90,
+        "padding_bottom": 90,
+        "background": "#f3f3f1",
+        "text_color": "#0b0b0c"
+      }
+    },
+    "new": {
+      "type": "product-grid",
+      "settings": {
+        "show_heading": true,
+        "eyebrow": "02 / Just landed",
+        "heading": "Just landed.",
+        "copy": "New graphics, oversized tees and everyday layers from TACT.",
+        "link_label": "Shop all pieces",
+        "products_to_show": 4,
+        "columns": 4,
+        "columns_mobile": 2,
+        "mobile_scroll": true,
+        "show_quick_add": true,
+        "show_wishlist": true,
+        "image_ratio": "4 / 5",
+        "card_radius": 14,
+        "product_title_size": 13,
+        "heading_size": 78,
+        "heading_size_mobile": 54,
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "background": "#f3f3f1",
+        "text_color": "#0b0b0c"
       }
     },
     "editorial": {
       "type": "editorial-image-text",
       "settings": {
         "layout": "image-left",
-        "eyebrow": "02 / Sleeveless society",
+        "eyebrow": "03 / Sleeveless society",
         "heading": "Hard lines. Easy movement.",
         "copy": "<p>A relaxed statement shaped by sharp graphics and tactile detail.</p>",
         "button_label": "Discover the piece"
@@ -77,17 +160,36 @@
       "type": "reviews-story",
       "blocks": {
         "review1": {"type": "review", "settings": {"rating": 5, "title": "Amazing quality", "quote": "Amazinnggggg Quality!!! Loved every bit", "name": "Shahid", "product_name": "Enchantment Chain Sleeveless Tee"}},
-        "review3": {"type": "review", "settings": {"rating": 5, "title": "Best and minimalistic", "quote": "BESTTTT AND MINIMALISTIC", "name": "Gautam", "product_name": "Classic Tact Tee — White"}},
-        "review4": {"type": "review", "settings": {"rating": 5, "title": "Absolutely loved it", "quote": "Absolutely loved it", "name": "Ritesh Jain", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
-        "review5": {"type": "review", "settings": {"rating": 5, "title": "Worth it", "quote": "Goood and worth 100%", "name": "Keval", "product_name": "Ghost of Tsushima Oversized Tee — Beige"}},
-        "review6": {"type": "review", "settings": {"rating": 4, "title": "Fit and design", "quote": "Very good fit and slick design!", "name": "Darsh", "product_name": "Confused Puzzle Emboss Tee"}}
+        "review2": {"type": "review", "settings": {"rating": 5, "title": "Best and minimalistic", "quote": "BESTTTT AND MINIMALISTIC", "name": "Gautam", "product_name": "Classic Tact Tee — White"}},
+        "review3": {"type": "review", "settings": {"rating": 5, "title": "Absolutely loved it", "quote": "Absolutely loved it", "name": "Ritesh Jain", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        "review4": {"type": "review", "settings": {"rating": 5, "title": "Worth it", "quote": "Goood and worth 100%", "name": "Keval", "product_name": "Ghost of Tsushima Oversized Tee — Beige"}},
+        "review5": {"type": "review", "settings": {"rating": 4, "title": "Fit and design", "quote": "Very good fit and slick design!", "name": "Darsh", "product_name": "Confused Puzzle Emboss Tee"}},
+        "review6": {"type": "review", "settings": {"rating": 4, "title": "Better than expected", "quote": "The material feels nice on the skin and the back design really pops. Wore it once and already got compliments.", "name": "Prashant", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        "review7": {"type": "review", "settings": {"rating": 5, "title": "Perfect oversized fit", "quote": "Ordered XL and the fit is perfect. Comfortable fabric, great print quality, and the oversized style looks amazing.", "name": "Anmol", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        "review8": {"type": "review", "settings": {"rating": 5, "title": "Superb quality", "quote": "Supppppppperrrrb quality", "name": "Tejas", "product_name": "Neon Skull Illusion Puff Oversized Tee"}},
+        "review9": {"type": "review", "settings": {"rating": 5, "title": "Just wow", "quote": "THIS IS JUST WOW", "name": "Isa", "product_name": "Big Bang Sweatshirt"}},
+        "review10": {"type": "review", "settings": {"rating": 5, "title": "Mr. Perfect", "quote": "This tshirt should be called as Mr. Perfect", "name": "Sanidhya", "product_name": "Ghost of Tsushima Oversized Tee — Red"}},
+        "review11": {"type": "review", "settings": {"rating": 5, "title": "I loved it", "quote": "I LOVED IT", "name": "Taranjeet", "product_name": "Classic Tact Tee — Black"}}
       },
-      "block_order": ["review1", "review3", "review4", "review5", "review6"],
+      "block_order": ["review1", "review2", "review3", "review4", "review5", "review6", "review7", "review8", "review9", "review10", "review11"],
       "settings": {
         "eyebrow": "06 / Customer reviews",
-        "heading": "From the rotation.",
-        "copy": "Product reviews from TACT customers.",
-        "autoplay_seconds": 5
+        "heading": "Worn. Rated. Repeated.",
+        "copy": "<p>Real words from TACT customers, moving with the rotation.</p>",
+        "direction": "right",
+        "speed": 75,
+        "pause_on_hover": true,
+        "card_width": 410,
+        "card_height": 420,
+        "card_radius": 18,
+        "heading_size": 84,
+        "heading_size_mobile": 56,
+        "padding_top": 110,
+        "padding_bottom": 110,
+        "background": "#ebece8",
+        "text_color": "#0b0b0c",
+        "card_background": "#ffffff",
+        "card_text_color": "#0b0b0c"
       }
     },
     "services": {

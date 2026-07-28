@@ -1,83 +1,125 @@
-<section class="t-review-stories" data-review-stories data-review-interval="{{ section.settings.autoplay_seconds | times: 1000 }}">
-  <div class="t-review-stories__heading">
-    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
-    <h2>{{ section.settings.heading }}</h2>
-    <p>{{ section.settings.copy }}</p>
-    <div class="t-review-stories__controls" aria-label="Review navigation">
-      <button type="button" data-review-prev aria-label="Previous review">{% render 'icon', icon: 'arrow' %}</button>
-      <button type="button" data-review-next aria-label="Next review">{% render 'icon', icon: 'arrow' %}</button>
+<section
+  class="t-review-marquee t-review-marquee--{{ section.settings.direction }}{% if section.settings.pause_on_hover %} t-review-marquee--pause{% endif %}"
+  style="
+    --review-background: {{ section.settings.background }};
+    --review-text: {{ section.settings.text_color }};
+    --review-card-background: {{ section.settings.card_background }};
+    --review-card-text: {{ section.settings.card_text_color }};
+    --review-speed: {{ section.settings.speed }}s;
+    --review-card-width: {{ section.settings.card_width }}px;
+    --review-card-height: {{ section.settings.card_height }}px;
+    --review-heading-size: {{ section.settings.heading_size }}px;
+    --review-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --review-radius: {{ section.settings.card_radius }}px;
+    --review-padding-top: {{ section.settings.padding_top }}px;
+    --review-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  aria-labelledby="ReviewHeading-{{ section.id }}"
+>
+  <header class="t-review-marquee__heading">
+    <div>
+      {% if section.settings.eyebrow != blank %}<p class="t-kicker">{{ section.settings.eyebrow }}</p>{% endif %}
+      <h2 id="ReviewHeading-{{ section.id }}">{{ section.settings.heading }}</h2>
     </div>
-  </div>
+    {% if section.settings.copy != blank %}<div class="rte">{{ section.settings.copy }}</div>{% endif %}
+  </header>
 
-  <div class="t-review-carousel" aria-live="polite">
-    {% for block in section.blocks %}
-      <article class="t-review-slide{% if forloop.first %} is-active{% endif %}" data-review-slide {{ block.shopify_attributes }}>
-        <div class="t-review-slide__topline">
-          <span class="t-review-stars" aria-label="{{ block.settings.rating }} out of 5 stars">
-            {% for i in (1..block.settings.rating) %}{% render 'icon', icon: 'star' %}{% endfor %}
-          </span>
-          <span>0{{ forloop.index }} / 0{{ forloop.length }}</span>
+  <div class="t-review-marquee__window">
+    <div class="t-review-marquee__track">
+      {% for duplicate in (1..2) %}
+        <div class="t-review-marquee__group" aria-hidden="{% if duplicate == 2 %}true{% else %}false{% endif %}">
+          {% for block in section.blocks %}
+            <article class="t-review-card"{% if duplicate == 1 %} {{ block.shopify_attributes }}{% endif %}>
+              <div class="t-review-card__topline">
+                <span class="t-review-stars" aria-label="{{ block.settings.rating }} out of 5 stars">
+                  {% for i in (1..block.settings.rating) %}{% render 'icon', icon: 'star' %}{% endfor %}
+                </span>
+                <span>{{ block.settings.rating }}.0</span>
+              </div>
+              {% if block.settings.title != blank %}<p>{{ block.settings.title }}</p>{% endif %}
+              <blockquote>“{{ block.settings.quote }}”</blockquote>
+              <footer>
+                <span>— {{ block.settings.name }}</span>
+                {% if block.settings.product != blank %}
+                  <a href="{{ block.settings.product.url }}"{% if duplicate == 2 %} tabindex="-1"{% endif %}>
+                    {{ block.settings.product.title }} {% render 'icon', icon: 'arrow' %}
+                  </a>
+                {% elsif block.settings.link != blank %}
+                  <a href="{{ block.settings.link }}"{% if duplicate == 2 %} tabindex="-1"{% endif %}>
+                    {{ block.settings.product_name }} {% render 'icon', icon: 'arrow' %}
+                  </a>
+                {% else %}
+                  <span>{{ block.settings.product_name }}</span>
+                {% endif %}
+              </footer>
+            </article>
+          {% endfor %}
         </div>
-        <p>{{ block.settings.title }}</p>
-        <blockquote>“{{ block.settings.quote }}”</blockquote>
-        <footer>
-          <span>— {{ block.settings.name }}</span>
-          {% if block.settings.product %}
-            <a href="{{ block.settings.product.url }}">{{ block.settings.product.title }} {% render 'icon', icon: 'arrow' %}</a>
-          {% else %}
-            <span>{{ block.settings.product_name }}</span>
-          {% endif %}
-        </footer>
-      </article>
-    {% endfor %}
-  </div>
-
-  <div class="t-review-stories__dots" aria-label="Choose a review">
-    {% for block in section.blocks %}
-      <button
-        class="{% if forloop.first %}is-active{% endif %}"
-        type="button"
-        data-review-dot="{{ forloop.index0 }}"
-        aria-label="Show review {{ forloop.index }}"
-        {% if forloop.first %}aria-current="true"{% endif %}
-      ></button>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "Customer review carousel",
-  "max_blocks": 16,
+  "name": "Moving customer reviews",
+  "max_blocks": 24,
   "settings": [
+    {"type": "header", "content": "Content"},
     {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "06 / Customer reviews"},
-    {"type": "text", "id": "heading", "label": "Heading", "default": "From the rotation."},
-    {"type": "text", "id": "copy", "label": "Copy", "default": "Product reviews from TACT customers."},
-    {"type": "range", "id": "autoplay_seconds", "label": "Seconds between reviews", "min": 3, "max": 12, "step": 1, "unit": "s", "default": 5}
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Worn. Rated. Repeated."},
+    {"type": "richtext", "id": "copy", "label": "Copy", "default": "<p>Real words from TACT customers, moving with the rotation.</p>"},
+    {"type": "header", "content": "Movement"},
+    {"type": "select", "id": "direction", "label": "Direction", "default": "right", "options": [
+      {"value": "right", "label": "Left to right"},
+      {"value": "left", "label": "Right to left"}
+    ]},
+    {"type": "range", "id": "speed", "label": "Loop duration", "min": 30, "max": 160, "step": 5, "unit": "s", "default": 75, "info": "Higher values move more slowly."},
+    {"type": "checkbox", "id": "pause_on_hover", "label": "Pause on hover or keyboard focus", "default": true},
+    {"type": "header", "content": "Card sizing"},
+    {"type": "range", "id": "card_width", "label": "Card width", "min": 260, "max": 520, "step": 10, "unit": "px", "default": 410},
+    {"type": "range", "id": "card_height", "label": "Minimum card height", "min": 280, "max": 560, "step": 10, "unit": "px", "default": 420},
+    {"type": "range", "id": "card_radius", "label": "Card corner radius", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 18},
+    {"type": "range", "id": "heading_size", "label": "Desktop heading size", "min": 42, "max": 120, "step": 2, "unit": "px", "default": 84},
+    {"type": "range", "id": "heading_size_mobile", "label": "Mobile heading size", "min": 38, "max": 74, "step": 2, "unit": "px", "default": 56},
+    {"type": "range", "id": "padding_top", "label": "Top spacing", "min": 40, "max": 180, "step": 5, "unit": "px", "default": 110},
+    {"type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 40, "max": 180, "step": 5, "unit": "px", "default": 110},
+    {"type": "header", "content": "Colors"},
+    {"type": "color", "id": "background", "label": "Section background", "default": "#ebece8"},
+    {"type": "color", "id": "text_color", "label": "Section text", "default": "#0b0b0c"},
+    {"type": "color", "id": "card_background", "label": "Card background", "default": "#ffffff"},
+    {"type": "color", "id": "card_text_color", "label": "Card text", "default": "#0b0b0c"}
   ],
   "blocks": [
     {
       "type": "review",
-      "name": "Review",
+      "name": "Customer review",
       "settings": [
         {"type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5},
         {"type": "text", "id": "title", "label": "Short title", "default": "Amazing quality"},
-        {"type": "textarea", "id": "quote", "label": "Review", "default": "Amazinnggggg Quality!!! Loved every bit"},
-        {"type": "text", "id": "name", "label": "Customer name", "default": "Shahid"},
+        {"type": "textarea", "id": "quote", "label": "Review", "default": "Amazing quality. Loved every bit."},
+        {"type": "text", "id": "name", "label": "Customer name", "default": "TACT customer"},
         {"type": "product", "id": "product", "label": "Product link"},
-        {"type": "text", "id": "product_name", "label": "Fallback product name", "default": "Enchantment Chain Sleeveless Tee"}
+        {"type": "text", "id": "product_name", "label": "Fallback product name", "default": "TACT product"},
+        {"type": "url", "id": "link", "label": "Fallback link"}
       ]
     }
   ],
   "presets": [
     {
-      "name": "Customer review carousel",
+      "name": "Moving customer reviews",
       "blocks": [
-        {"type": "review", "settings": {"title": "Amazing quality", "quote": "Amazinnggggg Quality!!! Loved every bit", "name": "Shahid", "product_name": "Enchantment Chain Sleeveless Tee"}},
-        {"type": "review", "settings": {"title": "Best and minimalistic", "quote": "BESTTTT AND MINIMALISTIC", "name": "Gautam", "product_name": "Classic Tact Tee — White"}},
-        {"type": "review", "settings": {"title": "Absolutely loved it", "quote": "Absolutely loved it", "name": "Ritesh Jain", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
-        {"type": "review", "settings": {"title": "Worth it", "quote": "Goood and worth 100%", "name": "Keval", "product_name": "Ghost of Tsushima Oversized Tee — Beige"}},
-        {"type": "review", "settings": {"rating": 4, "title": "Fit and design", "quote": "Very good fit and slick design!", "name": "Darsh", "product_name": "Confused Puzzle Emboss Tee"}}
+        {"type": "review", "settings": {"rating": 5, "title": "I loved it", "quote": "😻 I LOVED IT", "name": "Taranjeet", "product_name": "Classic Tact Tee — Black"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Best and minimalistic", "quote": "BESTTTT AND MINIMALISTIC", "name": "Gautam", "product_name": "Classic Tact Tee — White"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Absolutely loved it", "quote": "Absolutely loved it", "name": "Ritesh Jain", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Amazing quality", "quote": "Amazinnggggg Quality!!! Loved every bit", "name": "Shahid", "product_name": "Enchantment Chain Sleeveless Tee"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Worth it", "quote": "Goood and worth 100%", "name": "Keval", "product_name": "Ghost of Tsushima Oversized Tee — Beige"}},
+        {"type": "review", "settings": {"rating": 4, "title": "Fit and design", "quote": "Very good fit and slick design!", "name": "Darsh", "product_name": "Confused Puzzle Emboss Tee"}},
+        {"type": "review", "settings": {"rating": 4, "title": "Better than expected", "quote": "Wasn’t sure at first, but honestly this turned out better than expected. The material feels nice on the skin and the back design really pops. Wore it once and already got compliments.", "name": "Prashant", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Perfect oversized fit", "quote": "Ordered XL and the fit is perfect. Comfortable fabric, great print quality, and the oversized style looks amazing. Very happy with the purchase!", "name": "Anmol", "product_name": "Ghost of Tsushima Oversized Tee — Cream"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Superb quality", "quote": "Supppppppperrrrb quality", "name": "Tejas", "product_name": "Neon Skull Illusion Puff Oversized Tee"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Just wow", "quote": "THIS IS JUST WOW", "name": "Isa", "product_name": "Big Bang Sweatshirt"}},
+        {"type": "review", "settings": {"rating": 5, "title": "Mr. Perfect", "quote": "This tshirt should be called as Mr. Perfect", "name": "Sanidhya", "product_name": "Ghost of Tsushima Oversized Tee — Red"}}
       ]
     }
   ]

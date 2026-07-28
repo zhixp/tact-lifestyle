@@ -1,149 +1,315 @@
-{% liquid
-  assign hero_link = section.settings.link
-  if section.settings.product != blank
-    assign hero_link = section.settings.product.url
-  endif
-  assign desktop_overlay_alpha = section.settings.overlay_opacity | divided_by: 100.0
-  assign mobile_overlay_alpha = section.settings.mobile_overlay_opacity | divided_by: 100.0
-  assign desktop_overlay_color = section.settings.overlay_color | color_modify: 'alpha', desktop_overlay_alpha
-  assign mobile_overlay_color = section.settings.mobile_overlay_color | color_modify: 'alpha', mobile_overlay_alpha
-%}
 <section
-  class="t-hero t-hero--{{ section.settings.height }} t-hero--copy-{{ section.settings.content_alignment }}"
+  class="t-hero-carousel t-hero-carousel--{{ section.settings.height }}"
+  data-hero-carousel
+  data-hero-autoplay="{{ section.settings.autoplay }}"
+  data-hero-duration="{{ section.settings.autoplay_seconds | times: 1000 }}"
+  data-hero-pause="{{ section.settings.pause_on_hover }}"
   data-hero-speed="{{ section.settings.playback_speed }}"
   style="
-    --hero-position: {{ section.settings.desktop_position }};
-    --hero-mobile-position: {{ section.settings.mobile_position }};
-    --hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
-    --hero-mobile-overlay: {{ section.settings.mobile_overlay_opacity | divided_by: 100.0 }};
-    --hero-overlay-color: {{ desktop_overlay_color }};
-    --hero-mobile-overlay-color: {{ mobile_overlay_color }};
-    --hero-copy-color: {{ section.settings.text_color }};
-    --hero-mobile-copy-color: {{ section.settings.mobile_text_color }};
+    --hero-custom-height: {{ section.settings.custom_height }}px;
+    --hero-custom-height-mobile: {{ section.settings.custom_height_mobile }}px;
+    --hero-transition: {{ section.settings.transition_speed | times: 100 }}ms;
+    --hero-nav-bottom: {{ section.settings.navigation_bottom }}px;
   "
+  aria-roledescription="carousel"
+  aria-label="{{ section.settings.accessibility_label | escape }}"
 >
-  <div class="t-hero__desktop-media">
-    {% if section.settings.desktop_video != blank %}
-      {{
-        section.settings.desktop_video
-        | video_tag:
-          class: 't-hero__desktop-video',
-          autoplay: true,
-          muted: true,
-          loop: true,
-          controls: false,
-          playsinline: true,
-          preload: 'auto',
-          image_size: '2400x'
-      }}
-    {% elsif section.settings.image != blank %}
-      {{
-        section.settings.image
-        | image_url: width: 2400
-        | image_tag:
-          loading: 'eager',
-          fetchpriority: 'high',
-          widths: '750, 1100, 1500, 2000, 2400',
-          sizes: '100vw',
-          alt: section.settings.image.alt
-      }}
+  <div class="t-hero-carousel__viewport">
+    {% for block in section.blocks %}
+      {% liquid
+        assign hero_link = block.settings.link
+        assign hero_loading = 'lazy'
+        assign hero_priority = 'auto'
+        if forloop.first
+          assign hero_loading = 'eager'
+          assign hero_priority = 'high'
+        endif
+        assign desktop_overlay_alpha = block.settings.overlay_opacity | divided_by: 100.0
+        assign mobile_overlay_alpha = block.settings.mobile_overlay_opacity | divided_by: 100.0
+        assign desktop_overlay_color = block.settings.overlay_color | color_modify: 'alpha', desktop_overlay_alpha
+        assign mobile_overlay_color = block.settings.overlay_color | color_modify: 'alpha', mobile_overlay_alpha
+      %}
+      <article
+        class="t-hero-slide t-hero-slide--{{ block.settings.layout }}{% if forloop.first %} is-active{% endif %}"
+        data-hero-slide
+        aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}"
+        style="
+          --slide-background: {{ block.settings.background }};
+          --slide-desktop-fit: {{ block.settings.desktop_fit }};
+          --slide-mobile-fit: {{ block.settings.mobile_fit }};
+          --slide-desktop-position: {{ block.settings.desktop_position }};
+          --slide-mobile-position: {{ block.settings.mobile_position }};
+          --slide-overlay: {{ desktop_overlay_color }};
+          --slide-mobile-overlay: {{ mobile_overlay_color }};
+          --slide-text: {{ block.settings.text_color }};
+          --slide-mobile-text: {{ block.settings.mobile_text_color }};
+          --slide-heading-size: {{ block.settings.heading_size }}px;
+          --slide-heading-size-mobile: {{ block.settings.heading_size_mobile }}px;
+          --slide-copy-width: 700px;
+        "
+        {{ block.shopify_attributes }}
+      >
+        <div class="t-hero-slide__desktop-media">
+          {% if block.settings.desktop_video != blank %}
+            {{
+              block.settings.desktop_video
+              | video_tag:
+                autoplay: true,
+                muted: true,
+                loop: true,
+                controls: false,
+                playsinline: true,
+                preload: 'metadata',
+                image_size: '2400x'
+            }}
+          {% elsif block.settings.desktop_image != blank %}
+            {{
+              block.settings.desktop_image
+              | image_url: width: 2600
+              | image_tag:
+                loading: hero_loading,
+                fetchpriority: hero_priority,
+                widths: '900, 1200, 1600, 2000, 2400, 2600',
+                sizes: '100vw',
+                alt: block.settings.heading
+            }}
+          {% elsif block.settings.fallback_media == 'madison' %}
+            <img src="{{ 'hero-madison.png' | asset_url }}" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
+          {% elsif block.settings.fallback_media == 'group' %}
+            <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
+          {% else %}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 't-hero-slide__placeholder' }}
+          {% endif %}
+        </div>
+
+        <div class="t-hero-slide__mobile-media">
+          {% if block.settings.mobile_video != blank %}
+            {{
+              block.settings.mobile_video
+              | video_tag:
+                autoplay: true,
+                muted: true,
+                loop: true,
+                controls: false,
+                playsinline: true,
+                preload: 'metadata',
+                image_size: '1200x'
+            }}
+          {% elsif block.settings.mobile_image != blank %}
+            {{
+              block.settings.mobile_image
+              | image_url: width: 1400
+              | image_tag:
+                loading: hero_loading,
+                fetchpriority: hero_priority,
+                widths: '480, 720, 960, 1200, 1400',
+                sizes: '100vw',
+                alt: block.settings.heading
+            }}
+          {% elsif block.settings.fallback_media == 'madison' %}
+            <img src="{{ 'hero-madison.png' | asset_url }}" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
+          {% elsif block.settings.fallback_media == 'group' %}
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://cdn.shopify.com/videos/c/o/v/86c1a15e84d04318bad0cd353bad88dd.mp4" type="video/mp4">
+            </video>
+          {% elsif block.settings.desktop_video != blank %}
+            {{
+              block.settings.desktop_video
+              | video_tag:
+                autoplay: true,
+                muted: true,
+                loop: true,
+                controls: false,
+                playsinline: true,
+                preload: 'metadata',
+                image_size: '1200x'
+            }}
+          {% elsif block.settings.desktop_image != blank %}
+            {{
+              block.settings.desktop_image
+              | image_url: width: 1400
+              | image_tag:
+                loading: hero_loading,
+                fetchpriority: hero_priority,
+                widths: '480, 720, 960, 1200, 1400',
+                sizes: '100vw',
+                alt: block.settings.heading
+            }}
+          {% else %}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 't-hero-slide__placeholder' }}
+          {% endif %}
+        </div>
+
+        <div class="t-hero-slide__shade"></div>
+        {% if block.settings.edition != blank %}
+          <p class="t-hero-slide__edition">{{ block.settings.edition }}</p>
+        {% endif %}
+        <div class="t-hero-slide__copy t-hero-slide__copy--{{ block.settings.content_position }} t-hero-slide__copy-v--{{ block.settings.content_vertical }}">
+          {% if block.settings.eyebrow != blank %}<p>{{ block.settings.eyebrow }}</p>{% endif %}
+          {% if forloop.first %}
+            <h1>{{ block.settings.heading }}</h1>
+          {% else %}
+            <h2>{{ block.settings.heading }}</h2>
+          {% endif %}
+          {% if block.settings.button_label != blank %}
+            <a href="{{ hero_link | default: routes.all_products_collection_url }}">
+              {{ block.settings.button_label }} {% render 'icon', icon: 'arrow' %}
+            </a>
+          {% endif %}
+        </div>
+      </article>
     {% else %}
-      <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="{{ section.settings.heading | escape }}" fetchpriority="high">
-    {% endif %}
+      <article class="t-hero-slide is-active" data-hero-slide aria-hidden="false">
+        <div class="t-hero-slide__desktop-media">
+          <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="TACT current collection">
+        </div>
+        <div class="t-hero-slide__mobile-media">
+          <video autoplay muted loop playsinline preload="metadata">
+            <source src="https://cdn.shopify.com/videos/c/o/v/86c1a15e84d04318bad0cd353bad88dd.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="t-hero-slide__shade"></div>
+        <div class="t-hero-slide__copy t-hero-slide__copy--center t-hero-slide__copy-v--bottom">
+          <p>Everyday streetwear</p>
+          <h1>Wear Your Flex</h1>
+          <a href="{{ routes.all_products_collection_url }}">Shop now {% render 'icon', icon: 'arrow' %}</a>
+        </div>
+      </article>
+    {% endfor %}
   </div>
 
-  <div class="t-hero__mobile-media">
-    {% if section.settings.mobile_video != blank %}
-      {{
-        section.settings.mobile_video
-        | video_tag:
-          class: 't-hero__mobile-video',
-          autoplay: true,
-          muted: true,
-          loop: true,
-          controls: false,
-          playsinline: true,
-          preload: 'auto',
-          image_size: '1000x'
-      }}
-    {% elsif section.settings.mobile_image != blank %}
-      {{
-        section.settings.mobile_image
-        | image_url: width: 1200
-        | image_tag:
-          loading: 'eager',
-          fetchpriority: 'high',
-          widths: '500, 750, 1000, 1200',
-          sizes: '100vw',
-          alt: section.settings.mobile_image.alt
-      }}
-    {% else %}
-      <video class="t-hero__mobile-video" autoplay muted loop playsinline preload="auto">
-        <source src="https://cdn.shopify.com/videos/c/o/v/86c1a15e84d04318bad0cd353bad88dd.mp4" type="video/mp4">
-      </video>
-    {% endif %}
-  </div>
-
-  <div class="t-hero__shade"></div>
-  <p class="t-hero__edition">{{ section.settings.edition }}</p>
-  <div class="t-hero__copy">
-    <p>{{ section.settings.eyebrow }}</p>
-    <h1>{{ section.settings.heading }}</h1>
-    {% if section.settings.button_label != blank %}
-      <a href="{{ hero_link | default: routes.all_products_collection_url }}">
-        {{ section.settings.button_label }} {% render 'icon', icon: 'arrow' %}
-      </a>
-    {% endif %}
-  </div>
+  {% if section.blocks.size > 1 %}
+    <div class="t-hero-carousel__navigation">
+      {% if section.settings.show_counter %}
+        <span data-hero-counter>01 / {{ section.blocks.size | prepend: '0' }}</span>
+      {% endif %}
+      {% if section.settings.show_dots %}
+        <div class="t-hero-carousel__dots" aria-label="{{ section.settings.dots_label | escape }}">
+          {% for block in section.blocks %}
+            <button
+              type="button"
+              class="{% if forloop.first %}is-active{% endif %}"
+              data-hero-dot="{{ forloop.index0 }}"
+              aria-label="Show {{ block.settings.heading | escape }}"
+              {% if forloop.first %}aria-current="true"{% endif %}
+            ></button>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if section.settings.show_arrows %}
+        <div class="t-hero-carousel__arrows">
+          <button type="button" data-hero-prev aria-label="{{ section.settings.previous_label | escape }}">{% render 'icon', icon: 'arrow' %}</button>
+          <button type="button" data-hero-next aria-label="{{ section.settings.next_label | escape }}">{% render 'icon', icon: 'arrow' %}</button>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
 </section>
 
 {% schema %}
 {
-  "name": "Editorial hero",
-  "tag": "section",
+  "name": "Editorial hero slideshow",
+  "max_blocks": 6,
   "settings": [
-    {"type": "header", "content": "Desktop media"},
-    {"type": "video", "id": "desktop_video", "label": "Desktop video", "info": "Optional. A selected video takes priority over the desktop image."},
-    {"type": "image_picker", "id": "image", "label": "Desktop image or GIF"},
-    {"type": "header", "content": "Mobile media"},
-    {"type": "video", "id": "mobile_video", "label": "Mobile video", "info": "Optional. A selected video takes priority over the mobile image or GIF."},
-    {"type": "image_picker", "id": "mobile_image", "label": "Mobile image, GIF or video poster"},
-    {"type": "range", "id": "playback_speed", "label": "Video playback speed", "min": 0.5, "max": 2, "step": 0.25, "default": 1.5},
-    {"type": "select", "id": "height", "label": "Height", "default": "full", "options": [
+    {"type": "header", "content": "Slideshow"},
+    {"type": "checkbox", "id": "autoplay", "label": "Auto-rotate slides", "default": true},
+    {"type": "range", "id": "autoplay_seconds", "label": "Seconds per slide", "min": 3, "max": 12, "step": 1, "unit": "s", "default": 7},
+    {"type": "range", "id": "playback_speed", "label": "Video playback speed", "min": 0.5, "max": 2, "step": 0.1, "default": 1.5},
+    {"type": "range", "id": "transition_speed", "label": "Transition speed", "min": 2, "max": 15, "step": 1, "default": 9, "info": "Each step is one tenth of a second."},
+    {"type": "checkbox", "id": "pause_on_hover", "label": "Pause on hover or focus", "default": true},
+    {"type": "checkbox", "id": "show_arrows", "label": "Show arrows", "default": true},
+    {"type": "checkbox", "id": "show_dots", "label": "Show progress indicators", "default": true},
+    {"type": "checkbox", "id": "show_counter", "label": "Show slide counter", "default": true},
+    {"type": "range", "id": "navigation_bottom", "label": "Controls distance from bottom", "min": 70, "max": 180, "step": 5, "unit": "px", "default": 95},
+    {"type": "header", "content": "Height"},
+    {"type": "select", "id": "height", "label": "Hero height", "default": "full", "options": [
       {"value": "full", "label": "Full screen"},
       {"value": "large", "label": "Large"},
-      {"value": "medium", "label": "Medium"}
+      {"value": "medium", "label": "Medium"},
+      {"value": "custom", "label": "Custom"}
     ]},
-    {"type": "select", "id": "desktop_position", "label": "Desktop media position", "default": "center center", "options": [
-      {"value": "left center", "label": "Left"},
-      {"value": "center center", "label": "Center"},
-      {"value": "right center", "label": "Right"},
-      {"value": "center top", "label": "Top"}
-    ]},
-    {"type": "select", "id": "mobile_position", "label": "Mobile media position", "default": "center center", "options": [
-      {"value": "left center", "label": "Left"},
-      {"value": "center center", "label": "Center"},
-      {"value": "right center", "label": "Right"},
-      {"value": "center top", "label": "Top"}
-    ]},
-    {"type": "select", "id": "content_alignment", "label": "Text alignment", "default": "left", "options": [
-      {"value": "left", "label": "Left"},
-      {"value": "center", "label": "Center"},
-      {"value": "right", "label": "Right"}
-    ]},
-    {"type": "color", "id": "text_color", "label": "Desktop text colour", "default": "#0a0a0a"},
-    {"type": "color", "id": "mobile_text_color", "label": "Mobile text colour", "default": "#ffffff"},
-    {"type": "color", "id": "overlay_color", "label": "Desktop overlay colour", "default": "#f7f4ef"},
-    {"type": "color", "id": "mobile_overlay_color", "label": "Mobile overlay colour", "default": "#000000"},
-    {"type": "range", "id": "overlay_opacity", "label": "Desktop bottom overlay", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 20},
-    {"type": "range", "id": "mobile_overlay_opacity", "label": "Mobile bottom overlay", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 55},
-    {"type": "text", "id": "edition", "label": "Top label", "default": "TACT / Drop 06"},
-    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Everyday streetwear"},
-    {"type": "text", "id": "heading", "label": "Heading", "default": "Wear Your Flex"},
-    {"type": "product", "id": "product", "label": "Featured product"},
-    {"type": "url", "id": "link", "label": "Custom link"},
-    {"type": "text", "id": "button_label", "label": "Button label", "default": "Shop now"}
+    {"type": "range", "id": "custom_height", "label": "Custom desktop height", "min": 500, "max": 1200, "step": 20, "unit": "px", "default": 900},
+    {"type": "range", "id": "custom_height_mobile", "label": "Custom mobile height", "min": 520, "max": 1000, "step": 20, "unit": "px", "default": 820},
+    {"type": "header", "content": "Accessibility labels"},
+    {"type": "text", "id": "accessibility_label", "label": "Slideshow label", "default": "Featured campaigns"},
+    {"type": "text", "id": "dots_label", "label": "Slide selector label", "default": "Choose a campaign"},
+    {"type": "text", "id": "previous_label", "label": "Previous label", "default": "Previous campaign"},
+    {"type": "text", "id": "next_label", "label": "Next label", "default": "Next campaign"}
   ],
-  "presets": [{"name": "Editorial hero"}]
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Campaign slide",
+      "settings": [
+        {"type": "video", "id": "desktop_video", "label": "Desktop video"},
+        {"type": "image_picker", "id": "desktop_image", "label": "Desktop image or GIF"},
+        {"type": "video", "id": "mobile_video", "label": "Mobile video"},
+        {"type": "image_picker", "id": "mobile_image", "label": "Mobile image or GIF"},
+        {"type": "select", "id": "fallback_media", "label": "Built-in fallback media", "default": "none", "options": [
+          {"value": "none", "label": "None"},
+          {"value": "group", "label": "TACT group campaign"},
+          {"value": "madison", "label": "Web of Madison"}
+        ]},
+        {"type": "select", "id": "layout", "label": "Desktop layout", "default": "full", "options": [
+          {"value": "full", "label": "Full bleed"},
+          {"value": "split", "label": "Split image and copy"}
+        ]},
+        {"type": "select", "id": "desktop_fit", "label": "Desktop image fit", "default": "cover", "options": [
+          {"value": "cover", "label": "Fill / crop"},
+          {"value": "contain", "label": "Show full image"}
+        ]},
+        {"type": "select", "id": "mobile_fit", "label": "Mobile image fit", "default": "cover", "options": [
+          {"value": "cover", "label": "Fill / crop"},
+          {"value": "contain", "label": "Show full image"}
+        ]},
+        {"type": "select", "id": "desktop_position", "label": "Desktop focal point", "default": "center center", "options": [
+          {"value": "left center", "label": "Left"},
+          {"value": "center center", "label": "Center"},
+          {"value": "right center", "label": "Right"},
+          {"value": "center top", "label": "Top"},
+          {"value": "center bottom", "label": "Bottom"}
+        ]},
+        {"type": "select", "id": "mobile_position", "label": "Mobile focal point", "default": "center center", "options": [
+          {"value": "left center", "label": "Left"},
+          {"value": "center center", "label": "Center"},
+          {"value": "right center", "label": "Right"},
+          {"value": "center top", "label": "Top"},
+          {"value": "center bottom", "label": "Bottom"}
+        ]},
+        {"type": "color", "id": "background", "label": "Media background", "default": "#0a285e"},
+        {"type": "text", "id": "edition", "label": "Top label"},
+        {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Everyday streetwear"},
+        {"type": "text", "id": "heading", "label": "Heading", "default": "Wear Your Flex"},
+        {"type": "text", "id": "button_label", "label": "Button label", "default": "Shop the edit"},
+        {"type": "url", "id": "link", "label": "Custom link"},
+        {"type": "select", "id": "content_position", "label": "Horizontal position", "default": "center", "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ]},
+        {"type": "select", "id": "content_vertical", "label": "Vertical position", "default": "bottom", "options": [
+          {"value": "top", "label": "Top"},
+          {"value": "center", "label": "Center"},
+          {"value": "bottom", "label": "Bottom"}
+        ]},
+        {"type": "range", "id": "heading_size", "label": "Desktop heading size", "min": 36, "max": 150, "step": 2, "unit": "px", "default": 92},
+        {"type": "range", "id": "heading_size_mobile", "label": "Mobile heading size", "min": 32, "max": 82, "step": 2, "unit": "px", "default": 58},
+        {"type": "color", "id": "text_color", "label": "Desktop text", "default": "#0a0a0a"},
+        {"type": "color", "id": "mobile_text_color", "label": "Mobile text", "default": "#ffffff"},
+        {"type": "color", "id": "overlay_color", "label": "Desktop overlay", "default": "#000000"},
+        {"type": "range", "id": "overlay_opacity", "label": "Desktop overlay strength", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 10},
+        {"type": "range", "id": "mobile_overlay_opacity", "label": "Mobile overlay strength", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 55}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial hero slideshow",
+      "blocks": [
+        {"type": "slide", "settings": {"fallback_media": "group", "heading": "Wear Your Flex", "desktop_fit": "contain", "background": "#eee8df"}},
+        {"type": "slide", "settings": {"fallback_media": "madison", "layout": "split", "eyebrow": "New release", "heading": "Web of Madison", "button_label": "Shop the story", "background": "#0a285e"}}
+      ]
+    }
+  ]
 }
 {% endschema %}

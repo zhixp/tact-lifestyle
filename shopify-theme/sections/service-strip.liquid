@@ -1,9 +1,25 @@
-<section class="t-services">
+<section
+  class="t-services"
+  style="
+    --services-background: {{ section.settings.background }};
+    --services-text: {{ section.settings.text_color }};
+    --services-columns: {{ section.settings.columns }};
+    --services-padding: {{ section.settings.padding }}px;
+    --services-heading-size: {{ section.settings.heading_size }}px;
+  "
+>
   {% for block in section.blocks %}
     <article {{ block.shopify_attributes }}>
-      <small>0{{ forloop.index }}</small>
+      {% if block.settings.icon != blank %}
+        {{ block.settings.icon | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
+      {% elsif section.settings.show_numbers %}
+        <small>{{ forloop.index | prepend: '0' }}</small>
+      {% endif %}
       <h3>{{ block.settings.heading }}</h3>
       <p>{{ block.settings.copy }}</p>
+      {% if block.settings.link_label != blank %}
+        <a href="{{ block.settings.link }}">{{ block.settings.link_label }} {% render 'icon', icon: 'arrow' %}</a>
+      {% endif %}
     </article>
   {% endfor %}
 </section>
@@ -11,14 +27,25 @@
 {% schema %}
 {
   "name": "Service strip",
-  "max_blocks": 4,
+  "max_blocks": 6,
+  "settings": [
+    {"type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 6, "step": 1, "default": 4},
+    {"type": "checkbox", "id": "show_numbers", "label": "Show numbers without custom icons", "default": true},
+    {"type": "range", "id": "heading_size", "label": "Heading size", "min": 14, "max": 32, "step": 1, "unit": "px", "default": 18},
+    {"type": "range", "id": "padding", "label": "Vertical padding", "min": 24, "max": 120, "step": 4, "unit": "px", "default": 56},
+    {"type": "color", "id": "background", "label": "Background", "default": "#ffffff"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"}
+  ],
   "blocks": [
     {
       "type": "service",
       "name": "Service",
       "settings": [
+        {"type": "image_picker", "id": "icon", "label": "Custom icon"},
         {"type": "text", "id": "heading", "label": "Heading", "default": "Free shipping"},
-        {"type": "text", "id": "copy", "label": "Copy", "default": "Complimentary delivery on qualifying orders."}
+        {"type": "text", "id": "copy", "label": "Copy", "default": "Complimentary delivery on qualifying orders."},
+        {"type": "text", "id": "link_label", "label": "Optional link label"},
+        {"type": "url", "id": "link", "label": "Optional link"}
       ]
     }
   ],

@@ -1,14 +1,34 @@
+{% liquid
+  assign header_alpha = section.settings.background_opacity | divided_by: 100.0
+  assign header_background = section.settings.background | color_modify: 'alpha', header_alpha
+%}
+<style>
+  :root {
+    --header-height: {{ section.settings.height }}px;
+    --header-height-mobile: {{ section.settings.height_mobile }}px;
+  }
+  #shopify-section-{{ section.id }} {
+    --header-background: {{ header_background }};
+    --header-color: {{ section.settings.text_color }};
+    --header-nav-size: {{ section.settings.nav_font_size }}px;
+    --menu-background: {{ section.settings.menu_background }};
+    --menu-color: {{ section.settings.menu_text_color }};
+    --menu-promo-height: {{ section.settings.promo_height }}px;
+  }
+</style>
+
 <header
-  class="t-header{% if request.page_type == 'index' %} t-header--overlay t-header--desktop-{{ section.settings.homepage_overlay_color }} t-header--mobile-{{ section.settings.homepage_mobile_overlay_color }}{% endif %}"
+  class="t-header{% if request.page_type == 'index' %} t-header--overlay t-header--desktop-{{ section.settings.homepage_overlay_color }} t-header--mobile-{{ section.settings.home_mobile_overlay }}{% endif %}{% unless section.settings.sticky_header %} t-header--static{% endunless %}"
   data-site-header
+  data-hide-on-scroll="{{ section.settings.hide_on_scroll }}"
 >
   <nav class="t-header__links" aria-label="Primary">
-    {% for link in section.settings.menu.links limit: 2 %}
+    {% for link in section.settings.menu.links limit: section.settings.desktop_links_limit %}
       <a href="{{ link.url }}">{{ link.title }}</a>
     {% endfor %}
   </nav>
 
-  <button class="t-icon-button t-header__menu" type="button" data-menu-open aria-label="Open menu">
+  <button class="t-icon-button t-header__menu" type="button" data-menu-open aria-label="{{ section.settings.open_menu_label | escape }}">
     {% render 'icon', icon: 'menu' %}
   </button>
 
@@ -16,84 +36,104 @@
     {% if settings.logo %}
       {{
         settings.logo
-        | image_url: width: settings.logo_width
-        | image_tag: class: 't-logo-dark', widths: '100, 132, 180, 240', alt: shop.name
+        | image_url: width: 560
+        | image_tag: class: 't-logo-dark', widths: '120, 180, 240, 360, 560', alt: shop.name
       }}
     {% else %}
-      <img class="t-logo-dark" src="{{ 'logo-black.png' | asset_url }}" width="{{ settings.logo_width }}" alt="{{ shop.name }}">
+      <img class="t-logo-dark" src="{{ 'logo-black.png' | asset_url }}" width="280" alt="{{ shop.name }}">
     {% endif %}
     {% if settings.logo_light %}
       {{
         settings.logo_light
-        | image_url: width: settings.logo_width
-        | image_tag: class: 't-logo-light', widths: '100, 132, 180, 240', alt: shop.name
+        | image_url: width: 560
+        | image_tag: class: 't-logo-light', widths: '120, 180, 240, 360, 560', alt: shop.name
       }}
     {% else %}
-      <img class="t-logo-light" src="{{ 'logo-white.png' | asset_url }}" width="{{ settings.logo_width }}" alt="{{ shop.name }}">
+      <img class="t-logo-light" src="{{ 'logo-white.png' | asset_url }}" width="280" alt="{{ shop.name }}">
     {% endif %}
   </a>
 
   <div class="t-header__actions">
-    <a class="t-icon-button" href="{{ routes.search_url }}" aria-label="Search">
-      {% render 'icon', icon: 'search' %}
-    </a>
-    <a class="t-icon-button" href="{{ routes.account_url }}" aria-label="Account">
-      {% render 'icon', icon: 'user' %}
-    </a>
-    <a class="t-icon-button" href="{{ routes.cart_url }}" aria-label="Bag with {{ cart.item_count }} items">
-      {% render 'icon', icon: 'bag' %}
-      {% if cart.item_count > 0 %}<span>{{ cart.item_count }}</span>{% endif %}
-    </a>
-    <button class="t-icon-button t-header__desktop-menu" type="button" data-menu-open aria-label="Open menu">
+    {% if section.settings.show_search %}
+      <a class="t-icon-button" href="{{ routes.search_url }}" aria-label="{{ section.settings.search_label | escape }}">
+        {% render 'icon', icon: 'search' %}
+      </a>
+    {% endif %}
+    {% if section.settings.show_account %}
+      <a class="t-icon-button" href="{{ routes.account_url }}" aria-label="{{ section.settings.account_label | escape }}">
+        {% render 'icon', icon: 'user' %}
+      </a>
+    {% endif %}
+    {% if section.settings.show_wishlist %}
+      <button class="t-icon-button" type="button" data-wishlist-open aria-label="{{ section.settings.wishlist_label | escape }}">
+        {% render 'icon', icon: 'heart' %}
+        <span data-wishlist-count hidden>0</span>
+      </button>
+    {% endif %}
+    {% if section.settings.show_cart %}
+      <a class="t-icon-button" href="{{ routes.cart_url }}" aria-label="{{ section.settings.bag_label | escape }} — {{ cart.item_count }}">
+        {% render 'icon', icon: 'bag' %}
+        {% if cart.item_count > 0 %}<span>{{ cart.item_count }}</span>{% endif %}
+      </a>
+    {% endif %}
+    <button class="t-icon-button t-header__desktop-menu" type="button" data-menu-open aria-label="{{ section.settings.open_menu_label | escape }}">
       {% render 'icon', icon: 'menu' %}
     </button>
   </div>
 </header>
 
-<nav class="t-mobile-dock" aria-label="Mobile navigation">
-  <a href="{{ routes.root_url }}">{% render 'icon', icon: 'home' %}<span>Home</span></a>
-  <a href="{{ routes.account_url }}">{% render 'icon', icon: 'user' %}<span>Account</span></a>
-  <a href="{{ routes.search_url }}">{% render 'icon', icon: 'search' %}<span>Search</span></a>
-  <a href="{{ routes.cart_url }}">
-    {% render 'icon', icon: 'bag' %}
-    <span>Bag{% if cart.item_count > 0 %} · {{ cart.item_count }}{% endif %}</span>
-  </a>
-</nav>
+{% if section.settings.show_mobile_dock %}
+  <nav class="t-mobile-dock" aria-label="Mobile navigation">
+    <a href="{{ routes.root_url }}">{% render 'icon', icon: 'home' %}<span>{{ section.settings.home_label }}</span></a>
+    <a href="{{ routes.account_url }}">{% render 'icon', icon: 'user' %}<span>{{ section.settings.account_label }}</span></a>
+    <a href="{{ routes.search_url }}">{% render 'icon', icon: 'search' %}<span>{{ section.settings.search_label }}</span></a>
+    <a href="{{ routes.cart_url }}">
+      {% render 'icon', icon: 'bag' %}
+      <span>{{ section.settings.bag_label }}{% if cart.item_count > 0 %} · {{ cart.item_count }}{% endif %}</span>
+    </a>
+  </nav>
+{% endif %}
 
-<button class="t-overlay" type="button" data-overlay aria-label="Close menu"></button>
+<button class="t-overlay" type="button" data-overlay aria-label="{{ section.settings.close_menu_label | escape }}"></button>
 <aside class="t-menu" data-menu aria-hidden="true">
   <div class="t-menu__bar">
     <a href="{{ routes.root_url }}">
       {% if settings.logo %}
-        {{ settings.logo | image_url: width: settings.logo_width | image_tag: alt: shop.name }}
+        {{ settings.logo | image_url: width: 560 | image_tag: widths: '120, 180, 240, 360, 560', alt: shop.name }}
       {% else %}
-        <img src="{{ 'logo-black.png' | asset_url }}" width="{{ settings.logo_width }}" alt="{{ shop.name }}">
+        <img src="{{ 'logo-black.png' | asset_url }}" width="280" alt="{{ shop.name }}">
       {% endif %}
     </a>
-    <button class="t-icon-button" type="button" data-menu-close aria-label="Close menu">
+    <button class="t-icon-button" type="button" data-menu-close aria-label="{{ section.settings.close_menu_label | escape }}">
       {% render 'icon', icon: 'close' %}
     </button>
   </div>
   <div class="t-menu__panel">
     <nav class="t-menu__primary" aria-label="Shop">
       {% for link in section.settings.menu.links %}
-        <a href="{{ link.url }}"><small>0{{ forloop.index }}</small>{{ link.title }}</a>
+        <a href="{{ link.url }}"><small>{{ forloop.index | prepend: '0' }}</small>{{ link.title }}</a>
       {% else %}
-        <a href="{{ routes.all_products_collection_url }}"><small>01</small>Shop all</a>
+        <a href="{{ routes.all_products_collection_url }}"><small>01</small>{{ section.settings.shop_all_label }}</a>
       {% endfor %}
     </nav>
     <div class="t-menu__secondary">
       <div>
-        <p>Customer care</p>
+        <p>{{ section.settings.support_heading }}</p>
         {% for link in section.settings.support_menu.links %}
           <a href="{{ link.url }}">{{ link.title }}</a>
         {% endfor %}
       </div>
       <div>
-        <p>Collections</p>
-        {% for collection in collections limit: 5 %}
-          <a href="{{ collection.url }}">{{ collection.title }}</a>
-        {% endfor %}
+        <p>{{ section.settings.collections_heading }}</p>
+        {% if section.settings.collections_menu != blank %}
+          {% for link in section.settings.collections_menu.links %}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {% endfor %}
+        {% else %}
+          {% for collection in collections limit: 8 %}
+            <a href="{{ collection.url }}">{{ collection.title }}</a>
+          {% endfor %}
+        {% endif %}
       </div>
       {% liquid
         assign promo_product = section.settings.promo_product
@@ -106,65 +146,107 @@
           assign promo_image = promo_product.featured_image
         endif
       %}
-      <div class="t-menu__promo">
-        {% if promo_image != blank %}
-          {{
-            promo_image
-            | image_url: width: 900
-            | image_tag: loading: 'lazy', widths: '360, 540, 720, 900', sizes: '(max-width: 749px) 100vw, 32vw', alt: section.settings.promo_heading
-          }}
-        {% else %}
-          <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" loading="lazy" alt="{{ section.settings.promo_heading | escape }}">
-        {% endif %}
-        <a href="{{ promo_link | default: routes.all_products_collection_url }}">
-          <span>
-            <small>{{ section.settings.promo_eyebrow }}</small>
-            <strong>{{ section.settings.promo_heading }}</strong>
-          </span>
-          {% render 'icon', icon: 'arrow' %}
-        </a>
-      </div>
+      {% if section.settings.show_promo %}
+        <div class="t-menu__promo">
+          {% if promo_image != blank %}
+            {{
+              promo_image
+              | image_url: width: 1200
+              | image_tag: loading: 'lazy', widths: '360, 540, 720, 900, 1200', sizes: '(max-width: 749px) 100vw, 32vw', alt: section.settings.promo_heading
+            }}
+          {% else %}
+            <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" loading="lazy" alt="{{ section.settings.promo_heading | escape }}">
+          {% endif %}
+          <a href="{{ promo_link | default: routes.all_products_collection_url }}">
+            <span>
+              <small>{{ section.settings.promo_eyebrow }}</small>
+              <strong>{{ section.settings.promo_heading }}</strong>
+            </span>
+            {% render 'icon', icon: 'arrow' %}
+          </a>
+        </div>
+      {% endif %}
     </div>
   </div>
 </aside>
+
+{% if section.settings.show_wishlist %}
+  <button class="t-overlay t-wishlist-overlay" type="button" data-wishlist-close aria-label="{{ section.settings.close_wishlist_label | escape }}"></button>
+  <aside class="t-wishlist" data-wishlist-drawer aria-hidden="true">
+    <div class="t-wishlist__bar">
+      <div>
+        <p class="t-kicker">{{ section.settings.wishlist_eyebrow }}</p>
+        <h2>{{ section.settings.wishlist_heading }}</h2>
+      </div>
+      <button class="t-icon-button" type="button" data-wishlist-close aria-label="{{ section.settings.close_wishlist_label | escape }}">
+        {% render 'icon', icon: 'close' %}
+      </button>
+    </div>
+    <div class="t-wishlist__items" data-wishlist-items></div>
+    <div class="t-wishlist__empty" data-wishlist-empty>
+      <p>{{ section.settings.wishlist_empty }}</p>
+      <a class="t-button t-button--interactive" href="{{ routes.all_products_collection_url }}">
+        {{ section.settings.wishlist_shop_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+      </a>
+    </div>
+  </aside>
+{% endif %}
 
 {% schema %}
 {
   "name": "Header",
   "settings": [
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "Main menu",
-      "default": "main-menu"
-    },
-    {
-      "type": "link_list",
-      "id": "support_menu",
-      "label": "Support menu",
-      "default": "footer"
-    },
-    {
-      "type": "select",
-      "id": "homepage_overlay_color",
-      "label": "Homepage desktop header colour",
-      "default": "dark",
-      "options": [
-        {"value": "dark", "label": "Dark"},
-        {"value": "light", "label": "Light"}
-      ]
-    },
-    {
-      "type": "select",
-      "id": "homepage_mobile_overlay_color",
-      "label": "Homepage mobile header colour",
-      "default": "light",
-      "options": [
-        {"value": "dark", "label": "Dark"},
-        {"value": "light", "label": "Light"}
-      ]
-    },
-    {"type": "header", "content": "Menu promotion"},
+    {"type": "header", "content": "Layout"},
+    {"type": "checkbox", "id": "sticky_header", "label": "Sticky header", "default": true},
+    {"type": "checkbox", "id": "hide_on_scroll", "label": "Hide while scrolling down", "default": true},
+    {"type": "range", "id": "height", "label": "Desktop height", "min": 54, "max": 100, "step": 2, "unit": "px", "default": 68},
+    {"type": "range", "id": "height_mobile", "label": "Mobile height", "min": 50, "max": 82, "step": 2, "unit": "px", "default": 60},
+    {"type": "range", "id": "nav_font_size", "label": "Navigation text size", "min": 10, "max": 18, "step": 1, "unit": "px", "default": 13},
+    {"type": "range", "id": "desktop_links_limit", "label": "Desktop links shown", "min": 1, "max": 6, "step": 1, "default": 4},
+    {"type": "color", "id": "background", "label": "Header background", "default": "#ffffff"},
+    {"type": "range", "id": "background_opacity", "label": "Background opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 95},
+    {"type": "color", "id": "text_color", "label": "Header text", "default": "#0a0a0a"},
+    {"type": "header", "content": "Navigation"},
+    {"type": "link_list", "id": "menu", "label": "Main menu", "default": "main-menu"},
+    {"type": "link_list", "id": "support_menu", "label": "Support menu", "default": "footer"},
+    {"type": "link_list", "id": "collections_menu", "label": "Collections menu"},
+    {"type": "text", "id": "support_heading", "label": "Support heading", "default": "Customer care"},
+    {"type": "text", "id": "collections_heading", "label": "Collections heading", "default": "Collections"},
+    {"type": "text", "id": "shop_all_label", "label": "Fallback shop label", "default": "Shop all"},
+    {"type": "header", "content": "Header actions"},
+    {"type": "checkbox", "id": "show_search", "label": "Show search", "default": true},
+    {"type": "checkbox", "id": "show_account", "label": "Show account", "default": true},
+    {"type": "checkbox", "id": "show_wishlist", "label": "Show wishlist", "default": true},
+    {"type": "checkbox", "id": "show_cart", "label": "Show cart", "default": true},
+    {"type": "text", "id": "open_menu_label", "label": "Open menu label", "default": "Open menu"},
+    {"type": "text", "id": "close_menu_label", "label": "Close menu label", "default": "Close menu"},
+    {"type": "text", "id": "search_label", "label": "Search label", "default": "Search"},
+    {"type": "text", "id": "account_label", "label": "Account label", "default": "Account"},
+    {"type": "text", "id": "bag_label", "label": "Bag label", "default": "Bag"},
+    {"type": "text", "id": "wishlist_label", "label": "Wishlist label", "default": "Wishlist"},
+    {"type": "text", "id": "home_label", "label": "Home label", "default": "Home"},
+    {"type": "header", "content": "Wishlist drawer"},
+    {"type": "text", "id": "wishlist_eyebrow", "label": "Eyebrow", "default": "Saved for later"},
+    {"type": "text", "id": "wishlist_heading", "label": "Heading", "default": "Your wishlist."},
+    {"type": "text", "id": "wishlist_empty", "label": "Empty message", "default": "Save the pieces you want to come back to."},
+    {"type": "text", "id": "wishlist_shop_label", "label": "Shop button", "default": "Explore all pieces"},
+    {"type": "text", "id": "close_wishlist_label", "label": "Close label", "default": "Close wishlist"},
+    {"type": "header", "content": "Mobile dock"},
+    {"type": "checkbox", "id": "show_mobile_dock", "label": "Show mobile navigation dock", "default": true},
+    {"type": "header", "content": "Homepage overlay"},
+    {"type": "select", "id": "homepage_overlay_color", "label": "Desktop header colour", "default": "dark", "options": [
+      {"value": "dark", "label": "Dark"},
+      {"value": "light", "label": "Light"}
+    ]},
+    {"type": "select", "id": "home_mobile_overlay", "label": "Mobile header colour", "default": "light", "options": [
+      {"value": "dark", "label": "Dark"},
+      {"value": "light", "label": "Light"}
+    ]},
+    {"type": "header", "content": "Menu drawer"},
+    {"type": "color", "id": "menu_background", "label": "Menu background", "default": "#f3f3f1"},
+    {"type": "color", "id": "menu_text_color", "label": "Menu text", "default": "#0a0a0a"},
+    {"type": "checkbox", "id": "show_promo", "label": "Show promotional tile", "default": true},
+    {"type": "range", "id": "promo_height", "label": "Promo tile height", "min": 180, "max": 520, "step": 10, "unit": "px", "default": 280},
     {"type": "image_picker", "id": "promo_image", "label": "Promo image"},
     {"type": "product", "id": "promo_product", "label": "Promo product"},
     {"type": "text", "id": "promo_eyebrow", "label": "Promo eyebrow", "default": "Latest from TACT"},

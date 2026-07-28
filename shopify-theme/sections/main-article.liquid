@@ -1,0 +1,35 @@
+<article
+  class="t-article"
+  style="
+    --article-background: {{ section.settings.background }};
+    --article-text: {{ section.settings.text_color }};
+    --article-heading-size: {{ section.settings.heading_size }}px;
+    --article-width: {{ section.settings.content_width }}px;
+  "
+>
+  <header>
+    <a href="{{ blog.url }}">{{ section.settings.back_label }}</a>
+    <p class="t-kicker">{{ article.published_at | date: '%B %d, %Y' }}</p>
+    <h1>{{ article.title }}</h1>
+    {% if section.settings.show_author %}<p>{{ section.settings.author_prefix }} {{ article.author }}</p>{% endif %}
+  </header>
+  {% if article.image != blank %}
+    {{ article.image | image_url: width: 2200 | image_tag: widths: '720, 1100, 1600, 2200', sizes: '100vw', alt: article.image.alt }}
+  {% endif %}
+  <div class="t-article__content rte">{{ article.content }}</div>
+</article>
+
+{% schema %}
+{
+  "name": "Main article",
+  "settings": [
+    {"type": "text", "id": "back_label", "label": "Back link", "default": "Back to journal"},
+    {"type": "checkbox", "id": "show_author", "label": "Show author", "default": true},
+    {"type": "text", "id": "author_prefix", "label": "Author prefix", "default": "By"},
+    {"type": "range", "id": "heading_size", "label": "Heading size", "min": 46, "max": 120, "step": 2, "unit": "px", "default": 86},
+    {"type": "range", "id": "content_width", "label": "Article width", "min": 580, "max": 1000, "step": 20, "unit": "px", "default": 720},
+    {"type": "color", "id": "background", "label": "Background", "default": "#f3f3f1"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"}
+  ]
+}
+{% endschema %}

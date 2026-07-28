@@ -1,12 +1,40 @@
-<section class="t-cart">
+<section
+  class="t-cart"
+  style="
+    --cart-background: {{ section.settings.background }};
+    --cart-text: {{ section.settings.text_color }};
+    --cart-heading-size: {{ section.settings.heading_size }}px;
+    --cart-heading-mobile: {{ section.settings.heading_size_mobile }}px;
+  "
+>
   <header>
-    <p class="t-kicker">TACT / Bag</p>
-    <h1>Your bag.</h1>
+    {% if section.settings.eyebrow != blank %}<p class="t-kicker">{{ section.settings.eyebrow }}</p>{% endif %}
+    <h1>{{ section.settings.heading }}</h1>
   </header>
+
   {% if cart.item_count == 0 %}
-    <div class="t-cart__empty">
-      <p>Your bag is ready for a new flex.</p>
-      <a class="t-button" href="{{ routes.all_products_collection_url }}">Shop new arrivals {% render 'icon', icon: 'arrow' %}</a>
+    <div class="t-cart-empty t-cart-empty--{{ section.settings.empty_layout }}">
+      <div class="t-cart-empty__media">
+        {% if section.settings.empty_image != blank %}
+          {{
+            section.settings.empty_image
+            | image_url: width: 1800
+            | image_tag: widths: '600, 900, 1200, 1500, 1800', sizes: '(max-width: 749px) 100vw, 60vw', alt: section.settings.empty_heading
+          }}
+        {% else %}
+          <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="{{ section.settings.empty_heading | escape }}">
+        {% endif %}
+      </div>
+      <div class="t-cart-empty__copy">
+        {% if section.settings.empty_eyebrow != blank %}<p class="t-kicker">{{ section.settings.empty_eyebrow }}</p>{% endif %}
+        <h2>{{ section.settings.empty_heading }}</h2>
+        {% if section.settings.empty_copy != blank %}<div class="rte">{{ section.settings.empty_copy }}</div>{% endif %}
+        {% if section.settings.empty_button_label != blank %}
+          <a class="t-button t-button--interactive" href="{{ section.settings.empty_link | default: routes.all_products_collection_url }}">
+            {{ section.settings.empty_button_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+          </a>
+        {% endif %}
+      </div>
     </div>
   {% else %}
     <form action="{{ routes.cart_url }}" method="post" class="t-cart__form">
@@ -14,31 +42,95 @@
         {% for item in cart.items %}
           <article class="t-cart__line">
             <a href="{{ item.url }}">
-              {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.image.alt }}
+              {{ item.image | image_url: width: 420 | image_tag: loading: 'lazy', widths: '160, 240, 320, 420', alt: item.image.alt }}
             </a>
             <div>
               <a href="{{ item.url }}"><h2>{{ item.product.title }}</h2></a>
-              <p>{{ item.variant.title }}</p>
+              {% unless item.product.has_only_default_variant %}<p>{{ item.variant.title }}</p>{% endunless %}
               <span>{{ item.final_line_price | money }}</span>
               <label>
-                Quantity
-                <input type="number" name="updates[]" value="{{ item.quantity }}" min="0">
+                {{ section.settings.quantity_label }}
+                <input type="number" name="updates[{{ item.key }}]" value="{{ item.quantity }}" min="0">
               </label>
-              <a href="{{ item.url_to_remove }}">Remove</a>
+              <a href="{{ item.url_to_remove }}">{{ section.settings.remove_label }}</a>
             </div>
           </article>
         {% endfor %}
+        {% if section.settings.show_cart_note %}
+          <label class="t-cart__note">
+            <span>{{ section.settings.note_label }}</span>
+            <textarea name="note" placeholder="{{ section.settings.note_placeholder | escape }}">{{ cart.note }}</textarea>
+          </label>
+        {% endif %}
       </div>
       <aside class="t-cart__summary">
-        <p>Subtotal <strong>{{ cart.total_price | money }}</strong></p>
-        <button type="submit" name="update">Update bag</button>
-        <button class="t-button" type="submit" name="checkout">Continue to checkout {% render 'icon', icon: 'arrow' %}</button>
-        <small>Taxes included. Shipping calculated at checkout.</small>
+        <h2>{{ section.settings.summary_heading }}</h2>
+        <p>{{ section.settings.subtotal_label }} <strong>{{ cart.total_price | money }}</strong></p>
+        <button type="submit" name="update">{{ section.settings.update_label }}</button>
+        <button class="t-button t-button--interactive" type="submit" name="checkout">
+          {{ section.settings.checkout_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+        </button>
+        <small>{{ section.settings.checkout_note }}</small>
       </aside>
     </form>
+  {% endif %}
+
+  {% if section.settings.show_upsell and section.settings.upsell_collection != blank %}
+    <section class="t-cart-upsell">
+      <header>
+        {% if section.settings.upsell_eyebrow != blank %}<p class="t-kicker">{{ section.settings.upsell_eyebrow }}</p>{% endif %}
+        <h2>{{ section.settings.upsell_heading }}</h2>
+      </header>
+      <div class="t-product-grid">
+        {% for product in section.settings.upsell_collection.products limit: section.settings.upsell_products %}
+          {% render 'product-card', card_product: product, quick_add: true, wishlist: section.settings.upsell_wishlist %}
+        {% endfor %}
+      </div>
+    </section>
   {% endif %}
 </section>
 
 {% schema %}
-{"name": "Main cart", "settings": []}
+{
+  "name": "Main cart",
+  "settings": [
+    {"type": "header", "content": "Page heading"},
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "TACT / Bag"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Your bag."},
+    {"type": "range", "id": "heading_size", "label": "Desktop heading size", "min": 48, "max": 130, "step": 2, "unit": "px", "default": 92},
+    {"type": "range", "id": "heading_size_mobile", "label": "Mobile heading size", "min": 40, "max": 76, "step": 2, "unit": "px", "default": 58},
+    {"type": "color", "id": "background", "label": "Background", "default": "#f3f3f1"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"},
+    {"type": "header", "content": "Empty bag showcase"},
+    {"type": "select", "id": "empty_layout", "label": "Layout", "default": "image-left", "options": [
+      {"value": "image-left", "label": "Image left"},
+      {"value": "image-right", "label": "Image right"},
+      {"value": "stacked", "label": "Stacked"}
+    ]},
+    {"type": "image_picker", "id": "empty_image", "label": "Showcase image"},
+    {"type": "text", "id": "empty_eyebrow", "label": "Eyebrow", "default": "Nothing here yet"},
+    {"type": "text", "id": "empty_heading", "label": "Heading", "default": "Your next rotation starts here."},
+    {"type": "richtext", "id": "empty_copy", "label": "Copy", "default": "<p>Discover graphic tees, everyday layers and new drops made to move with you.</p>"},
+    {"type": "text", "id": "empty_button_label", "label": "Button label", "default": "Explore new arrivals"},
+    {"type": "url", "id": "empty_link", "label": "Button link"},
+    {"type": "header", "content": "Cart content"},
+    {"type": "text", "id": "quantity_label", "label": "Quantity label", "default": "Quantity"},
+    {"type": "text", "id": "remove_label", "label": "Remove label", "default": "Remove"},
+    {"type": "checkbox", "id": "show_cart_note", "label": "Show order note", "default": true},
+    {"type": "text", "id": "note_label", "label": "Order note label", "default": "Add a note"},
+    {"type": "text", "id": "note_placeholder", "label": "Order note placeholder", "default": "Delivery instructions or a note for the TACT team"},
+    {"type": "text", "id": "summary_heading", "label": "Summary heading", "default": "Order summary"},
+    {"type": "text", "id": "subtotal_label", "label": "Subtotal label", "default": "Subtotal"},
+    {"type": "text", "id": "update_label", "label": "Update button", "default": "Update bag"},
+    {"type": "text", "id": "checkout_label", "label": "Checkout button", "default": "Continue to checkout"},
+    {"type": "text", "id": "checkout_note", "label": "Checkout note", "default": "Taxes included. Shipping calculated at checkout."},
+    {"type": "header", "content": "Cart upsell"},
+    {"type": "checkbox", "id": "show_upsell", "label": "Show product upsell", "default": true},
+    {"type": "collection", "id": "upsell_collection", "label": "Upsell collection"},
+    {"type": "text", "id": "upsell_eyebrow", "label": "Upsell eyebrow", "default": "Complete the rotation"},
+    {"type": "text", "id": "upsell_heading", "label": "Upsell heading", "default": "You may also like."},
+    {"type": "range", "id": "upsell_products", "label": "Products shown", "min": 2, "max": 8, "step": 1, "default": 4},
+    {"type": "checkbox", "id": "upsell_wishlist", "label": "Show wishlist on upsell products", "default": true}
+  ]
+}
 {% endschema %}

@@ -1,27 +1,37 @@
 <section class="t-register">
   <div>
-    <p class="t-kicker">Join TACT</p>
-    <h1>Create your account.</h1>
-    <p>Track orders, manage addresses and move through checkout faster.</p>
+    {% if section.settings.eyebrow != blank %}<p class="t-kicker">{{ section.settings.eyebrow }}</p>{% endif %}
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.copy }}</p>
     {% form 'create_customer' %}
       {{ form.errors | default_errors }}
-      <label for="RegisterFirstName">First name</label>
+      <label for="RegisterFirstName">{{ section.settings.first_name_label }}</label>
       <input id="RegisterFirstName" type="text" name="customer[first_name]" autocomplete="given-name">
-      <label for="RegisterLastName">Last name</label>
+      <label for="RegisterLastName">{{ section.settings.last_name_label }}</label>
       <input id="RegisterLastName" type="text" name="customer[last_name]" autocomplete="family-name">
-      <label for="RegisterEmail">Email</label>
+      <label for="RegisterEmail">{{ section.settings.email_label }}</label>
       <input id="RegisterEmail" type="email" name="customer[email]" autocomplete="email" required>
-      <label for="RegisterPassword">Password</label>
+      <label for="RegisterPassword">{{ section.settings.password_label }}</label>
       <input id="RegisterPassword" type="password" name="customer[password]" autocomplete="new-password" required>
-      <button class="t-button t-button--dark" type="submit">Create account {% render 'icon', icon: 'arrow' %}</button>
+      <button class="t-button t-button--dark" type="submit">{{ section.settings.button_label }} {% render 'icon', icon: 'arrow' %}</button>
     {% endform %}
-    <a href="{{ routes.account_login_url }}">Already have an account? Sign in.</a>
+    <a href="{{ routes.account_login_url }}">{{ section.settings.login_label }}</a>
   </div>
 </section>
 
 {% schema %}
 {
   "name": "Customer registration",
-  "settings": []
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Join TACT"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Create your account."},
+    {"type": "textarea", "id": "copy", "label": "Copy", "default": "Track orders, manage addresses and move through checkout faster."},
+    {"type": "text", "id": "first_name_label", "label": "First name label", "default": "First name"},
+    {"type": "text", "id": "last_name_label", "label": "Last name label", "default": "Last name"},
+    {"type": "text", "id": "email_label", "label": "Email label", "default": "Email"},
+    {"type": "text", "id": "password_label", "label": "Password label", "default": "Password"},
+    {"type": "text", "id": "button_label", "label": "Button label", "default": "Create account"},
+    {"type": "text", "id": "login_label", "label": "Login link", "default": "Already have an account? Sign in."}
+  ]
 }
 {% endschema %}

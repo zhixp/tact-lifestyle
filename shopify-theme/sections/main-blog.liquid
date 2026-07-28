@@ -1,0 +1,53 @@
+<section
+  class="t-blog"
+  style="
+    --blog-background: {{ section.settings.background }};
+    --blog-text: {{ section.settings.text_color }};
+    --blog-columns: {{ section.settings.columns }};
+    --blog-heading-size: {{ section.settings.heading_size }}px;
+  "
+>
+  <header>
+    {% if section.settings.eyebrow != blank %}<p class="t-kicker">{{ section.settings.eyebrow }}</p>{% endif %}
+    <h1>{{ blog.title }}</h1>
+    {% if section.settings.copy != blank %}<div class="rte">{{ section.settings.copy }}</div>{% endif %}
+  </header>
+  {% paginate blog.articles by section.settings.articles_per_page %}
+    <div class="t-blog__grid">
+      {% for article in blog.articles %}
+        <article>
+          <a href="{{ article.url }}">
+            {% if article.image != blank %}
+              {{ article.image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '360, 540, 720, 900, 1200', alt: article.image.alt }}
+            {% endif %}
+            <small>{{ article.published_at | date: '%d.%m.%Y' }}</small>
+            <h2>{{ article.title }}</h2>
+            {% if section.settings.show_excerpt %}<p>{{ article.excerpt_or_content | strip_html | truncatewords: 24 }}</p>{% endif %}
+            <span>{{ section.settings.read_label }} {% render 'icon', icon: 'arrow' %}</span>
+          </a>
+        </article>
+      {% else %}
+        <p>{{ section.settings.empty_copy }}</p>
+      {% endfor %}
+    </div>
+    {{ paginate | default_pagination }}
+  {% endpaginate %}
+</section>
+
+{% schema %}
+{
+  "name": "Main blog",
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "TACT / Journal"},
+    {"type": "richtext", "id": "copy", "label": "Intro copy", "default": "<p>Stories, drops and the thinking behind the rotation.</p>"},
+    {"type": "text", "id": "read_label", "label": "Read label", "default": "Read story"},
+    {"type": "text", "id": "empty_copy", "label": "Empty message", "default": "Stories are coming soon."},
+    {"type": "checkbox", "id": "show_excerpt", "label": "Show excerpts", "default": true},
+    {"type": "range", "id": "articles_per_page", "label": "Articles per page", "min": 3, "max": 18, "step": 3, "default": 9},
+    {"type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 4, "step": 1, "default": 3},
+    {"type": "range", "id": "heading_size", "label": "Heading size", "min": 54, "max": 130, "step": 2, "unit": "px", "default": 92},
+    {"type": "color", "id": "background", "label": "Background", "default": "#f3f3f1"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"}
+  ]
+}
+{% endschema %}

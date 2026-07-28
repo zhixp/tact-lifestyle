@@ -1,4 +1,15 @@
-<article class="t-product-card">
+{% liquid
+  assign card_quick_add = quick_add
+  if card_quick_add == nil
+    assign card_quick_add = true
+  endif
+  assign card_wishlist = wishlist
+  if card_wishlist == nil
+    assign card_wishlist = true
+  endif
+  assign selected_variant = card_product.selected_or_first_available_variant
+%}
+<article class="t-product-card" data-product-card>
   <a class="t-product-card__media" href="{{ card_product.url }}">
     {% if card_product.tags.size > 0 %}
       <span class="t-product-card__badge">{{ card_product.tags.first }}</span>
@@ -6,11 +17,11 @@
     {% if card_product.featured_media %}
       {{
         card_product.featured_media
-        | image_url: width: 900
+        | image_url: width: 1200
         | image_tag:
           loading: 'lazy',
-          widths: '240, 360, 540, 720, 900',
-          sizes: '(max-width: 749px) 50vw, 25vw',
+          widths: '240, 360, 540, 720, 900, 1200',
+          sizes: '(max-width: 749px) 72vw, 25vw',
           alt: card_product.featured_media.alt
       }}
     {% else %}
@@ -19,16 +30,63 @@
     {% if card_product.media[1] %}
       {{
         card_product.media[1]
-        | image_url: width: 900
+        | image_url: width: 1200
         | image_tag:
           loading: 'lazy',
           class: 't-product-card__alternate',
-          widths: '240, 360, 540, 720, 900',
-          sizes: '(max-width: 749px) 50vw, 25vw',
+          widths: '240, 360, 540, 720, 900, 1200',
+          sizes: '(max-width: 749px) 72vw, 25vw',
           alt: ''
       }}
     {% endif %}
   </a>
+
+  {% if card_wishlist %}
+    <button
+      class="t-product-card__wishlist"
+      type="button"
+      data-wishlist-toggle
+      data-wishlist-handle="{{ card_product.handle }}"
+      data-wishlist-title="{{ card_product.title | escape }}"
+      data-wishlist-url="{{ card_product.url }}"
+      data-wishlist-image="{{ card_product.featured_image | image_url: width: 240 }}"
+      data-wishlist-price="{{ card_product.price | money | escape }}"
+      aria-label="Add {{ card_product.title | escape }} to wishlist"
+      aria-pressed="false"
+    >
+      {% render 'icon', icon: 'heart' %}
+    </button>
+  {% endif %}
+
+  {% if card_quick_add and card_product.available %}
+    <div class="t-product-card__actions">
+      <form class="t-card-quick-add" method="post" action="{{ routes.cart_add_url }}" data-quick-add>
+        <div class="t-card-quick-add__variants" aria-label="Choose a size">
+          {% if card_product.has_only_default_variant %}
+            <input type="hidden" name="id" value="{{ selected_variant.id }}">
+          {% else %}
+            {% for variant in card_product.variants limit: 6 %}
+              <label{% unless variant.available %} class="is-sold-out"{% endunless %}>
+                <input
+                  type="radio"
+                  name="id"
+                  value="{{ variant.id }}"
+                  {% if variant.id == selected_variant.id %}checked{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                >
+                <span>{{ variant.title }}</span>
+              </label>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <button type="submit" aria-label="Add {{ card_product.title | escape }} to bag">
+          <span data-quick-add-label>Quick add</span>
+          <i>{% render 'icon', icon: 'plus' %}</i>
+        </button>
+      </form>
+    </div>
+  {% endif %}
+
   <div class="t-product-card__info">
     <a href="{{ card_product.url }}">
       <h3>{{ card_product.title }}</h3>

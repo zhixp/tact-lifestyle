@@ -2,10 +2,10 @@
   {
     "name": "theme_info",
     "theme_name": "TACT Editorial",
-    "theme_version": "1.0.0",
+    "theme_version": "1.2.0",
     "theme_author": "TACT Lifestyle",
     "theme_documentation_url": "https://www.tactlifestyle.store/",
-    "theme_support_url": "mailto:info@tactlifestyle.store"
+    "theme_support_url": "https://www.tactlifestyle.store/pages/contact"
   },
   {
     "name": "Brand",
@@ -21,31 +21,234 @@
         "label": "Light logo"
       },
       {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon"
+      },
+      {
         "type": "range",
         "id": "logo_width",
-        "min": 80,
-        "max": 240,
+        "min": 60,
+        "max": 280,
         "step": 4,
         "unit": "px",
-        "label": "Logo width",
+        "label": "Desktop logo width",
         "default": 132
+      },
+      {
+        "type": "range",
+        "id": "logo_width_mobile",
+        "min": 56,
+        "max": 180,
+        "step": 4,
+        "unit": "px",
+        "label": "Mobile logo width",
+        "default": 108
       }
     ]
   },
   {
-    "name": "Colors and shape",
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "body_font",
+        "label": "Body font",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "heading_font",
+        "label": "Heading font",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "accent_font",
+        "label": "Labels and buttons font",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "range",
+        "id": "body_font_size",
+        "min": 12,
+        "max": 22,
+        "step": 1,
+        "unit": "px",
+        "label": "Body text size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "min": 75,
+        "max": 140,
+        "step": 5,
+        "unit": "%",
+        "label": "Global heading scale",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "body_line_height",
+        "min": 1.2,
+        "max": 1.8,
+        "step": 0.1,
+        "label": "Body line height",
+        "default": 1.5
+      },
+      {
+        "type": "range",
+        "id": "heading_letter_spacing",
+        "min": -8,
+        "max": 2,
+        "step": 1,
+        "unit": "%",
+        "label": "Heading letter spacing",
+        "default": -6
+      },
+      {
+        "type": "range",
+        "id": "label_letter_spacing",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "%",
+        "label": "Label letter spacing",
+        "default": 13
+      }
+    ]
+  },
+  {
+    "name": "Layout and sizing",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "min": 1200,
+        "max": 2400,
+        "step": 40,
+        "unit": "px",
+        "label": "Maximum page width",
+        "default": 1920
+      },
+      {
+        "type": "range",
+        "id": "page_padding",
+        "min": 12,
+        "max": 80,
+        "step": 2,
+        "unit": "px",
+        "label": "Desktop side padding",
+        "default": 34
+      },
+      {
+        "type": "range",
+        "id": "page_padding_mobile",
+        "min": 10,
+        "max": 36,
+        "step": 1,
+        "unit": "px",
+        "label": "Mobile side padding",
+        "default": 18
+      },
+      {
+        "type": "range",
+        "id": "section_spacing",
+        "min": 40,
+        "max": 200,
+        "step": 4,
+        "unit": "px",
+        "label": "Default section spacing",
+        "default": 120
+      },
+      {
+        "type": "range",
+        "id": "grid_gap",
+        "min": 4,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Default grid gap",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "card_radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Card corner radius",
+        "default": 18
+      },
+      {
+        "type": "range",
+        "id": "button_radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Button corner radius",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "button_height",
+        "min": 40,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Button height",
+        "default": 52
+      },
+      {
+        "type": "range",
+        "id": "icon_size",
+        "min": 14,
+        "max": 32,
+        "step": 1,
+        "unit": "px",
+        "label": "Default icon size",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "icon_stroke",
+        "min": 1,
+        "max": 3,
+        "step": 0.25,
+        "label": "Default icon stroke",
+        "default": 1.5
+      }
+    ]
+  },
+  {
+    "name": "Colors",
     "settings": [
       {
         "type": "color",
         "id": "color_ink",
-        "label": "Ink",
+        "label": "Primary text",
         "default": "#0b0b0c"
       },
       {
         "type": "color",
         "id": "color_paper",
-        "label": "Paper",
+        "label": "Page background",
         "default": "#f3f3f1"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Cards and fields",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "label": "Muted text",
+        "default": "#6b6b6b"
       },
       {
         "type": "color",
@@ -54,19 +257,75 @@
         "default": "#1746ff"
       },
       {
-        "type": "range",
-        "id": "card_radius",
-        "min": 0,
-        "max": 36,
-        "step": 2,
-        "unit": "px",
-        "label": "Card corner radius",
-        "default": 18
+        "type": "color",
+        "id": "color_button",
+        "label": "Primary button",
+        "default": "#0b0b0c"
+      },
+      {
+        "type": "color",
+        "id": "color_button_text",
+        "label": "Primary button text",
+        "default": "#ffffff"
       }
     ]
   },
   {
-    "name": "Social",
+    "name": "Custom icons",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Upload square PNG, WebP or SVG-style image assets. If empty, the built-in line icon is used."
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_menu",
+        "label": "Menu icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_close",
+        "label": "Close icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_search",
+        "label": "Search icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_account",
+        "label": "Account icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_bag",
+        "label": "Bag icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_home",
+        "label": "Home icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_arrow",
+        "label": "Arrow icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_wishlist",
+        "label": "Wishlist icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_plus",
+        "label": "Add / plus icon"
+      }
+    ]
+  },
+  {
+    "name": "Social links",
     "settings": [
       {
         "type": "url",
@@ -75,8 +334,34 @@
       },
       {
         "type": "url",
+        "id": "facebook_url",
+        "label": "Facebook"
+      },
+      {
+        "type": "url",
         "id": "youtube_url",
         "label": "YouTube"
+      },
+      {
+        "type": "url",
+        "id": "pinterest_url",
+        "label": "Pinterest"
+      },
+      {
+        "type": "url",
+        "id": "x_url",
+        "label": "X / Twitter"
+      }
+    ]
+  },
+  {
+    "name": "Advanced",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS",
+        "info": "Advanced users only. Applied after the theme styles."
       }
     ]
   }

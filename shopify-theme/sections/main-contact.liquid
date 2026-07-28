@@ -1,0 +1,50 @@
+<section
+  class="t-contact"
+  style="
+    --contact-background: {{ section.settings.background }};
+    --contact-text: {{ section.settings.text_color }};
+    --contact-heading-size: {{ section.settings.heading_size }}px;
+  "
+>
+  <header>
+    {% if section.settings.eyebrow != blank %}<p class="t-kicker">{{ section.settings.eyebrow }}</p>{% endif %}
+    <h1>{{ section.settings.heading }}</h1>
+    {% if section.settings.copy != blank %}<div class="rte">{{ section.settings.copy }}</div>{% endif %}
+  </header>
+  {% form 'contact', class: 't-contact__form' %}
+    {% if form.posted_successfully? %}<p role="status">{{ section.settings.success_message }}</p>{% endif %}
+    {{ form.errors | default_errors }}
+    <label for="ContactName">{{ section.settings.name_label }}</label>
+    <input id="ContactName" type="text" name="contact[name]" value="{{ form.name }}" autocomplete="name">
+    <label for="ContactEmail">{{ section.settings.email_label }}</label>
+    <input id="ContactEmail" type="email" name="contact[email]" value="{{ form.email }}" autocomplete="email" required>
+    <label for="ContactPhone">{{ section.settings.phone_label }}</label>
+    <input id="ContactPhone" type="tel" name="contact[phone]" value="{{ form.phone }}" autocomplete="tel">
+    <label for="ContactMessage">{{ section.settings.message_label }}</label>
+    <textarea id="ContactMessage" name="contact[body]" rows="7" required>{{ form.body }}</textarea>
+    <button class="t-button t-button--interactive" type="submit">
+      {{ section.settings.button_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+    </button>
+  {% endform %}
+</section>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Customer care"},
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Talk to TACT."},
+    {"type": "richtext", "id": "copy", "label": "Copy", "default": "<p>Questions about an order, size or product? Send the team a message.</p>"},
+    {"type": "text", "id": "name_label", "label": "Name label", "default": "Name"},
+    {"type": "text", "id": "email_label", "label": "Email label", "default": "Email"},
+    {"type": "text", "id": "phone_label", "label": "Phone label", "default": "Phone"},
+    {"type": "text", "id": "message_label", "label": "Message label", "default": "Message"},
+    {"type": "text", "id": "button_label", "label": "Button label", "default": "Send message"},
+    {"type": "text", "id": "success_message", "label": "Success message", "default": "Thanks. The TACT team will get back to you."},
+    {"type": "range", "id": "heading_size", "label": "Heading size", "min": 48, "max": 120, "step": 2, "unit": "px", "default": 82},
+    {"type": "color", "id": "background", "label": "Background", "default": "#f3f3f1"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"}
+  ],
+  "presets": [{"name": "Contact form"}]
+}
+{% endschema %}
