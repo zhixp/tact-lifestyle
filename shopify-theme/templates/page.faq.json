@@ -17,7 +17,7 @@
             "answer": "<p>Standard shipping generally takes 3–4 business days. Expedited shipping generally takes 1–3 business days. Carrier delays can affect these estimates.</p>"
           }
         },
-        "free_shipping": {
+        "freeshipping": {
           "type": "question",
           "settings": {
             "question": "Is shipping free?",
@@ -56,7 +56,7 @@
       "block_order": [
         "processing",
         "delivery",
-        "free_shipping",
+        "freeshipping",
         "return",
         "fee",
         "refund",

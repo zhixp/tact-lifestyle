@@ -3,7 +3,7 @@
     "hero": {
       "type": "hero-editorial",
       "blocks": {
-        "group_campaign": {
+        "groupcampaign": {
           "type": "slide",
           "settings": {
             "fallback_media": "group",
@@ -23,12 +23,12 @@
             "mobile_text_color": "#ffffff",
             "overlay_color": "#000000",
             "overlay_opacity": 20,
-            "mobile_overlay_opacity": 38,
+            "mobile_overlay_opacity": 40,
             "heading_size": 74,
             "heading_size_mobile": 48
           }
         },
-        "madison_campaign": {
+        "madisoncampaign": {
           "type": "slide",
           "settings": {
             "fallback_media": "madison",
@@ -47,14 +47,14 @@
             "text_color": "#ffffff",
             "mobile_text_color": "#ffffff",
             "overlay_color": "#000000",
-            "overlay_opacity": 18,
-            "mobile_overlay_opacity": 34,
+            "overlay_opacity": 20,
+            "mobile_overlay_opacity": 35,
             "heading_size": 74,
             "heading_size_mobile": 48
           }
         }
       },
-      "block_order": ["group_campaign", "madison_campaign"],
+      "block_order": ["groupcampaign", "madisoncampaign"],
       "settings": {
         "autoplay": true,
         "autoplay_seconds": 7,

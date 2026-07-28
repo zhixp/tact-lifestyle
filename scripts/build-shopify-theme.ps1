@@ -8,6 +8,9 @@ Set-StrictMode -Version Latest
 
 $repository = Split-Path -Parent $PSScriptRoot
 $source = (Resolve-Path -LiteralPath (Join-Path $repository $SourceDirectory)).Path
+& (Join-Path $PSScriptRoot "validate-shopify-theme.ps1") `
+  -SourceDirectory $SourceDirectory
+
 $schema = Get-Content -Raw -LiteralPath (Join-Path $source "config\settings_schema.json") |
   ConvertFrom-Json
 $themeInfo = $schema | Where-Object name -eq "theme_info" | Select-Object -First 1

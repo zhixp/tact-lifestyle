@@ -1,14 +1,34 @@
 # TACT Shopify theme handoff
 
-`tact-editorial-1.6.0.zip` is the Shopify CLI-built Online Store 2.0 package
+`tact-editorial-1.6.1.zip` is the Shopify CLI-built Online Store 2.0 package
 for Shopify Basic. Do not reuse an older `tact-shopify-theme.zip` upload.
 
 Upload it from **Shopify admin → Online Store → Themes → Import theme → Upload zip file**. Keep it unpublished while testing.
 
-After uploading, verify the draft theme is named **tact-editorial-1.6.0** and open
+After uploading, verify the draft theme is named **tact-editorial-1.6.1** and open
 **Theme settings > Advanced**. It must show
-**TACT Editorial 1.6.0 · Full Online Store 2.0 package**. If it does not, the
+**TACT Editorial 1.6.1 · Shopify JSON contract repair**. If it does not, the
 wrong archive or an older draft theme is open.
+
+## If the editor opens on “404 page”
+
+The template name in the editor’s top bar is the page currently being previewed.
+Click **404 page** and choose **Home page** before judging the homepage sections.
+Use the draft theme’s **Preview** action; opening the bare `.myshopify.com` URL
+does not select an unpublished theme.
+
+If Home page still shows Shopify’s generic black-bar “Not Found” card, wait for
+theme processing to finish and inspect the uploaded draft rather than rebuilding
+blindly:
+
+```powershell
+shopify theme list --store your-store.myshopify.com
+shopify theme pull --store your-store.myshopify.com --theme "tact-editorial-1.6.1" --path remote-theme
+```
+
+Compare `remote-theme/templates/index.json`, `templates/404.json`,
+`layout/theme.liquid`, and their referenced section files. These commands require
+Shopify staff/collaborator access or a Theme Access app password.
 
 ## What the client controls without code
 

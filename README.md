@@ -32,7 +32,7 @@ The demo now includes:
 ## Shopify delivery
 
 The production Shopify theme is in `shopify-theme`. Upload
-`tact-editorial-1.6.0.zip` to Shopify Basic and follow `SHOPIFY_HANDOFF.md`.
+`tact-editorial-1.6.1.zip` to Shopify Basic and follow `SHOPIFY_HANDOFF.md`.
 
 The client can manage without touching code:
 
@@ -55,6 +55,7 @@ The client can manage without touching code:
 ```powershell
 pnpm typecheck
 pnpm build
+powershell -ExecutionPolicy Bypass -File scripts/validate-shopify-theme.ps1
 powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1
 ```
 
