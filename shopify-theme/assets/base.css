@@ -256,7 +256,7 @@ svg {
   width: 44px;
 }
 .t-icon-button:hover { background: rgba(127,127,127,.15); }
-.t-header__actions .t-icon-button > span {
+.t-header__actions .t-icon-button > .t-header__count {
   align-items: center;
   background: currentColor;
   border-radius: 50%;
@@ -645,7 +645,9 @@ svg {
   .t-header__menu { display: flex; }
   .t-header__logo { height: 52px; width: 116px; }
   .t-header__logo img { max-height: 36px; max-width: 105px; }
-  .t-header__actions .t-icon-button:first-child { display: none; }
+  .t-header__search,
+  .t-header__account,
+  .t-header__wishlist { display: none; }
   .t-header__actions .t-icon-button { height: 42px; width: 42px; }
   .t-menu { border-radius: 0 0 26px 26px; bottom: 0; overflow-y: auto; padding: 0 8px 8px; }
   .t-menu__bar { height: 59px; }

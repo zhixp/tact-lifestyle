@@ -99,11 +99,10 @@
     data-account-login-url="{{ routes.account_login_url }}"
   >
     <a class="skip-link" href="#MainContent">Skip to content</a>
-    {% section 'announcement-bar' %}
-    {% section 'header' %}
+    {% sections 'header-group' %}
     <main id="MainContent" tabindex="-1">
       {{ content_for_layout }}
     </main>
-    {% section 'footer' %}
+    {% sections 'footer-group' %}
   </body>
 </html>

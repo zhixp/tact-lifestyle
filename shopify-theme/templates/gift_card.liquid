@@ -1,0 +1,10 @@
+<section class="t-gift-card">
+  <p class="t-kicker">TACT / Gift card</p>
+  <h1>{{ gift_card.initial_value | money }}</h1>
+  {% if gift_card.enabled %}
+    <p>{{ gift_card.code | format_code }}</p>
+    <a class="t-button" href="{{ shop.url }}">Shop TACT {% render 'icon', icon: 'arrow' %}</a>
+  {% else %}
+    <p>This gift card is no longer active.</p>
+  {% endif %}
+</section>

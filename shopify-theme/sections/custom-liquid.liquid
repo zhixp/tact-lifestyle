@@ -1,0 +1,53 @@
+<section
+  class="t-custom-liquid"
+  style="
+    --custom-liquid-background: {{ section.settings.background }};
+    --custom-liquid-text: {{ section.settings.text_color }};
+    --custom-liquid-padding: {{ section.settings.padding }}px;
+  "
+>
+  <div class="t-custom-liquid__inner">
+    {{ section.settings.custom_liquid }}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Liquid",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Liquid code",
+      "info": "Use for an approved app snippet or custom storefront content."
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Vertical spacing",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#f3f3f1"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#0b0b0c"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Liquid"
+    }
+  ]
+}
+{% endschema %}

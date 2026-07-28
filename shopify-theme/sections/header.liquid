@@ -40,7 +40,7 @@
         | image_tag: class: 't-logo-dark', widths: '120, 180, 240, 360, 560', alt: shop.name
       }}
     {% else %}
-      <img class="t-logo-dark" src="{{ 'logo-black.png' | asset_url }}" width="280" alt="{{ shop.name }}">
+      <img class="t-logo-dark" src="{{ 'logo-black.png' | asset_url }}" width="520" height="238" alt="{{ shop.name }}">
     {% endif %}
     {% if settings.logo_light %}
       {{
@@ -49,37 +49,40 @@
         | image_tag: class: 't-logo-light', widths: '120, 180, 240, 360, 560', alt: shop.name
       }}
     {% else %}
-      <img class="t-logo-light" src="{{ 'logo-white.png' | asset_url }}" width="280" alt="{{ shop.name }}">
+      <img class="t-logo-light" src="{{ 'logo-white.png' | asset_url }}" width="760" height="393" alt="{{ shop.name }}">
     {% endif %}
   </a>
 
   <div class="t-header__actions">
     {% if section.settings.show_search %}
-      <a class="t-icon-button" href="{{ routes.search_url }}" aria-label="{{ section.settings.search_label | escape }}">
+      <a class="t-icon-button t-header__search" href="{{ routes.search_url }}" aria-label="{{ section.settings.search_label | escape }}">
         {% render 'icon', icon: 'search' %}
       </a>
     {% endif %}
     {% if settings.enable_dark_mode and section.settings.show_theme_toggle %}
-      <button class="t-icon-button t-theme-toggle" type="button" data-theme-toggle aria-label="Use dark mode">
-        <span class="t-theme-toggle__moon" aria-hidden="true">◐</span>
-        <span class="t-theme-toggle__sun" aria-hidden="true">☼</span>
+      <button class="t-theme-toggle t-header__theme-toggle" type="button" data-theme-toggle aria-label="Use dark mode">
+        <span class="t-theme-toggle__icons" aria-hidden="true">
+          <i class="t-theme-toggle__moon">{% render 'icon', icon: 'moon' %}</i>
+          <i class="t-theme-toggle__sun">{% render 'icon', icon: 'sun' %}</i>
+        </span>
+        <span class="t-theme-toggle__label" data-theme-toggle-label>Dark mode</span>
       </button>
     {% endif %}
     {% if section.settings.show_account %}
-      <a class="t-icon-button" href="{{ routes.account_url }}" aria-label="{{ section.settings.account_label | escape }}">
+      <a class="t-icon-button t-header__account" href="{{ routes.account_url }}" aria-label="{{ section.settings.account_label | escape }}">
         {% render 'icon', icon: 'user' %}
       </a>
     {% endif %}
     {% if section.settings.show_wishlist %}
-      <button class="t-icon-button" type="button" data-wishlist-open aria-label="{{ section.settings.wishlist_label | escape }}">
+      <button class="t-icon-button t-header__wishlist" type="button" data-wishlist-open aria-label="{{ section.settings.wishlist_label | escape }}">
         {% render 'icon', icon: 'heart' %}
         <span data-wishlist-count hidden>0</span>
       </button>
     {% endif %}
     {% if section.settings.show_cart %}
-      <a class="t-icon-button" href="{{ routes.cart_url }}" aria-label="{{ section.settings.bag_label | escape }} — {{ cart.item_count }}">
+      <a class="t-icon-button t-header__cart" href="{{ routes.cart_url }}" aria-label="{{ section.settings.bag_label | escape }} — {{ cart.item_count }}">
         {% render 'icon', icon: 'bag' %}
-        {% if cart.item_count > 0 %}<span>{{ cart.item_count }}</span>{% endif %}
+        {% if cart.item_count > 0 %}<span class="t-header__count">{{ cart.item_count }}</span>{% endif %}
       </a>
     {% endif %}
     <button class="t-icon-button t-header__desktop-menu" type="button" data-menu-open aria-label="{{ section.settings.open_menu_label | escape }}">
@@ -114,7 +117,7 @@
       {% if settings.logo %}
         {{ settings.logo | image_url: width: 560 | image_tag: widths: '120, 180, 240, 360, 560', alt: shop.name }}
       {% else %}
-        <img src="{{ 'logo-black.png' | asset_url }}" width="280" alt="{{ shop.name }}">
+        <img src="{{ 'logo-black.png' | asset_url }}" width="520" height="238" alt="{{ shop.name }}">
       {% endif %}
     </a>
     <button class="t-icon-button" type="button" data-menu-close aria-label="{{ section.settings.close_menu_label | escape }}">
@@ -137,8 +140,8 @@
         {% endfor %}
         {% if settings.enable_dark_mode and section.settings.show_theme_toggle %}
           <button class="t-menu__theme-toggle" type="button" data-theme-toggle>
-            <span class="t-theme-toggle__moon" aria-hidden="true">◐</span>
-            <span class="t-theme-toggle__sun" aria-hidden="true">☼</span>
+            <span class="t-theme-toggle__moon" aria-hidden="true">{% render 'icon', icon: 'moon' %}</span>
+            <span class="t-theme-toggle__sun" aria-hidden="true">{% render 'icon', icon: 'sun' %}</span>
             <i data-theme-toggle-label>Dark mode</i>
           </button>
         {% endif %}
@@ -175,7 +178,7 @@
               | image_tag: loading: 'lazy', widths: '360, 540, 720, 900, 1200', sizes: '(max-width: 749px) 100vw, 32vw', alt: section.settings.promo_heading
             }}
           {% else %}
-            <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" loading="lazy" alt="{{ section.settings.promo_heading | escape }}">
+            <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" loading="lazy" alt="{{ section.settings.promo_heading | escape }}">
           {% endif %}
           <a href="{{ promo_link | default: routes.all_products_collection_url }}">
             <span>
@@ -226,6 +229,7 @@
 {% schema %}
 {
   "name": "Header",
+  "enabled_on": {"groups": ["header"]},
   "settings": [
     {"type": "header", "content": "Layout"},
     {"type": "checkbox", "id": "sticky_header", "label": "Sticky header", "default": true},
@@ -288,6 +292,7 @@
     {"type": "text", "id": "promo_eyebrow", "label": "Promo eyebrow", "default": "Latest from TACT"},
     {"type": "text", "id": "promo_heading", "label": "Promo heading", "default": "8-Bit Attitude"},
     {"type": "url", "id": "promo_link", "label": "Promo custom link"}
-  ]
+  ],
+  "presets": [{"name": "Header"}]
 }
 {% endschema %}

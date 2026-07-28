@@ -74,9 +74,9 @@
                 alt: block.settings.heading
             }}
           {% elsif block.settings.fallback_media == 'madison' %}
-            <img src="{{ 'hero-madison.png' | asset_url }}" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
+            <img src="{{ 'hero-madison.png' | asset_url }}" width="1648" height="2528" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
           {% elsif block.settings.fallback_media == 'group' %}
-            <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
+            <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
           {% else %}
             {{ 'lifestyle-1' | placeholder_svg_tag: 't-hero-slide__placeholder' }}
           {% endif %}
@@ -107,7 +107,7 @@
                 alt: block.settings.heading
             }}
           {% elsif block.settings.fallback_media == 'madison' %}
-            <img src="{{ 'hero-madison.png' | asset_url }}" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
+            <img src="{{ 'hero-madison.png' | asset_url }}" width="1648" height="2528" alt="{{ block.settings.heading | escape }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}">
           {% elsif block.settings.fallback_media == 'group' %}
             <video autoplay muted loop playsinline preload="auto">
               <source src="https://cdn.shopify.com/videos/c/o/v/86c1a15e84d04318bad0cd353bad88dd.mp4" type="video/mp4">
@@ -161,7 +161,7 @@
     {% else %}
       <article class="t-hero-slide is-active" data-hero-slide aria-hidden="false">
         <div class="t-hero-slide__desktop-media">
-          <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" alt="TACT current collection">
+        <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" alt="TACT current collection">
         </div>
         <div class="t-hero-slide__mobile-media">
           <video autoplay muted loop playsinline preload="metadata">

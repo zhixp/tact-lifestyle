@@ -80,9 +80,13 @@
         "new": {"type": "collection", "settings": {"fallback_handle": "new-arrivals", "title": "New arrivals"}},
         "men": {"type": "collection", "settings": {"fallback_handle": "men", "title": "Men"}},
         "women": {"type": "collection", "settings": {"fallback_handle": "shop-womens", "title": "Women"}},
-        "unisex": {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}}
+        "unisex": {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}},
+        "coords": {"type": "collection", "settings": {"fallback_handle": "co-ord-set-women", "title": "Co-ord sets"}},
+        "joggers": {"type": "collection", "settings": {"fallback_handle": "tact-joggers-men", "title": "Joggers"}},
+        "hoodies": {"type": "collection", "settings": {"fallback_handle": "hoodies-men", "title": "Hoodies"}},
+        "neon": {"type": "collection", "settings": {"fallback_handle": "neon-rush-all-products", "title": "Neon Rush"}}
       },
-      "block_order": ["new", "men", "women", "unisex"],
+      "block_order": ["new", "men", "women", "unisex", "coords", "joggers", "hoodies", "neon"],
       "settings": {
         "show_heading": true,
         "eyebrow": "01 / Find your everyday drip",
@@ -110,7 +114,8 @@
         "heading": "Just landed.",
         "copy": "New graphics, oversized tees and everyday layers from TACT.",
         "link_label": "Shop all pieces",
-        "products_to_show": 4,
+        "products_to_show": 8,
+        "product_offset": 0,
         "columns": 4,
         "columns_mobile": 2,
         "mobile_scroll": true,
@@ -154,6 +159,32 @@
         "copy": "<p>Campaign films, close-up details and the pieces in each look.</p>",
         "link_label": "Meet TACT",
         "use_tact_fallbacks": true
+      }
+    },
+    "rotation": {
+      "type": "product-grid",
+      "settings": {
+        "show_heading": true,
+        "eyebrow": "05 / Current rotation",
+        "heading": "Made to stay in rotation.",
+        "copy": "More of the graphic tees, co-ords and layers people keep coming back for.",
+        "link_label": "Explore the full catalog",
+        "products_to_show": 8,
+        "product_offset": 8,
+        "columns": 4,
+        "columns_mobile": 2,
+        "mobile_scroll": true,
+        "show_quick_add": true,
+        "show_wishlist": true,
+        "image_ratio": "4 / 5",
+        "card_radius": 14,
+        "product_title_size": 13,
+        "heading_size": 78,
+        "heading_size_mobile": 54,
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "background": "#f3f3f1",
+        "text_color": "#0b0b0c"
       }
     },
     "reviews": {
@@ -204,5 +235,5 @@
       "settings": {}
     }
   },
-  "order": ["hero", "collections", "new", "editorial", "videos", "reviews", "services"]
+  "order": ["hero", "collections", "new", "editorial", "videos", "rotation", "reviews", "services"]
 }

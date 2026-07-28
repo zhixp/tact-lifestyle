@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "TACT Editorial",
-    "theme_version": "1.4.0",
+    "theme_version": "1.5.0",
     "theme_author": "TACT Lifestyle",
     "theme_documentation_url": "https://www.tactlifestyle.store/",
     "theme_support_url": "https://www.tactlifestyle.store/pages/contact"
@@ -217,7 +217,7 @@
         "id": "icon_stroke",
         "min": 1,
         "max": 3,
-        "step": 0.25,
+        "step": 0.5,
         "label": "Default icon stroke",
         "default": 1.5
       }
@@ -376,6 +376,16 @@
         "type": "image_picker",
         "id": "icon_plus",
         "label": "Add / plus icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_moon",
+        "label": "Dark mode icon"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_sun",
+        "label": "Light mode icon"
       }
     ]
   },

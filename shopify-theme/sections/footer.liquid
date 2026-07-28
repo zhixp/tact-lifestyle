@@ -36,7 +36,7 @@
       {% elsif settings.logo_light %}
         {{ settings.logo_light | image_url: width: 560 | image_tag: widths: '160, 240, 360, 560', alt: shop.name }}
       {% else %}
-        <img src="{{ 'logo-white.png' | asset_url }}" width="280" alt="{{ shop.name }}">
+        <img src="{{ 'logo-white.png' | asset_url }}" width="760" height="393" alt="{{ shop.name }}">
       {% endif %}
       {% if section.settings.heading != blank %}<h2>{{ section.settings.heading }}</h2>{% endif %}
       {% if section.settings.copy != blank %}<p>{{ section.settings.copy }}</p>{% endif %}
@@ -90,6 +90,7 @@
 {% schema %}
 {
   "name": "Footer",
+  "enabled_on": {"groups": ["footer"]},
   "max_blocks": 3,
   "settings": [
     {"type": "header", "content": "Style"},
@@ -133,6 +134,16 @@
       "settings": [
         {"type": "text", "id": "label", "label": "Label", "default": "FAQ"},
         {"type": "url", "id": "link", "label": "Link"}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer",
+      "blocks": [
+        {"type": "support_link", "settings": {"label": "FAQ", "link": "/pages/faq"}},
+        {"type": "support_link", "settings": {"label": "Shipping", "link": "/policies/shipping-policy"}},
+        {"type": "support_link", "settings": {"label": "Returns", "link": "/policies/refund-policy"}}
       ]
     }
   ]

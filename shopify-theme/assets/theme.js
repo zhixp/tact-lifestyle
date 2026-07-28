@@ -540,6 +540,8 @@ class TactTheme {
 
     apply(stored || preferred || "light");
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+      if (button.dataset.themeBound === "true") return;
+      button.dataset.themeBound = "true";
       button.addEventListener("click", () => {
         const next = root.dataset.theme === "dark" ? "light" : "dark";
         window.localStorage.setItem(storageKey, next);
@@ -636,5 +638,7 @@ document.addEventListener("DOMContentLoaded", () => {
     theme.bindReviewStories();
     theme.bindVideoQuickAdd();
     theme.bindWishlist();
+    theme.bindProductCardMotion();
+    theme.bindThemeMode();
   });
 });

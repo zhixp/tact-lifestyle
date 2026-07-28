@@ -44,6 +44,14 @@
         if card_image == blank and chosen_collection != blank
           assign card_image = chosen_collection.featured_image
         endif
+        assign all_collection = collections['all']
+        assign fallback_product = all_collection.products | slice: forloop.index0, 1 | first
+        if card_image == blank and chosen_collection != blank
+          assign card_image = chosen_collection.products.first.featured_image
+        endif
+        if card_image == blank and fallback_product != blank
+          assign card_image = fallback_product.featured_image
+        endif
         assign card_title = block.settings.title
         if card_title == blank and chosen_collection != blank
           assign card_title = chosen_collection.title
@@ -68,7 +76,16 @@
               alt: card_title
           }}
         {% else %}
-          {{ 'collection-1' | placeholder_svg_tag: 't-collection-tile__placeholder' }}
+          {% case forloop.index %}
+            {% when 1 %}
+              <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" loading="lazy" alt="{{ card_title | escape }}">
+            {% when 2 %}
+              <img src="{{ 'hero-demo.webp' | asset_url }}" width="1872" height="1200" loading="lazy" alt="{{ card_title | escape }}">
+            {% when 3 %}
+              <img src="{{ 'editorial-demo.webp' | asset_url }}" width="1648" height="2528" loading="lazy" alt="{{ card_title | escape }}">
+            {% else %}
+              <img src="{{ 'hero-madison.png' | asset_url }}" width="1648" height="2528" loading="lazy" alt="{{ card_title | escape }}">
+          {% endcase %}
         {% endif %}
         {% if section.settings.show_numbers %}<span class="t-collection-tile__number">{{ forloop.index | prepend: '0' }}</span>{% endif %}
         <strong>{{ card_title | default: 'Collection' }}</strong>
@@ -137,7 +154,11 @@
         {"type": "collection", "settings": {"fallback_handle": "new-arrivals", "title": "New arrivals"}},
         {"type": "collection", "settings": {"fallback_handle": "men", "title": "Men"}},
         {"type": "collection", "settings": {"fallback_handle": "shop-womens", "title": "Women"}},
-        {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}}
+        {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}},
+        {"type": "collection", "settings": {"fallback_handle": "co-ord-set-women", "title": "Co-ord sets"}},
+        {"type": "collection", "settings": {"fallback_handle": "tact-joggers-men", "title": "Joggers"}},
+        {"type": "collection", "settings": {"fallback_handle": "hoodies-men", "title": "Hoodies"}},
+        {"type": "collection", "settings": {"fallback_handle": "neon-rush-all-products", "title": "Neon Rush"}}
       ]
     }
   ]
