@@ -14,18 +14,33 @@
         {% if section.settings.help_eyebrow != blank %}<p class="t-kicker">{{ section.settings.help_eyebrow }}</p>{% endif %}
         <h2>{{ section.settings.help_heading }}</h2>
       </div>
+      {% assign support_count = 0 %}
       {% for block in section.blocks %}
         {% if block.type == 'support_link' %}
-          <a href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
-            <span>{{ forloop.index | prepend: '0' }}</span>
+          {% assign support_count = support_count | plus: 1 %}
+          {% case support_count %}
+            {% when 1 %}
+              {% assign support_fallback = '/pages/faq' %}
+            {% when 2 %}
+              {% assign support_fallback = '/policies/shipping-policy' %}
+            {% else %}
+              {% assign support_fallback = '/policies/refund-policy' %}
+          {% endcase %}
+          <a href="{{ block.settings.link | default: support_fallback }}" {{ block.shopify_attributes }}>
+            <span>{{ support_count | prepend: '0' }}</span>
             {{ block.settings.label }} {% render 'icon', icon: 'arrow' %}
           </a>
         {% endif %}
-      {% else %}
-        <a href="{{ pages.faq.url | default: '/pages/faq' }}"><span>01</span>FAQ {% render 'icon', icon: 'arrow' %}</a>
-        <a href="{{ shop.shipping_policy.url }}"><span>02</span>Shipping {% render 'icon', icon: 'arrow' %}</a>
-        <a href="{{ shop.refund_policy.url }}"><span>03</span>Returns {% render 'icon', icon: 'arrow' %}</a>
       {% endfor %}
+      {% if support_count < 1 %}
+        <a href="{{ pages.faq.url | default: '/pages/faq' }}"><span>01</span>FAQ {% render 'icon', icon: 'arrow' %}</a>
+      {% endif %}
+      {% if support_count < 2 %}
+        <a href="{{ shop.shipping_policy.url | default: '/policies/shipping-policy' }}"><span>02</span>Shipping {% render 'icon', icon: 'arrow' %}</a>
+      {% endif %}
+      {% if support_count < 3 %}
+        <a href="{{ shop.refund_policy.url | default: '/policies/refund-policy' }}"><span>03</span>Returns {% render 'icon', icon: 'arrow' %}</a>
+      {% endif %}
     </div>
   {% endif %}
 
@@ -36,7 +51,7 @@
       {% elsif settings.logo_light %}
         {{ settings.logo_light | image_url: width: 560 | image_tag: widths: '160, 240, 360, 560', alt: shop.name }}
       {% else %}
-        <img src="{{ 'logo-white.png' | asset_url }}" width="760" height="393" alt="{{ shop.name }}">
+        <img src="{{ 'logo-white.png' | asset_url }}" width="280" height="145" alt="{{ shop.name }}">
       {% endif %}
       {% if section.settings.heading != blank %}<h2>{{ section.settings.heading }}</h2>{% endif %}
       {% if section.settings.copy != blank %}<p>{{ section.settings.copy }}</p>{% endif %}
@@ -62,22 +77,48 @@
     <div class="t-footer__nav">
       <div>
         <h3>{{ section.settings.menu_heading_1 }}</h3>
-        {% for link in section.settings.menu_1.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+        {% for link in section.settings.menu_1.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% else %}
+          <a href="{{ routes.all_products_collection_url }}">Shop all</a>
+          <a href="{{ routes.collections_url }}">Collections</a>
+        {% endfor %}
       </div>
       <div>
         <h3>{{ section.settings.menu_heading_2 }}</h3>
+        <a href="{{ section.settings.faq_link | default: '/pages/faq' }}">FAQ</a>
+        <a href="{{ shop.shipping_policy.url | default: '/policies/shipping-policy' }}">Shipping</a>
+        <a href="{{ shop.refund_policy.url | default: '/policies/refund-policy' }}">Returns &amp; exchange</a>
+        <a href="{{ section.settings.track_link | default: '/pages/track-your-order' }}">Track your order</a>
+        <a href="{{ section.settings.contact_link | default: '/pages/contact' }}">Contact</a>
         {% for link in section.settings.menu_2.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
       </div>
       <div>
         <h3>{{ section.settings.menu_heading_3 }}</h3>
-        {% for link in section.settings.menu_3.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+        {% for link in section.settings.menu_3.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% else %}
+          <a href="{{ section.settings.about_link | default: '/pages/about-us' }}">About TACT</a>
+        {% endfor %}
+        <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy policy</a>
+        <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms of service</a>
       </div>
       <div>
         <h3>{{ section.settings.connect_heading }}</h3>
         {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}">{{ section.settings.instagram_label }}</a>{% endif %}
         {% if settings.youtube_url != blank %}<a href="{{ settings.youtube_url }}">{{ section.settings.youtube_label }}</a>{% endif %}
-        {% if shop.email != blank %}<a href="mailto:{{ shop.email }}">{{ shop.email }}</a>{% endif %}
+        {% assign footer_email = section.settings.contact_email | default: shop.email %}
+        {% if footer_email != blank %}<a href="mailto:{{ footer_email }}">{{ footer_email }}</a>{% endif %}
+        {% if section.settings.contact_phone != blank %}<a href="tel:{{ section.settings.contact_phone | remove: ' ' }}">{{ section.settings.contact_phone }}</a>{% endif %}
       </div>
+      {% if section.settings.show_business_details %}
+        <div class="t-footer__details">
+          <h3>{{ section.settings.business_heading }}</h3>
+          {% if section.settings.business_name != blank %}<strong>{{ section.settings.business_name }}</strong>{% endif %}
+          {% if section.settings.business_address != blank %}<address>{{ section.settings.business_address | newline_to_br }}</address>{% endif %}
+          {% if section.settings.gstin != blank %}<small>GSTIN {{ section.settings.gstin }}</small>{% endif %}
+        </div>
+      {% endif %}
     </div>
   {% endif %}
 
@@ -90,7 +131,6 @@
 {% schema %}
 {
   "name": "Footer",
-  "enabled_on": {"groups": ["footer"]},
   "max_blocks": 3,
   "settings": [
     {"type": "header", "content": "Style"},
@@ -120,11 +160,23 @@
     {"type": "link_list", "id": "menu_1", "label": "First menu", "default": "main-menu"},
     {"type": "text", "id": "menu_heading_2", "label": "Second menu heading", "default": "Help"},
     {"type": "link_list", "id": "menu_2", "label": "Second menu", "default": "footer"},
+    {"type": "url", "id": "faq_link", "label": "FAQ page"},
+    {"type": "url", "id": "track_link", "label": "Track order page"},
+    {"type": "url", "id": "contact_link", "label": "Contact page"},
     {"type": "text", "id": "menu_heading_3", "label": "Third menu heading", "default": "TACT"},
     {"type": "link_list", "id": "menu_3", "label": "Third menu"},
+    {"type": "url", "id": "about_link", "label": "About page"},
     {"type": "text", "id": "connect_heading", "label": "Connect heading", "default": "Connect"},
     {"type": "text", "id": "instagram_label", "label": "Instagram label", "default": "Instagram"},
     {"type": "text", "id": "youtube_label", "label": "YouTube label", "default": "YouTube"},
+    {"type": "text", "id": "contact_email", "label": "Contact email", "default": "info@tactlifestyle.store"},
+    {"type": "text", "id": "contact_phone", "label": "Contact phone", "default": "+91 98937 89469"},
+    {"type": "header", "content": "Business details"},
+    {"type": "checkbox", "id": "show_business_details", "label": "Show business details", "default": true},
+    {"type": "text", "id": "business_heading", "label": "Details heading", "default": "Studio"},
+    {"type": "text", "id": "business_name", "label": "Business name", "default": "TACT ENTERPRISES"},
+    {"type": "textarea", "id": "business_address", "label": "Business address", "default": "60-1, SFTF, New Dewas Road\nIndore, Madhya Pradesh 452003\nIndia"},
+    {"type": "text", "id": "gstin", "label": "GSTIN", "default": "23CPVPK9292J1Z0"},
     {"type": "text", "id": "footer_note", "label": "Footer note", "default": "Free delivery over ₹499 / India"}
   ],
   "blocks": [
@@ -134,16 +186,6 @@
       "settings": [
         {"type": "text", "id": "label", "label": "Label", "default": "FAQ"},
         {"type": "url", "id": "link", "label": "Link"}
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "Footer",
-      "blocks": [
-        {"type": "support_link", "settings": {"label": "FAQ", "link": "/pages/faq"}},
-        {"type": "support_link", "settings": {"label": "Shipping", "link": "/policies/shipping-policy"}},
-        {"type": "support_link", "settings": {"label": "Returns", "link": "/policies/refund-policy"}}
       ]
     }
   ]

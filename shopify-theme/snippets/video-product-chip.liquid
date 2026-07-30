@@ -21,8 +21,15 @@
         aria-label="{% if product.available %}Quick add {{ product.title | escape }}{% else %}{{ product.title | escape }} is sold out{% endif %}"
         {% unless product.available %}disabled{% endunless %}
       >
-        {% if product.available %}+{% else %}×{% endif %}
+        {% if product.available %}
+          <span class="t-quick-add__plus" aria-hidden="true">{% render 'icon', icon: 'plus' %}</span>
+          <span class="t-quick-add__check" aria-hidden="true">{% render 'icon', icon: 'check' %}</span>
+          <span class="t-quick-add__error" aria-hidden="true">!</span>
+        {% else %}
+          <span aria-hidden="true">×</span>
+        {% endif %}
       </button>
+      <span class="visually-hidden" role="status" aria-live="polite" data-quick-add-status></span>
     </form>
   </div>
 {% endif %}

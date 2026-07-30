@@ -138,14 +138,24 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html {
+  max-width: 100%;
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
 body {
   background: var(--tact-paper);
   color: var(--tact-ink);
   font-family: var(--tact-font);
+  max-width: 100%;
   margin: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
+}
+#MainContent {
+  display: block;
+  min-width: 0;
+  width: 100%;
 }
 body.t-overlay-open { overflow: hidden; }
 a { color: inherit; text-decoration: none; }
@@ -228,6 +238,7 @@ svg {
   right: 0;
   top: 0;
   transition: background .35s var(--tact-ease), color .25s ease;
+  width: 100%;
   z-index: 80;
   backdrop-filter: blur(18px);
 }

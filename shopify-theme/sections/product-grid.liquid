@@ -7,6 +7,10 @@
   if showcase_link == blank and showcase_collection != blank
     assign showcase_link = showcase_collection.url
   endif
+  assign showcase_has_products = false
+  if showcase_collection != blank and showcase_collection.products_count > section.settings.product_offset
+    assign showcase_has_products = true
+  endif
 %}
 <section
   class="t-section t-product-showcase{% if section.settings.mobile_scroll %} t-product-showcase--mobile-scroll{% endif %}"
@@ -18,6 +22,7 @@
     --products-heading-size: {{ section.settings.heading_size }}px;
     --products-heading-mobile: {{ section.settings.heading_size_mobile }}px;
     --products-title-size: {{ section.settings.product_title_size }}px;
+    --products-image-fit: {{ section.settings.image_fit }};
     --products-background: {{ section.settings.background }};
     --products-text: {{ section.settings.text_color }};
     --products-padding-top: {{ section.settings.padding_top }}px;
@@ -40,20 +45,19 @@
       </div>
     </div>
   {% endif %}
-  <div class="t-product-grid">
-    {% if showcase_collection != blank and showcase_collection.products_count > 0 %}
+  {% if showcase_has_products %}
+    <div class="t-product-grid">
       {% for product in showcase_collection.products limit: section.settings.products_to_show offset: section.settings.product_offset %}
         {% render 'product-card', card_product: product, quick_add: section.settings.show_quick_add, wishlist: section.settings.show_wishlist %}
       {% endfor %}
-    {% else %}
-      {% for i in (1..4) %}
-        <article class="t-product-card">
-          <div class="t-product-card__media">{{ 'product-' | append: i | placeholder_svg_tag }}</div>
-          <div class="t-product-card__info"><h3>Product {{ i }}</h3><p>Add products in Shopify admin</p></div>
-        </article>
-      {% endfor %}
-    {% endif %}
-  </div>
+    </div>
+  {% else %}
+    <div class="t-product-showcase__empty">
+      <p class="t-kicker">{% if request.design_mode %}Shopify setup{% else %}{{ section.settings.empty_eyebrow }}{% endif %}</p>
+      <h3>{% if request.design_mode %}Choose a collection or import the TACT catalog.{% else %}{{ section.settings.empty_heading }}{% endif %}</h3>
+      <p>{% if request.design_mode %}This section automatically uses the store's All collection when no collection is selected.{% else %}{{ section.settings.empty_copy }}{% endif %}</p>
+    </div>
+  {% endif %}
 </section>
 
 {% schema %}
@@ -70,9 +74,9 @@
     {"type": "text", "id": "link_label", "label": "Link label", "default": "Shop all pieces"},
     {"type": "header", "content": "Products"},
     {"type": "range", "id": "products_to_show", "min": 2, "max": 16, "step": 1, "label": "Products to show", "default": 4},
-    {"type": "range", "id": "product_offset", "min": 0, "max": 24, "step": 1, "label": "Skip first products", "default": 0, "info": "Useful when adding a second product section from the same collection."},
+    {"type": "range", "id": "product_offset", "min": 0, "max": 24, "step": 1, "label": "Skip first products", "default": 0, "info": "Use this when a second product section should continue from the same collection."},
     {"type": "range", "id": "columns", "min": 2, "max": 6, "step": 1, "label": "Desktop columns", "default": 4},
-    {"type": "range", "id": "columns_mobile", "min": 1, "max": 2, "step": 1, "label": "Mobile columns", "default": 2},
+    {"type": "range", "id": "columns_mobile", "min": 1, "max": 3, "step": 1, "label": "Mobile columns", "default": 2},
     {"type": "checkbox", "id": "mobile_scroll", "label": "Use horizontal product rail on mobile", "default": false},
     {"type": "checkbox", "id": "show_quick_add", "label": "Show quick add and size selection", "default": true},
     {"type": "checkbox", "id": "show_wishlist", "label": "Show wishlist buttons", "default": true},
@@ -82,8 +86,16 @@
       {"value": "3 / 4", "label": "Tall portrait"},
       {"value": "auto", "label": "Natural"}
     ]},
+    {"type": "select", "id": "image_fit", "label": "Product image fit", "default": "cover", "options": [
+      {"value": "cover", "label": "Fill the card"},
+      {"value": "contain", "label": "Show the full product"}
+    ]},
     {"type": "range", "id": "card_radius", "label": "Image corner radius", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 14},
     {"type": "range", "id": "product_title_size", "label": "Product title size", "min": 10, "max": 20, "step": 1, "unit": "px", "default": 13},
+    {"type": "header", "content": "Empty collection"},
+    {"type": "text", "id": "empty_eyebrow", "label": "Eyebrow", "default": "TACT / Incoming"},
+    {"type": "text", "id": "empty_heading", "label": "Heading", "default": "The next drop is being prepared."},
+    {"type": "textarea", "id": "empty_copy", "label": "Copy", "default": "Products will appear here as soon as they are published."},
     {"type": "header", "content": "Section sizing"},
     {"type": "range", "id": "heading_size", "label": "Desktop heading size", "min": 40, "max": 110, "step": 2, "unit": "px", "default": 78},
     {"type": "range", "id": "heading_size_mobile", "label": "Mobile heading size", "min": 36, "max": 72, "step": 2, "unit": "px", "default": 54},

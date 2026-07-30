@@ -1,6 +1,20 @@
 {% liquid
   assign header_alpha = section.settings.background_opacity | divided_by: 100.0
   assign header_background = section.settings.background | color_modify: 'alpha', header_alpha
+  assign dock_home_active = false
+  assign dock_shop_active = false
+  assign dock_search_active = false
+  assign dock_account_active = false
+
+  if request.page_type == 'index'
+    assign dock_home_active = true
+  elsif request.page_type == 'collection' or request.page_type == 'list-collections'
+    assign dock_shop_active = true
+  elsif request.page_type == 'search'
+    assign dock_search_active = true
+  elsif request.path contains '/account'
+    assign dock_account_active = true
+  endif
 %}
 <style>
   :root {
@@ -80,7 +94,7 @@
       </button>
     {% endif %}
     {% if section.settings.show_cart %}
-      <a class="t-icon-button t-header__cart" href="{{ routes.cart_url }}" aria-label="{{ section.settings.bag_label | escape }} — {{ cart.item_count }}">
+      <a class="t-icon-button t-header__cart" href="{{ routes.cart_url }}" data-cart-open aria-label="{{ section.settings.bag_label | escape }} — {{ cart.item_count }}">
         {% render 'icon', icon: 'bag' %}
         {% if cart.item_count > 0 %}<span class="t-header__count">{{ cart.item_count }}</span>{% endif %}
       </a>
@@ -92,20 +106,29 @@
 </header>
 
 {% if section.settings.show_mobile_dock %}
-  <nav class="t-mobile-dock" aria-label="Mobile navigation">
-    <a href="{{ routes.root_url }}">{% render 'icon', icon: 'home' %}<span>{{ section.settings.home_label }}</span></a>
-    <a href="{{ routes.search_url }}">{% render 'icon', icon: 'search' %}<span>{{ section.settings.search_label }}</span></a>
+  <nav class="t-mobile-dock" data-mobile-dock aria-label="Mobile navigation">
+    <a class="{% if dock_home_active %}is-active{% endif %}" href="{{ routes.root_url }}"{% if dock_home_active %} aria-current="page"{% endif %}>
+      {% render 'icon', icon: 'home' %}
+      <span>{{ section.settings.home_label }}</span>
+    </a>
+    <a class="{% if dock_shop_active %}is-active{% endif %}" href="{{ routes.all_products_collection_url }}"{% if dock_shop_active %} aria-current="page"{% endif %}>
+      {% render 'icon', icon: 'shop' %}
+      <span>{{ section.settings.shop_label }}</span>
+    </a>
+    <a class="{% if dock_search_active %}is-active{% endif %}" href="{{ routes.search_url }}"{% if dock_search_active %} aria-current="page"{% endif %}>
+      {% render 'icon', icon: 'search' %}
+      <span>{{ section.settings.search_label }}</span>
+    </a>
     {% if section.settings.show_wishlist %}
-      <button type="button" data-wishlist-open>
+      <button type="button" data-wishlist-open aria-pressed="false">
         {% render 'icon', icon: 'heart' %}
         <i data-wishlist-count hidden>0</i>
         <span>{{ section.settings.wishlist_label }}</span>
       </button>
     {% endif %}
-    <a href="{{ routes.account_url }}">{% render 'icon', icon: 'user' %}<span>{{ section.settings.account_label }}</span></a>
-    <a href="{{ routes.cart_url }}">
-      {% render 'icon', icon: 'bag' %}
-      <span>{{ section.settings.bag_label }}{% if cart.item_count > 0 %} · {{ cart.item_count }}{% endif %}</span>
+    <a class="{% if dock_account_active %}is-active{% endif %}" href="{{ routes.account_url }}"{% if dock_account_active %} aria-current="page"{% endif %}>
+      {% render 'icon', icon: 'user' %}
+      <span>{{ section.settings.account_label }}</span>
     </a>
   </nav>
 {% endif %}
@@ -226,10 +249,13 @@
   </aside>
 {% endif %}
 
+{% if section.settings.show_cart and section.settings.enable_cart_drawer %}
+  {% render 'cart-drawer', section: section %}
+{% endif %}
+
 {% schema %}
 {
   "name": "Header",
-  "enabled_on": {"groups": ["header"]},
   "settings": [
     {"type": "header", "content": "Layout"},
     {"type": "checkbox", "id": "sticky_header", "label": "Sticky header", "default": true},
@@ -261,6 +287,7 @@
     {"type": "text", "id": "bag_label", "label": "Bag label", "default": "Bag"},
     {"type": "text", "id": "wishlist_label", "label": "Wishlist label", "default": "Wishlist"},
     {"type": "text", "id": "home_label", "label": "Home label", "default": "Home"},
+    {"type": "text", "id": "shop_label", "label": "Shop label", "default": "Shop"},
     {"type": "header", "content": "Wishlist drawer"},
     {"type": "text", "id": "wishlist_eyebrow", "label": "Eyebrow", "default": "Saved for later"},
     {"type": "text", "id": "wishlist_heading", "label": "Heading", "default": "Your wishlist."},
@@ -271,6 +298,26 @@
     {"type": "textarea", "id": "wishlist_login_copy", "label": "Login copy", "default": "Your wishlist is connected to your customer profile, not a shared browser bag."},
     {"type": "text", "id": "wishlist_login_label", "label": "Login button", "default": "Sign in or create account"},
     {"type": "text", "id": "close_wishlist_label", "label": "Close label", "default": "Close wishlist"},
+    {"type": "header", "content": "Cart drawer"},
+    {"type": "checkbox", "id": "enable_cart_drawer", "label": "Open cart in a drawer", "default": true},
+    {"type": "text", "id": "cart_eyebrow", "label": "Eyebrow", "default": "Your rotation"},
+    {"type": "text", "id": "cart_heading", "label": "Heading", "default": "Your bag"},
+    {"type": "text", "id": "cart_close_label", "label": "Close label", "default": "Close bag"},
+    {"type": "number", "id": "cart_free_shipping_target", "label": "Free shipping target", "default": 499, "info": "Enter the amount in your store currency."},
+    {"type": "text", "id": "cart_shipping_before", "label": "Shipping progress text", "default": "Add"},
+    {"type": "text", "id": "cart_shipping_after", "label": "Shipping progress suffix", "default": "for free shipping."},
+    {"type": "text", "id": "cart_shipping_unlocked", "label": "Unlocked message", "default": "Free shipping unlocked."},
+    {"type": "text", "id": "cart_empty_eyebrow", "label": "Empty eyebrow", "default": "Nothing here yet"},
+    {"type": "text", "id": "cart_empty_heading", "label": "Empty heading", "default": "Your bag is ready for a first piece."},
+    {"type": "textarea", "id": "cart_empty_copy", "label": "Empty copy", "default": "Start with the latest TACT drops and build your rotation."},
+    {"type": "text", "id": "cart_empty_button", "label": "Empty button", "default": "Explore new arrivals"},
+    {"type": "collection", "id": "cart_upsell_collection", "label": "Pairs well with collection"},
+    {"type": "text", "id": "cart_upsell_heading", "label": "Upsell heading", "default": "Pairs well with"},
+    {"type": "text", "id": "cart_upsell_label", "label": "Upsell label", "default": "Quick add"},
+    {"type": "text", "id": "cart_upsell_add", "label": "Upsell button", "default": "Add"},
+    {"type": "text", "id": "cart_subtotal_label", "label": "Subtotal label", "default": "Subtotal"},
+    {"type": "text", "id": "cart_checkout_label", "label": "Checkout button", "default": "Continue to checkout"},
+    {"type": "text", "id": "cart_tax_note", "label": "Tax note", "default": "Taxes included. Shipping calculated at checkout."},
     {"type": "header", "content": "Mobile dock"},
     {"type": "checkbox", "id": "show_mobile_dock", "label": "Show mobile navigation dock", "default": true},
     {"type": "header", "content": "Homepage overlay"},
@@ -292,7 +339,6 @@
     {"type": "text", "id": "promo_eyebrow", "label": "Promo eyebrow", "default": "Latest from TACT"},
     {"type": "text", "id": "promo_heading", "label": "Promo heading", "default": "8-Bit Attitude"},
     {"type": "url", "id": "promo_link", "label": "Promo custom link"}
-  ],
-  "presets": [{"name": "Header"}]
+  ]
 }
 {% endschema %}

@@ -44,11 +44,11 @@
         if card_image == blank and chosen_collection != blank
           assign card_image = chosen_collection.featured_image
         endif
-        assign all_collection = collections['all']
-        assign fallback_product = all_collection.products | slice: forloop.index0, 1 | first
         if card_image == blank and chosen_collection != blank
           assign card_image = chosen_collection.products.first.featured_image
         endif
+        assign all_collection = collections['all']
+        assign fallback_product = all_collection.products | slice: forloop.index0, 1 | first
         if card_image == blank and fallback_product != blank
           assign card_image = fallback_product.featured_image
         endif

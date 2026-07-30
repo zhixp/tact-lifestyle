@@ -1,0 +1,144 @@
+{% liquid
+  assign free_shipping_target = section.settings.cart_free_shipping_target | times: 100
+  assign free_shipping_remaining = free_shipping_target | minus: cart.total_price
+  assign free_shipping_progress = cart.total_price | times: 100.0 | divided_by: free_shipping_target
+  if free_shipping_progress > 100
+    assign free_shipping_progress = 100
+  endif
+%}
+
+<button
+  class="t-overlay t-cart-drawer-overlay"
+  type="button"
+  data-cart-close
+  aria-label="{{ section.settings.cart_close_label | escape }}"
+></button>
+
+<aside
+  class="t-cart-drawer"
+  data-cart-drawer
+  data-free-shipping-target="{{ free_shipping_target }}"
+  data-shipping-before="{{ section.settings.cart_shipping_before | escape }}"
+  data-shipping-after="{{ section.settings.cart_shipping_after | escape }}"
+  data-shipping-unlocked="{{ section.settings.cart_shipping_unlocked | escape }}"
+  aria-hidden="true"
+  aria-label="{{ section.settings.cart_heading | escape }}"
+>
+  <header class="t-cart-drawer__header">
+    <div>
+      <p class="t-kicker">{{ section.settings.cart_eyebrow }}</p>
+      <h2>{{ section.settings.cart_heading }} <span data-cart-drawer-count>({{ cart.item_count }})</span></h2>
+    </div>
+    <button class="t-icon-button" type="button" data-cart-close aria-label="{{ section.settings.cart_close_label | escape }}">
+      {% render 'icon', icon: 'close' %}
+    </button>
+  </header>
+
+  <div class="t-cart-drawer__shipping" data-cart-shipping>
+    <p data-cart-shipping-label>
+      {% if free_shipping_remaining > 0 %}
+        {{ section.settings.cart_shipping_before }} {{ free_shipping_remaining | money }} {{ section.settings.cart_shipping_after }}
+      {% else %}
+        {{ section.settings.cart_shipping_unlocked }}
+      {% endif %}
+    </p>
+    <div aria-hidden="true"><i data-cart-shipping-progress style="width: {{ free_shipping_progress }}%"></i></div>
+  </div>
+
+  <div class="t-cart-drawer__body" data-cart-drawer-body>
+    {% if cart.item_count > 0 %}
+      <div class="t-cart-drawer__lines">
+        {% for item in cart.items %}
+          <article class="t-cart-drawer__line" data-cart-line="{{ item.key }}">
+            <a href="{{ item.url }}">
+              {% if item.image %}
+                {{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '96, 144, 192, 240', sizes: '82px', alt: item.title }}
+              {% endif %}
+            </a>
+            <div>
+              <a href="{{ item.url }}"><strong>{{ item.product.title }}</strong></a>
+              {% unless item.product.has_only_default_variant %}<small>{{ item.variant.title }}</small>{% endunless %}
+              <span>{{ item.final_line_price | money }}</span>
+              <div class="t-cart-drawer__quantity">
+                <button type="button" data-cart-quantity="-1" data-cart-key="{{ item.key }}" aria-label="Reduce quantity">−</button>
+                <b>{{ item.quantity }}</b>
+                <button type="button" data-cart-quantity="1" data-cart-key="{{ item.key }}" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+            <button class="t-cart-drawer__remove" type="button" data-cart-remove data-cart-key="{{ item.key }}" aria-label="Remove {{ item.title | escape }}">×</button>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="t-cart-drawer__empty">
+        <p class="t-kicker">{{ section.settings.cart_empty_eyebrow }}</p>
+        <h3>{{ section.settings.cart_empty_heading }}</h3>
+        <p>{{ section.settings.cart_empty_copy }}</p>
+        <a class="t-button t-button--interactive" href="{{ routes.all_products_collection_url }}">
+          {{ section.settings.cart_empty_button }} <i>{% render 'icon', icon: 'arrow' %}</i>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  {% liquid
+    assign upsell_collection = section.settings.cart_upsell_collection
+    if upsell_collection == blank
+      assign upsell_collection = collections['all']
+    endif
+  %}
+  {% if upsell_collection != blank and upsell_collection.products_count > 0 %}
+    <div class="t-cart-drawer__upsell">
+      <header>
+        <h3>{{ section.settings.cart_upsell_heading }}</h3>
+        <span>{{ section.settings.cart_upsell_label }}</span>
+      </header>
+      <div class="t-cart-drawer__upsell-rail">
+        {% for upsell_product in upsell_collection.products limit: 4 %}
+          {% assign upsell_variant = upsell_product.selected_or_first_available_variant %}
+          <article>
+            <a href="{{ upsell_product.url }}">
+              {% if upsell_product.featured_image %}
+                {{ upsell_product.featured_image | image_url: width: 280 | image_tag: loading: 'lazy', widths: '120, 180, 240, 280', sizes: '76px', alt: upsell_product.title }}
+              {% endif %}
+              <span><strong>{{ upsell_product.title }}</strong><small>{{ upsell_product.price | money }}</small></span>
+            </a>
+            {% if upsell_variant.available %}
+              <form method="post" action="{{ routes.cart_add_url }}" data-quick-add>
+                <input type="hidden" name="id" value="{{ upsell_variant.id }}">
+                <button type="submit">
+                  <span data-quick-add-label>{{ section.settings.cart_upsell_add }}</span>
+                  <i aria-hidden="true">
+                    <span class="t-quick-add__plus">{% render 'icon', icon: 'plus' %}</span>
+                    <span class="t-quick-add__check">{% render 'icon', icon: 'check' %}</span>
+                    <span class="t-quick-add__error">!</span>
+                  </i>
+                </button>
+                <span class="visually-hidden" role="status" aria-live="polite" data-quick-add-status></span>
+              </form>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <footer class="t-cart-drawer__footer" data-cart-drawer-footer{% if cart.item_count == 0 %} hidden{% endif %}>
+    <p><span>{{ section.settings.cart_subtotal_label }}</span><strong data-cart-drawer-total>{{ cart.total_price | money }}</strong></p>
+    <a class="t-button t-button--interactive" href="{{ routes.cart_url }}">
+      {{ section.settings.cart_checkout_label }} <i>{% render 'icon', icon: 'arrow' %}</i>
+    </a>
+    <small>{{ section.settings.cart_tax_note }}</small>
+  </footer>
+
+  <template data-cart-empty-template>
+    <div class="t-cart-drawer__empty">
+      <p class="t-kicker">{{ section.settings.cart_empty_eyebrow }}</p>
+      <h3>{{ section.settings.cart_empty_heading }}</h3>
+      <p>{{ section.settings.cart_empty_copy }}</p>
+      <a class="t-button t-button--interactive" href="{{ routes.all_products_collection_url }}">
+        {{ section.settings.cart_empty_button }} <i>{% render 'icon', icon: 'arrow' %}</i>
+      </a>
+    </div>
+  </template>
+</aside>

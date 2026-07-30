@@ -75,14 +75,20 @@
     </form>
   {% endif %}
 
-  {% if section.settings.show_upsell and section.settings.upsell_collection != blank %}
+  {% liquid
+    assign upsell_source = section.settings.upsell_collection
+    if upsell_source == blank
+      assign upsell_source = collections['all']
+    endif
+  %}
+  {% if section.settings.show_upsell and upsell_source != blank and upsell_source.products_count > 0 %}
     <section class="t-cart-upsell">
       <header>
         {% if section.settings.upsell_eyebrow != blank %}<p class="t-kicker">{{ section.settings.upsell_eyebrow }}</p>{% endif %}
         <h2>{{ section.settings.upsell_heading }}</h2>
       </header>
       <div class="t-product-grid">
-        {% for product in section.settings.upsell_collection.products limit: section.settings.upsell_products %}
+        {% for product in upsell_source.products limit: section.settings.upsell_products %}
           {% render 'product-card', card_product: product, quick_add: true, wishlist: section.settings.upsell_wishlist %}
         {% endfor %}
       </div>

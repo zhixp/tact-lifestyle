@@ -23,15 +23,28 @@
   <div class="t-product__gallery">
     {% for media in product.media %}
       <figure class="{% if forloop.first %}t-product__gallery-primary{% endif %}">
-        {{
-          media.preview_image
-          | image_url: width: 1800
-          | image_tag:
-            loading: 'lazy',
-            widths: '500, 750, 1000, 1300, 1600, 1800',
-            sizes: '(max-width: 749px) 92vw, (min-width: 1200px) 66vw, 58vw',
-            alt: media.alt
-        }}
+        {% if forloop.first %}
+          {{
+            media.preview_image
+            | image_url: width: 1800
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '500, 750, 1000, 1300, 1600, 1800',
+              sizes: '(max-width: 749px) 92vw, (min-width: 1200px) 66vw, 58vw',
+              alt: media.alt
+          }}
+        {% else %}
+          {{
+            media.preview_image
+            | image_url: width: 1800
+            | image_tag:
+              loading: 'lazy',
+              widths: '500, 750, 1000, 1300, 1600, 1800',
+              sizes: '(max-width: 749px) 92vw, (min-width: 1200px) 66vw, 58vw',
+              alt: media.alt
+          }}
+        {% endif %}
         <figcaption>
           {{ forloop.index | prepend: '0' | slice: -2, 2 }} /
           {{ product.media.size | prepend: '0' | slice: -2, 2 }}
@@ -204,7 +217,13 @@
   </div>
 </section>
 
-{% if section.settings.show_complementary and section.settings.complementary_products != blank %}
+{% liquid
+  assign complementary_source = section.settings.complementary_products
+  if complementary_source == blank
+    assign complementary_source = collections['all'].products
+  endif
+%}
+{% if section.settings.show_complementary and complementary_source != blank %}
   <section
     class="t-complementary"
     style="
@@ -217,8 +236,10 @@
       <h2>{{ section.settings.complementary_heading }}</h2>
     </header>
     <div class="t-complementary__rail">
-      {% for card_product in section.settings.complementary_products %}
-        {% render 'product-card', card_product: card_product, quick_add: section.settings.complementary_quick_add, wishlist: section.settings.show_wishlist %}
+      {% for card_product in complementary_source limit: section.settings.complementary_limit %}
+        {% unless card_product.id == product.id %}
+          {% render 'product-card', card_product: card_product, quick_add: section.settings.complementary_quick_add, wishlist: section.settings.show_wishlist %}
+        {% endunless %}
       {% endfor %}
     </div>
   </section>
@@ -255,8 +276,8 @@
       {"value": "cover", "label": "Cover"}
     ]},
     {"type": "range", "id": "panel_width", "label": "Desktop details width", "min": 380, "max": 680, "step": 10, "unit": "px", "default": 520},
-    {"type": "range", "id": "title_size", "label": "Desktop title size", "min": 32, "max": 72, "step": 2, "unit": "px", "default": 48},
-    {"type": "range", "id": "title_size_mobile", "label": "Mobile title size", "min": 30, "max": 54, "step": 2, "unit": "px", "default": 40},
+    {"type": "range", "id": "title_size", "label": "Desktop title size", "min": 32, "max": 72, "step": 2, "unit": "px", "default": 44},
+    {"type": "range", "id": "title_size_mobile", "label": "Mobile title size", "min": 30, "max": 54, "step": 2, "unit": "px", "default": 34},
     {"type": "color", "id": "background", "label": "Gallery background", "default": "#e8e8e5"},
     {"type": "color", "id": "panel_background", "label": "Details background", "default": "#ffffff"},
     {"type": "header", "content": "Product heading and purchase"},
@@ -295,6 +316,7 @@
     {"type": "header", "content": "Pairs well with"},
     {"type": "checkbox", "id": "show_complementary", "label": "Show complementary products", "default": true},
     {"type": "product_list", "id": "complementary_products", "label": "Products", "limit": 8},
+    {"type": "range", "id": "complementary_limit", "label": "Products shown", "min": 2, "max": 8, "step": 1, "default": 6},
     {"type": "text", "id": "complementary_eyebrow", "label": "Eyebrow", "default": "Complete the look"},
     {"type": "text", "id": "complementary_heading", "label": "Heading", "default": "Pairs well with."},
     {"type": "checkbox", "id": "complementary_quick_add", "label": "Show quick add", "default": true},

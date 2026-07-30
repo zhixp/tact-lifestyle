@@ -43,15 +43,15 @@
       assign body_font_bold = settings.body_font | font_modify: 'weight', '700'
       assign heading_font_bold = settings.heading_font | font_modify: 'weight', '700'
     %}
-    {{ settings.body_font | font_face: font_display: 'swap' }}
-    {{ body_font_bold | font_face: font_display: 'swap' }}
-    {{ settings.heading_font | font_face: font_display: 'swap' }}
-    {{ heading_font_bold | font_face: font_display: 'swap' }}
-    {{ settings.accent_font | font_face: font_display: 'swap' }}
-
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'refinement.css' | asset_url | stylesheet_tag }}
     <style>
+      {{ settings.body_font | font_face: font_display: 'swap' }}
+      {{ body_font_bold | font_face: font_display: 'swap' }}
+      {{ settings.heading_font | font_face: font_display: 'swap' }}
+      {{ heading_font_bold | font_face: font_display: 'swap' }}
+      {{ settings.accent_font | font_face: font_display: 'swap' }}
+
       :root {
         --tact-ink: {{ settings.color_ink }};
         --tact-paper: {{ settings.color_paper }};
@@ -99,10 +99,11 @@
     data-account-login-url="{{ routes.account_login_url }}"
   >
     <a class="skip-link" href="#MainContent">Skip to content</a>
-    {% sections 'header-group' %}
+    {% section 'announcement-bar' %}
+    {% section 'header' %}
     <main id="MainContent" tabindex="-1">
       {{ content_for_layout }}
     </main>
-    {% sections 'footer-group' %}
+    {% section 'footer' %}
   </body>
 </html>

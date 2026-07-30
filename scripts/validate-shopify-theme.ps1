@@ -14,6 +14,31 @@ function Add-Issue([string]$Message) {
   $script:issues.Add($Message)
 }
 
+function Test-SettingDefinitions(
+  [string]$Context,
+  [object[]]$Definitions
+) {
+  foreach ($definition in @($Definitions)) {
+    if (-not $definition -or -not $definition.PSObject.Properties["type"] -or $definition.type -ne "range") {
+      continue
+    }
+
+    $minimum = [double]$definition.min
+    $maximum = [double]$definition.max
+    $step = [double]$definition.step
+
+    if ($step -le 0 -or $maximum -le $minimum) {
+      Add-Issue "$Context range '$($definition.id)' has invalid min, max, or step values."
+      continue
+    }
+
+    $valueCount = [math]::Floor(($maximum - $minimum) / $step) + 1
+    if ($valueCount -lt 3) {
+      Add-Issue "$Context range '$($definition.id)' must expose at least three values."
+    }
+  }
+}
+
 function Test-SettingValues(
   [string]$Context,
   [object]$Values,
@@ -63,21 +88,37 @@ function Test-SettingValues(
 
 Get-ChildItem -LiteralPath (Join-Path $source "sections") -Filter "*.liquid" -File |
   ForEach-Object {
-    $liquid = Get-Content -Raw -LiteralPath $_.FullName
+    $sectionFile = $_
+    $liquid = Get-Content -Raw -LiteralPath $sectionFile.FullName
     $match = [regex]::Match(
       $liquid,
       "(?s){%\s*schema\s*%}(.*?){%\s*endschema\s*%}"
     )
 
     if (-not $match.Success) {
-      Add-Issue "$($_.Name) has no section schema."
+      Add-Issue "$($sectionFile.Name) has no section schema."
       return
     }
 
     try {
-      $schemas[$_.BaseName] = $match.Groups[1].Value | ConvertFrom-Json
+      $schemaDocument = $match.Groups[1].Value | ConvertFrom-Json
+      $schemas[$sectionFile.BaseName] = $schemaDocument
+      $schemaSettings = $schemaDocument.PSObject.Properties["settings"]
+      if ($schemaSettings) {
+        Test-SettingDefinitions "$($sectionFile.Name) settings" $schemaSettings.Value
+      }
+      $schemaBlocks = $schemaDocument.PSObject.Properties["blocks"]
+      foreach ($block in @($(if ($schemaBlocks) { $schemaBlocks.Value }))) {
+        if (-not $block) {
+          continue
+        }
+        $blockSettings = $block.PSObject.Properties["settings"]
+        if ($blockSettings) {
+          Test-SettingDefinitions "$($sectionFile.Name) block '$($block.type)'" $blockSettings.Value
+        }
+      }
     } catch {
-      Add-Issue "$($_.Name) has invalid section schema JSON."
+      Add-Issue "$($sectionFile.Name) has invalid section schema JSON."
     }
   }
 

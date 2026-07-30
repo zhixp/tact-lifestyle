@@ -62,9 +62,8 @@ try {
     "layout/theme.liquid",
     "config/settings_schema.json",
     "config/settings_data.json",
-    "sections/header-group.json",
-    "sections/footer-group.json",
     "sections/main-404.liquid",
+    "sections/product-grid.liquid",
     "templates/index.json",
     "templates/404.json"
   )
@@ -72,6 +71,25 @@ try {
   foreach ($entryName in $requiredEntries) {
     if (-not $archive.GetEntry($entryName)) {
       throw "Invalid Shopify package: missing $entryName"
+    }
+  }
+
+  $requiredContracts = @(
+    @{ Name = "header"; Entries = @("sections/header-group.json", "sections/header.liquid") },
+    @{ Name = "footer"; Entries = @("sections/footer-group.json", "sections/footer.liquid") },
+    @{ Name = "product"; Entries = @("sections/product.liquid", "sections/main-product.liquid") }
+  )
+
+  foreach ($contract in $requiredContracts) {
+    $contractFound = $false
+    foreach ($entryName in $contract.Entries) {
+      if ($archive.GetEntry($entryName)) {
+        $contractFound = $true
+        break
+      }
+    }
+    if (-not $contractFound) {
+      throw "Invalid Shopify package: missing $($contract.Name) contract ($($contract.Entries -join ' or '))"
     }
   }
 

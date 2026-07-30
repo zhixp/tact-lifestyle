@@ -32,7 +32,12 @@ The demo now includes:
 ## Shopify delivery
 
 The production Shopify theme is in `shopify-theme`. Upload
-`tact-editorial-1.6.1.zip` to Shopify Basic and follow `SHOPIFY_HANDOFF.md`.
+`tact-editorial-catalog-ready-1.4.2.zip` to Shopify Basic and follow
+`SHOPIFY_HANDOFF.md`.
+
+This exact source is also deployed to unpublished Shopify draft `157168992421`.
+It has passed Shopify Theme Check and desktop/mobile storefront QA against the
+store's real catalog. Older rebuilt, recovery and 1.6.x archives are superseded.
 
 The client can manage without touching code:
 
@@ -42,6 +47,8 @@ The client can manage without touching code:
 - compact category tiles, up to 16 shoppable video blocks and a rotating
   customer-review carousel;
 - announcement ticker content and mega-menu promotion media/product;
+- native cart drawer content, free-shipping target, empty-bag copy and
+  collection-based "Pairs well with" quick adds;
 - light/dark palettes and the customer-facing theme switcher;
 - product images, descriptions, prices, sizes, stock and variants;
 - product-page offer copy, benefit copy, size guide, care, shipping and return
@@ -55,8 +62,8 @@ The client can manage without touching code:
 ```powershell
 pnpm typecheck
 pnpm build
-powershell -ExecutionPolicy Bypass -File scripts/validate-shopify-theme.ps1
-powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1
+pnpm theme:check
+pnpm theme:package
 ```
 
 Media provenance is documented in `ASSET_SOURCES.md`.

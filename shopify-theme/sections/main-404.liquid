@@ -1,7 +1,7 @@
 <section class="t-not-found">
   <p class="t-kicker">404 / Off the map</p>
   <h1>{{ section.settings.heading }}</h1>
-  <a class="t-button" href="{{ routes.root_url }}">{{ section.settings.button_label }} {% render 'icon', icon: 'arrow' %}</a>
+  <a class="t-button" href="{{ routes.all_products_collection_url }}">{{ section.settings.button_label }} {% render 'icon', icon: 'arrow' %}</a>
 </section>
 
 {% schema %}
@@ -9,7 +9,7 @@
   "name": "404",
   "settings": [
     {"type": "text", "id": "heading", "label": "Heading", "default": "This piece moved on."},
-    {"type": "text", "id": "button_label", "label": "Button label", "default": "Return home"}
+    {"type": "text", "id": "button_label", "label": "Button label", "default": "Shop the latest"}
   ]
 }
 {% endschema %}

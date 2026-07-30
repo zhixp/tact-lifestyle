@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "eyebrow": "TACT / Our story"
+      }
+    }
+  },
+  "order": ["main"]
+}

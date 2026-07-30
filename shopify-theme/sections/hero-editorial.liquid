@@ -32,6 +32,8 @@
       <article
         class="t-hero-slide t-hero-slide--{{ block.settings.layout }}{% if forloop.first %} is-active{% endif %}"
         data-hero-slide
+        data-header-tone="{{ block.settings.header_tone }}"
+        data-mobile-header-tone="{{ block.settings.mobile_header_tone }}"
         aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}"
         style="
           --slide-background: {{ block.settings.background }};
@@ -161,7 +163,7 @@
     {% else %}
       <article class="t-hero-slide is-active" data-hero-slide aria-hidden="false">
         <div class="t-hero-slide__desktop-media">
-        <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" alt="TACT current collection">
+          <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" alt="TACT current collection">
         </div>
         <div class="t-hero-slide__mobile-media">
           <video autoplay muted loop playsinline preload="metadata">
@@ -296,6 +298,14 @@
         {"type": "range", "id": "heading_size_mobile", "label": "Mobile heading size", "min": 32, "max": 82, "step": 2, "unit": "px", "default": 58},
         {"type": "color", "id": "text_color", "label": "Desktop text", "default": "#0a0a0a"},
         {"type": "color", "id": "mobile_text_color", "label": "Mobile text", "default": "#ffffff"},
+        {"type": "select", "id": "header_tone", "label": "Header logo and icons", "default": "light", "options": [
+          {"value": "light", "label": "Light — for dark banners"},
+          {"value": "dark", "label": "Dark — for light banners"}
+        ]},
+        {"type": "select", "id": "mobile_header_tone", "label": "Mobile header logo and icons", "default": "light", "options": [
+          {"value": "light", "label": "Light — for dark mobile banners"},
+          {"value": "dark", "label": "Dark — for light mobile banners"}
+        ]},
         {"type": "color", "id": "overlay_color", "label": "Desktop overlay", "default": "#000000"},
         {"type": "range", "id": "overlay_opacity", "label": "Desktop overlay strength", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 10},
         {"type": "range", "id": "mobile_overlay_opacity", "label": "Mobile overlay strength", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 55}
