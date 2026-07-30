@@ -1,7 +1,7 @@
 {
   "sections": {
     "main": {
-      "type": "main-page",
+      "type": "main-privacy",
       "settings": {
         "eyebrow": "Legal / Privacy"
       }

@@ -1,0 +1,141 @@
+{% liquid
+  assign privacy_content = page.content
+  if privacy_content == blank and shop.privacy_policy.body != blank
+    assign privacy_content = shop.privacy_policy.body
+  endif
+%}
+
+<section
+  class="t-legal-page"
+  style="
+    --legal-background: {{ section.settings.background }};
+    --legal-text: {{ section.settings.text_color }};
+    --legal-width: {{ section.settings.content_width }}px;
+  "
+>
+  <header class="t-legal-page__header">
+    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+    <h1>{{ page.title | default: section.settings.heading }}</h1>
+    <p>{{ section.settings.intro }}</p>
+    <small>{{ section.settings.updated_label }}</small>
+  </header>
+
+  <div class="t-legal-page__layout">
+    <nav class="t-legal-page__nav" aria-label="Privacy policy sections">
+      <span>On this page</span>
+      <a href="#information">Information we collect</a>
+      <a href="#use">How we use it</a>
+      <a href="#sharing">How we share it</a>
+      <a href="#rights">Your rights</a>
+      <a href="#security">Security and retention</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <article class="t-legal-page__content rte">
+      {% if privacy_content != blank %}
+        {{ privacy_content }}
+      {% else %}
+        <p>
+          Tactlifestyle operates this store and website, including its information, content,
+          features, tools, products and services. Shopify powers the store and enables us to
+          provide these services to you. This policy explains how we collect, use and disclose
+          personal information when you browse, communicate with us or complete a transaction.
+        </p>
+
+        <h2 id="information">Personal information we collect or process</h2>
+        <p>
+          We may collect contact details, billing and shipping addresses, payment and transaction
+          information, account details, products you view or save, communications with us, device
+          and browser information, IP address and information about how you use the store.
+        </p>
+        <p>
+          Information can come directly from you, automatically through the services and cookies,
+          from service providers acting for us, or from business and marketing partners.
+        </p>
+
+        <h2 id="use">How we use personal information</h2>
+        <p>
+          We use personal information to provide and improve the store, process payments and
+          orders, arrange delivery, manage accounts, remember preferences, support returns and
+          exchanges, prevent fraud, communicate with you, comply with legal obligations and—where
+          permitted—deliver relevant marketing and advertising.
+        </p>
+
+        <h2 id="sharing">How we disclose personal information</h2>
+        <p>
+          We may disclose information to Shopify and vendors that provide payment processing,
+          technology, analytics, customer support, storage, fulfilment, delivery, advertising and
+          other services. We may also disclose information when you direct us to, within our
+          corporate group, during a business transaction, or when required to comply with law and
+          protect the store, our customers or other people.
+        </p>
+        <p>
+          Shopify processes information to operate and improve the services. Information may be
+          processed in countries other than where you live. Learn more in the
+          <a href="https://www.shopify.com/legal/privacy/app-users">Shopify Consumer Privacy Policy</a>
+          and use the <a href="https://privacy.shopify.com/en">Shopify Privacy Portal</a> where
+          applicable.
+        </p>
+
+        <h2>Third-party websites and children’s data</h2>
+        <p>
+          Links to third-party platforms are governed by those platforms’ own privacy and security
+          terms. The services are not intended for children and we do not knowingly collect
+          personal information from children under the age of majority in their jurisdiction.
+        </p>
+
+        <h2 id="security">Security and retention</h2>
+        <p>
+          No security measure is perfect. We retain information only as long as reasonably needed
+          to provide services, maintain accounts, meet legal obligations, resolve disputes and
+          enforce agreements.
+        </p>
+
+        <h2 id="rights">Your rights and choices</h2>
+        <p>
+          Depending on where you live, you may have rights to access, correct, delete or receive a
+          portable copy of personal information. You may unsubscribe from promotional email at any
+          time, although we may still send service and order messages. We may need to verify your
+          identity before completing a request and will not discriminate against you for exercising
+          a privacy right.
+        </p>
+
+        <h2>Complaints, transfers and policy changes</h2>
+        <p>
+          You can contact us about a complaint and may also have the right to contact your local
+          data-protection authority. Where information is transferred internationally, we rely on
+          recognised legal transfer mechanisms where required. We may update this policy to reflect
+          operational, legal or regulatory changes and will update the date shown on this page.
+        </p>
+
+        <h2 id="contact">Contact</h2>
+        <p>
+          Questions and privacy requests can be sent to
+          <a href="mailto:{{ section.settings.contact_email }}">{{ section.settings.contact_email }}</a>
+          or made by calling
+          <a href="tel:{{ section.settings.contact_phone | remove: ' ' }}">{{ section.settings.contact_phone }}</a>.
+          You can also write to {{ section.settings.contact_address }}.
+        </p>
+      {% endif %}
+    </article>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Privacy policy",
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Legal / Privacy"},
+    {"type": "text", "id": "heading", "label": "Fallback heading", "default": "Privacy policy"},
+    {"type": "textarea", "id": "intro", "label": "Introduction", "default": "Clear information about how TACT and Shopify handle your data."},
+    {"type": "text", "id": "updated_label", "label": "Last updated label", "default": "Last updated July 24, 2026"},
+    {"type": "text", "id": "contact_email", "label": "Privacy email", "default": "Info@tactlifestyle.store"},
+    {"type": "text", "id": "contact_phone", "label": "Privacy phone", "default": "+91 999 372 8556"},
+    {"type": "textarea", "id": "contact_address", "label": "Privacy address", "default": "TACT Enterprises, 60 New Dewas Road, Shivaji Nagar, Indore, Madhya Pradesh 452003, India"},
+    {"type": "range", "id": "content_width", "label": "Reading width", "min": 620, "max": 980, "step": 20, "unit": "px", "default": 780},
+    {"type": "color", "id": "background", "label": "Background", "default": "#f3f3f1"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"}
+  ],
+  "presets": [{"name": "Privacy policy"}]
+}
+{% endschema %}

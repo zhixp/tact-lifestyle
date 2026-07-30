@@ -15,10 +15,12 @@ class TactTheme {
     this.lastScrollY = window.scrollY;
     this.bind();
     this.bindStoryVideos();
+    this.bindCategoryDecks();
     this.bindHeroCarousels();
     this.bindHeroVideos();
     this.bindReviewStories();
     this.bindVideoQuickAdd();
+    this.bindProductForms();
     this.bindCartDrawer();
     this.bindWishlist();
     this.bindProductCardMotion();
@@ -427,6 +429,95 @@ class TactTheme {
           }, 1800);
         }
       });
+    });
+  }
+
+  bindProductForms() {
+    document.querySelectorAll(".t-product-form").forEach((form) => {
+      if (form.dataset.productFormBound === "true") return;
+      form.dataset.productFormBound = "true";
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const button = form.querySelector('button[name="add"]');
+        const label = button?.querySelector("span");
+        const message = form.querySelector("[data-product-message]");
+        if (!button || button.disabled) return;
+
+        const initialLabel = label?.textContent || "Add to bag";
+        button.disabled = true;
+        button.classList.add("is-loading");
+        button.setAttribute("aria-busy", "true");
+        if (label) label.textContent = "Adding…";
+        if (message) message.textContent = "";
+
+        try {
+          const root = window.Shopify?.routes?.root || "/";
+          const response = await fetch(`${root}cart/add.js`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            body: new FormData(form),
+          });
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.description || "Unable to add this size");
+          }
+
+          if (label) label.textContent = "Added to bag";
+          button.classList.remove("is-loading");
+          button.classList.add("is-added");
+          if (message) message.textContent = "Added to your bag.";
+          document.dispatchEvent(new CustomEvent("tact:cart-updated", { detail: await this.fetchCart() }));
+        } catch (error) {
+          button.classList.remove("is-loading");
+          button.classList.add("is-error");
+          if (label) label.textContent = "Try again";
+          if (message) message.textContent = error?.message || "We couldn’t add this item.";
+        } finally {
+          button.removeAttribute("aria-busy");
+          window.setTimeout(() => {
+            button.disabled = false;
+            button.classList.remove("is-loading", "is-added", "is-error");
+            if (label) label.textContent = initialLabel;
+          }, 1800);
+        }
+      });
+    });
+  }
+
+  bindCategoryDecks() {
+    document.querySelectorAll("[data-category-deck]").forEach((deck) => {
+      if (deck.dataset.categoryBound === "true") return;
+      deck.dataset.categoryBound = "true";
+
+      const rail = deck.querySelector("[data-category-rail]");
+      const progress = deck.querySelector("[data-category-progress]");
+      if (!rail) return;
+
+      const update = () => {
+        const distance = Math.max(0, rail.scrollWidth - rail.clientWidth);
+        const amount = distance ? Math.min(1, rail.scrollLeft / distance) : 1;
+        if (progress) progress.style.transform = `scaleX(${Math.max(.12, amount)})`;
+        deck.querySelector("[data-category-prev]")?.toggleAttribute("disabled", rail.scrollLeft < 8);
+        deck
+          .querySelector("[data-category-next]")
+          ?.toggleAttribute("disabled", rail.scrollLeft >= distance - 8);
+      };
+      const move = (direction) => {
+        const card = rail.querySelector(".t-collection-tile");
+        const distance = card ? card.getBoundingClientRect().width + 12 : rail.clientWidth * .75;
+        rail.scrollBy({ left: distance * direction, behavior: "smooth" });
+      };
+
+      deck.querySelector("[data-category-prev]")?.addEventListener("click", () => move(-1));
+      deck.querySelector("[data-category-next]")?.addEventListener("click", () => move(1));
+      rail.addEventListener("scroll", update, { passive: true });
+      rail.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") move(-1);
+        if (event.key === "ArrowRight") move(1);
+      });
+      window.addEventListener("resize", update, { passive: true });
+      update();
     });
   }
 
@@ -914,10 +1005,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const theme = new TactTheme();
   document.addEventListener("shopify:section:load", () => {
     theme.bindStoryVideos();
+    theme.bindCategoryDecks();
     theme.bindHeroCarousels();
     theme.bindHeroVideos();
     theme.bindReviewStories();
     theme.bindVideoQuickAdd();
+    theme.bindProductForms();
     theme.bindCartDrawer();
     theme.bindWishlist();
     theme.bindProductCardMotion();

@@ -1,0 +1,103 @@
+<section
+  class="t-order-tracker"
+  style="
+    --tracker-background: {{ section.settings.background }};
+    --tracker-text: {{ section.settings.text_color }};
+    --tracker-accent: {{ section.settings.accent }};
+  "
+>
+  <header class="t-order-tracker__header">
+    <p class="t-kicker">{{ section.settings.eyebrow }}</p>
+    <h1>{{ page.title | default: section.settings.heading }}</h1>
+    <p>{{ section.settings.intro }}</p>
+  </header>
+
+  {% if customer %}
+    <div class="t-order-tracker__account">
+      <div class="t-order-tracker__account-bar">
+        <div>
+          <span>Signed in as</span>
+          <strong>{{ customer.name | default: customer.email }}</strong>
+        </div>
+        <a href="{{ routes.account_url }}">Open account</a>
+      </div>
+
+      {% if customer.orders.size > 0 %}
+        <div class="t-order-tracker__orders">
+          {% for order in customer.orders %}
+            <article>
+              <div>
+                <span>{{ order.created_at | date: "%d %b %Y" }}</span>
+                <h2>{{ order.name }}</h2>
+              </div>
+              <dl>
+                <div><dt>Payment</dt><dd>{{ order.financial_status_label }}</dd></div>
+                <div><dt>Fulfilment</dt><dd>{{ order.fulfillment_status_label }}</dd></div>
+                <div><dt>Total</dt><dd>{{ order.total_price | money }}</dd></div>
+              </dl>
+              <a
+                class="t-button t-button--interactive"
+                href="{{ order.order_status_url | default: order.customer_url }}"
+              >
+                <span>{{ section.settings.track_button_label }}</span>
+                <i>{% render 'icon', icon: 'arrow' %}</i>
+              </a>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="t-order-tracker__empty">
+          <h2>{{ section.settings.empty_heading }}</h2>
+          <p>{{ section.settings.empty_copy }}</p>
+          <a class="t-text-link" href="{{ routes.all_products_collection_url }}">
+            Shop the latest {% render 'icon', icon: 'arrow' %}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="t-order-tracker__guest">
+      <div>
+        <span>01 / Secure tracking</span>
+        <h2>{{ section.settings.guest_heading }}</h2>
+        <p>{{ section.settings.guest_copy }}</p>
+        <a class="t-button t-button--interactive" href="{{ routes.account_login_url }}">
+          <span>{{ section.settings.login_label }}</span>
+          <i>{% render 'icon', icon: 'arrow' %}</i>
+        </a>
+      </div>
+      <aside>
+        <span>02 / Need a hand?</span>
+        <h3>{{ section.settings.support_heading }}</h3>
+        <p>{{ section.settings.support_copy }}</p>
+        <a href="mailto:{{ section.settings.support_email }}">{{ section.settings.support_email }}</a>
+        <a href="tel:{{ section.settings.support_phone | remove: ' ' }}">{{ section.settings.support_phone }}</a>
+      </aside>
+    </div>
+  {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "Track your order",
+  "settings": [
+    {"type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Customer care / Orders"},
+    {"type": "text", "id": "heading", "label": "Fallback heading", "default": "Track your order"},
+    {"type": "textarea", "id": "intro", "label": "Introduction", "default": "Sign in to see every order, its fulfilment state and the latest delivery updates held securely by Shopify."},
+    {"type": "text", "id": "guest_heading", "label": "Guest heading", "default": "Your orders, in one place."},
+    {"type": "textarea", "id": "guest_copy", "label": "Guest copy", "default": "Use the same email or phone number used at checkout. Shopify will show the orders connected to your customer account."},
+    {"type": "text", "id": "login_label", "label": "Login button", "default": "Sign in to track"},
+    {"type": "text", "id": "track_button_label", "label": "Track button", "default": "View live status"},
+    {"type": "text", "id": "empty_heading", "label": "No orders heading", "default": "No orders yet."},
+    {"type": "textarea", "id": "empty_copy", "label": "No orders copy", "default": "Orders placed with this account will appear here automatically."},
+    {"type": "text", "id": "support_heading", "label": "Support heading", "default": "Can’t find an order?"},
+    {"type": "textarea", "id": "support_copy", "label": "Support copy", "default": "Send us the order number and the phone or email used at checkout. We’ll help locate it."},
+    {"type": "text", "id": "support_email", "label": "Support email", "default": "info@tactlifestyle.store"},
+    {"type": "text", "id": "support_phone", "label": "Support phone", "default": "+91 98937 89469"},
+    {"type": "color", "id": "background", "label": "Background", "default": "#f3f3f1"},
+    {"type": "color", "id": "text_color", "label": "Text", "default": "#0b0b0c"},
+    {"type": "color", "id": "accent", "label": "Accent", "default": "#234bff"}
+  ],
+  "presets": [{"name": "Track your order"}]
+}
+{% endschema %}

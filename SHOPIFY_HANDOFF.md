@@ -1,13 +1,13 @@
 # TACT Shopify theme handoff
 
-`tact-editorial-catalog-ready-1.4.2.zip` is the canonical Shopify CLI-built
+`tact-editorial-catalog-ready-1.4.3.zip` is the canonical Shopify CLI-built
 Online Store 2.0 package for Shopify Basic. Its source of truth is the
 `shopify-theme` directory. Do not reuse older rebuilt, recovery, 1.6.x or
 `tact-shopify-theme.zip` uploads.
 
 Upload it from **Shopify admin → Online Store → Themes → Import theme → Upload zip file**. Keep it unpublished while testing.
 
-After uploading, verify the draft is the new **TACT Editorial 1.4.2** package.
+After uploading, verify the draft is the new **TACT Editorial 1.4.3** package.
 In the Theme Editor, choose **Home page** from the page selector. The left
 sidebar should show the editable header, eight homepage sections and footer.
 If it does not, the wrong archive or an older draft theme is open.
@@ -48,7 +48,7 @@ blindly:
 
 ```powershell
 shopify theme list --store your-store.myshopify.com
-shopify theme pull --store your-store.myshopify.com --theme "TACT Editorial 1.4.2" --path remote-theme
+shopify theme pull --store your-store.myshopify.com --theme "TACT Editorial 1.4.3" --path remote-theme
 ```
 
 Compare `remote-theme/templates/index.json`, `templates/404.json`,
@@ -109,6 +109,29 @@ are not duplicated. Its visibility and individual header actions remain
 controlled from the header section settings.
 
 Products, titles, descriptions, variants, sizes, inventory and product media remain managed from **Products**. Collections remain managed from **Products → Collections**. The owner does not edit theme code when adding normal products.
+
+## Privacy and order-tracking pages
+
+Theme ZIP files can include page templates, but Shopify page resources remain
+store content. In **Online Store > Pages**, create or confirm these two published
+pages and assign their matching theme templates:
+
+- **Privacy policy** — handle `privacy-policy`, template `page.privacy`.
+- **Track your order** — handle `track-your-order`, template `page.track-order`.
+
+Both templates include complete fallback content, so their Shopify page body may
+remain blank. If the merchant adds page content later, the Privacy template uses
+that content first. The Track order template uses Shopify customer accounts and
+native order-status URLs; it never asks shoppers to enter order data into an
+unsecured theme form.
+
+The footer detects these pages automatically. If the Track page has not been
+created, its link safely falls back to the Shopify customer account route. An
+optional explicit Privacy/Track URL can also be chosen in the Footer settings.
+Until the Privacy page exists, the footer uses the theme-owned
+`search.privacy` alternate template so customers receive the complete policy
+instead of a 404. Creating the page resource later automatically replaces that
+fallback with the cleaner `/pages/privacy-policy` URL.
 
 ## Customer accounts
 

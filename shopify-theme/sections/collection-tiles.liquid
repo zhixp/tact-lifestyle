@@ -2,6 +2,7 @@
   class="t-collection-tiles"
   style="
     --category-columns: {{ section.settings.columns }};
+    --category-desktop-width: {{ section.settings.desktop_card_width }}px;
     --category-mobile-width: {{ section.settings.mobile_card_width }}vw;
     --category-ratio: {{ section.settings.image_ratio }};
     --category-radius: {{ section.settings.card_radius }}px;
@@ -29,8 +30,20 @@
       </div>
     </div>
   {% endif %}
-  <div class="t-collection-tiles__grid">
-    {% for block in section.blocks %}
+  <div class="t-category-deck" data-category-deck>
+    {% if section.settings.show_controls and section.blocks.size > 1 %}
+      <div class="t-category-deck__controls">
+        <button type="button" data-category-prev aria-label="Previous categories">
+          {% render 'icon', icon: 'arrow' %}
+        </button>
+        <div class="t-category-deck__progress" aria-hidden="true"><i data-category-progress></i></div>
+        <button type="button" data-category-next aria-label="Next categories">
+          {% render 'icon', icon: 'arrow' %}
+        </button>
+      </div>
+    {% endif %}
+    <div class="t-collection-tiles__grid" data-category-rail tabindex="0" aria-label="Shop by category">
+      {% for block in section.blocks %}
       {% liquid
         assign chosen_collection = block.settings.collection
         if chosen_collection == blank and block.settings.fallback_handle != blank
@@ -59,39 +72,40 @@
         assign overlay_alpha = block.settings.overlay_opacity | divided_by: 100.0
         assign overlay_color = block.settings.overlay_color | color_modify: 'alpha', overlay_alpha
       %}
-      <a
-        href="{{ card_link | default: routes.all_products_collection_url }}"
-        class="t-collection-tile"
-        style="--category-overlay: {{ overlay_color }}; --category-focal: {{ block.settings.image_position }};"
-        {{ block.shopify_attributes }}
-      >
-        {% if card_image %}
-          {{
-            card_image
-            | image_url: width: 1200
-            | image_tag:
-              loading: 'lazy',
-              widths: '320, 480, 640, 900, 1200',
-              sizes: '(max-width: 749px) 72vw, 25vw',
-              alt: card_title
-          }}
-        {% else %}
-          {% case forloop.index %}
-            {% when 1 %}
-              <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" loading="lazy" alt="{{ card_title | escape }}">
-            {% when 2 %}
-              <img src="{{ 'hero-demo.webp' | asset_url }}" width="1872" height="1200" loading="lazy" alt="{{ card_title | escape }}">
-            {% when 3 %}
-              <img src="{{ 'editorial-demo.webp' | asset_url }}" width="1648" height="2528" loading="lazy" alt="{{ card_title | escape }}">
-            {% else %}
-              <img src="{{ 'hero-madison.png' | asset_url }}" width="1648" height="2528" loading="lazy" alt="{{ card_title | escape }}">
-          {% endcase %}
-        {% endif %}
-        {% if section.settings.show_numbers %}<span class="t-collection-tile__number">{{ forloop.index | prepend: '0' }}</span>{% endif %}
-        <strong>{{ card_title | default: 'Collection' }}</strong>
-        {% render 'icon', icon: 'arrow' %}
-      </a>
-    {% endfor %}
+        <a
+          href="{{ card_link | default: routes.all_products_collection_url }}"
+          class="t-collection-tile"
+          style="--category-overlay: {{ overlay_color }}; --category-focal: {{ block.settings.image_position }};"
+          {{ block.shopify_attributes }}
+        >
+          {% if card_image %}
+            {{
+              card_image
+              | image_url: width: 1200
+              | image_tag:
+                loading: 'lazy',
+                widths: '320, 480, 640, 900, 1200',
+                sizes: '(max-width: 749px) 72vw, 320px',
+                alt: card_title
+            }}
+          {% else %}
+            {% case forloop.index %}
+              {% when 1 %}
+                <img src="{{ 'hero-editorial-v2.webp' | asset_url }}" width="1568" height="1003" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 2 %}
+                <img src="{{ 'hero-demo.webp' | asset_url }}" width="1872" height="1200" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 3 %}
+                <img src="{{ 'editorial-demo.webp' | asset_url }}" width="1648" height="2528" loading="lazy" alt="{{ card_title | escape }}">
+              {% else %}
+                <img src="{{ 'hero-madison.png' | asset_url }}" width="1648" height="2528" loading="lazy" alt="{{ card_title | escape }}">
+            {% endcase %}
+          {% endif %}
+          {% if section.settings.show_numbers %}<span class="t-collection-tile__number">{{ forloop.index | prepend: '0' }}</span>{% endif %}
+          <strong>{{ card_title | default: 'Collection' }}</strong>
+          {% render 'icon', icon: 'arrow' %}
+        </a>
+      {% endfor %}
+    </div>
   </div>
 </section>
 
@@ -110,7 +124,9 @@
     {"type": "checkbox", "id": "show_numbers", "label": "Show category numbers", "default": true},
     {"type": "header", "content": "Grid and sizing"},
     {"type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 6, "step": 1, "default": 4},
+    {"type": "range", "id": "desktop_card_width", "label": "Desktop card width", "min": 220, "max": 460, "step": 10, "unit": "px", "default": 320},
     {"type": "range", "id": "mobile_card_width", "label": "Mobile card width", "min": 55, "max": 92, "step": 1, "unit": "%", "default": 72},
+    {"type": "checkbox", "id": "show_controls", "label": "Show deck controls", "default": true},
     {"type": "select", "id": "image_ratio", "label": "Card ratio", "default": "1 / 1", "options": [
       {"value": "1 / 1", "label": "Square"},
       {"value": "4 / 5", "label": "Portrait"},

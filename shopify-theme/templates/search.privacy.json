@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-privacy",
+      "settings": {
+        "eyebrow": "Legal / Privacy",
+        "heading": "Privacy policy"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
