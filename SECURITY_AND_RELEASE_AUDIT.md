@@ -2,7 +2,7 @@
 
 Last verified: 2026-08-01
 
-Theme version: 1.4.5
+Theme version: 1.4.6
 
 This is the release boundary for the Shopify theme in `shopify-theme/` and the
 Next.js presentation build in `app/`. It records what was checked, what was
@@ -17,9 +17,13 @@ fixed, and which responsibilities remain with Shopify or installed apps.
 - Shopify Theme Check reports zero offences across 71 checked theme files.
 - The contract validator accepts all 28 JSON templates and section groups.
 - The Next.js build type-checks and generates all 82 routes.
-- Desktop and mobile storefront checks completed without JavaScript page errors
-  on the homepage, product page, cart drawer, dark mode and order-tracking
-  template.
+- Desktop and mobile storefront checks completed without theme JavaScript page
+  errors on the homepage, product page, cart drawer, dark mode and
+  order-tracking template. Shopify's local proxy can log a non-blocking CORS
+  warning for its own `origin_trials` script.
+- Release artifact:
+  `tact-editorial-catalog-ready-1.4.6.zip` — SHA-256
+  `5F79E7ECCE13CC1E984709CF1EF18EF21F9918DE108AC4AE293F4E4F84584EE3`.
 - The uploaded target is an unpublished Shopify draft. This audit does not
   authorize publishing it over the live theme.
 

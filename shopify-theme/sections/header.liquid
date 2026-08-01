@@ -96,7 +96,7 @@
     {% if section.settings.show_cart %}
       <a class="t-icon-button t-header__cart" href="{{ routes.cart_url }}" data-cart-open aria-label="{{ section.settings.bag_label | escape }} — {{ cart.item_count }}">
         {% render 'icon', icon: 'bag' %}
-        {% if cart.item_count > 0 %}<span class="t-header__count">{{ cart.item_count }}</span>{% endif %}
+        <span class="t-header__count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
       </a>
     {% endif %}
     <button class="t-icon-button t-header__desktop-menu" type="button" data-menu-open aria-label="{{ section.settings.open_menu_label | escape }}">
@@ -143,7 +143,7 @@
         <img src="{{ 'logo-black.png' | asset_url }}" width="520" height="238" alt="{{ shop.name }}">
       {% endif %}
     </a>
-    <button class="t-icon-button" type="button" data-menu-close aria-label="{{ section.settings.close_menu_label | escape }}">
+    <button class="t-icon-button t-menu__close" type="button" data-menu-close aria-label="{{ section.settings.close_menu_label | escape }}">
       {% render 'icon', icon: 'close' %}
     </button>
   </div>

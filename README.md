@@ -32,7 +32,7 @@ The demo now includes:
 ## Shopify delivery
 
 The production Shopify theme is in `shopify-theme`. Upload
-`tact-editorial-catalog-ready-1.4.4.zip` to Shopify Basic and follow
+`tact-editorial-catalog-ready-1.4.6.zip` to Shopify Basic and follow
 `SHOPIFY_HANDOFF.md`.
 
 Reusable engineering documentation:

@@ -24,9 +24,9 @@
         {% if product.available %}
           <span class="t-quick-add__plus" aria-hidden="true">{% render 'icon', icon: 'plus' %}</span>
           <span class="t-quick-add__check" aria-hidden="true">{% render 'icon', icon: 'check' %}</span>
-          <span class="t-quick-add__error" aria-hidden="true">!</span>
+          <span class="t-quick-add__error" aria-hidden="true">{% render 'icon', icon: 'close' %}</span>
         {% else %}
-          <span aria-hidden="true">×</span>
+          <span aria-hidden="true">{% render 'icon', icon: 'close' %}</span>
         {% endif %}
       </button>
       <span class="visually-hidden" role="status" aria-live="polite" data-quick-add-status></span>

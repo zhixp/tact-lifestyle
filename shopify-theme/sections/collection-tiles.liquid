@@ -53,18 +53,25 @@
         if card_link == blank and chosen_collection != blank
           assign card_link = chosen_collection.url
         endif
+        assign fallback_asset = block.settings.fallback_asset | default: 'auto'
+        assign use_fallback_asset = false
+        if block.settings.image == blank and block.settings.collection == blank and fallback_asset != 'auto'
+          assign use_fallback_asset = true
+        endif
         assign card_image = block.settings.image
-        if card_image == blank and chosen_collection != blank
-          assign card_image = chosen_collection.featured_image
-        endif
-        if card_image == blank and chosen_collection != blank
-          assign card_image = chosen_collection.products.first.featured_image
-        endif
-        assign all_collection = collections['all']
-        assign fallback_product = all_collection.products | slice: forloop.index0, 1 | first
-        if card_image == blank and fallback_product != blank
-          assign card_image = fallback_product.featured_image
-        endif
+        unless use_fallback_asset
+          if card_image == blank and chosen_collection != blank
+            assign card_image = chosen_collection.featured_image
+          endif
+          if card_image == blank and chosen_collection != blank
+            assign card_image = chosen_collection.products.first.featured_image
+          endif
+          assign all_collection = collections['all']
+          assign fallback_product = all_collection.products | slice: forloop.index0, 1 | first
+          if card_image == blank and fallback_product != blank
+            assign card_image = fallback_product.featured_image
+          endif
+        endunless
         assign card_title = block.settings.title
         if card_title == blank and chosen_collection != blank
           assign card_title = chosen_collection.title
@@ -78,7 +85,26 @@
           style="--category-overlay: {{ overlay_color }}; --category-focal: {{ block.settings.image_position }};"
           {{ block.shopify_attributes }}
         >
-          {% if card_image %}
+          {% if use_fallback_asset %}
+            {% case fallback_asset %}
+              {% when 'new-arrivals' %}
+                <img src="{{ 'category-new-arrivals.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'men' %}
+                <img src="{{ 'category-men.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'women' %}
+                <img src="{{ 'category-women.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'unisex' %}
+                <img src="{{ 'category-unisex.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'coords' %}
+                <img src="{{ 'category-coords.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'joggers' %}
+                <img src="{{ 'category-joggers.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'hoodies' %}
+                <img src="{{ 'category-hoodies.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+              {% when 'neon' %}
+                <img src="{{ 'category-neon.webp' | asset_url }}" width="900" height="1125" loading="lazy" alt="{{ card_title | escape }}">
+            {% endcase %}
+          {% elsif card_image %}
             {{
               card_image
               | image_url: width: 1200
@@ -151,6 +177,17 @@
         {"type": "text", "id": "title", "label": "Custom title"},
         {"type": "url", "id": "link", "label": "Custom link"},
         {"type": "text", "id": "fallback_handle", "label": "Demo collection handle"},
+        {"type": "select", "id": "fallback_asset", "label": "Demo artwork", "default": "auto", "info": "Used only until a collection or custom image is selected.", "options": [
+          {"value": "auto", "label": "Automatic"},
+          {"value": "new-arrivals", "label": "New arrivals"},
+          {"value": "men", "label": "Men"},
+          {"value": "women", "label": "Women"},
+          {"value": "unisex", "label": "Unisex"},
+          {"value": "coords", "label": "Co-ord sets"},
+          {"value": "joggers", "label": "Joggers"},
+          {"value": "hoodies", "label": "Hoodies"},
+          {"value": "neon", "label": "Neon Rush"}
+        ]},
         {"type": "select", "id": "image_position", "label": "Image focal point", "default": "center center", "options": [
           {"value": "left center", "label": "Left"},
           {"value": "center center", "label": "Center"},
@@ -167,14 +204,14 @@
     {
       "name": "Collection categories",
       "blocks": [
-        {"type": "collection", "settings": {"fallback_handle": "new-arrivals", "title": "New arrivals"}},
-        {"type": "collection", "settings": {"fallback_handle": "men", "title": "Men"}},
-        {"type": "collection", "settings": {"fallback_handle": "shop-womens", "title": "Women"}},
-        {"type": "collection", "settings": {"fallback_handle": "unisex", "title": "Unisex"}},
-        {"type": "collection", "settings": {"fallback_handle": "co-ord-set-women", "title": "Co-ord sets"}},
-        {"type": "collection", "settings": {"fallback_handle": "tact-joggers-men", "title": "Joggers"}},
-        {"type": "collection", "settings": {"fallback_handle": "hoodies-men", "title": "Hoodies"}},
-        {"type": "collection", "settings": {"fallback_handle": "neon-rush-all-products", "title": "Neon Rush"}}
+        {"type": "collection", "settings": {"fallback_handle": "new-arrivals", "fallback_asset": "new-arrivals", "title": "New arrivals"}},
+        {"type": "collection", "settings": {"fallback_handle": "men", "fallback_asset": "men", "title": "Men"}},
+        {"type": "collection", "settings": {"fallback_handle": "shop-womens", "fallback_asset": "women", "title": "Women"}},
+        {"type": "collection", "settings": {"fallback_handle": "unisex", "fallback_asset": "unisex", "title": "Unisex"}},
+        {"type": "collection", "settings": {"fallback_handle": "co-ord-set-women", "fallback_asset": "coords", "title": "Co-ord sets"}},
+        {"type": "collection", "settings": {"fallback_handle": "tact-joggers-men", "fallback_asset": "joggers", "title": "Joggers"}},
+        {"type": "collection", "settings": {"fallback_handle": "hoodies-men", "fallback_asset": "hoodies", "title": "Hoodies"}},
+        {"type": "collection", "settings": {"fallback_handle": "neon-rush-all-products", "fallback_asset": "neon", "title": "Neon Rush"}}
       ]
     }
   ]

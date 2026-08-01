@@ -27,6 +27,7 @@ class TactTheme {
     this.bindRevealMotion();
     this.bindThemeMode();
     this.bindMobileDock();
+    this.hydrateCart();
     this.onScroll();
   }
 
@@ -46,7 +47,9 @@ class TactTheme {
       });
       const payload = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(payload?.description || payload?.message || "The request could not be completed.");
+        const error = new Error(payload?.description || payload?.message || "The request could not be completed.");
+        error.status = response.status;
+        throw error;
       }
       return payload;
     } finally {
@@ -244,7 +247,10 @@ class TactTheme {
         if (!video) return;
         const sync = () => {
           const paused = video.paused;
-          button.querySelector("span").textContent = paused ? "▶" : "Ⅱ";
+          const playIcon = button.querySelector("[data-video-play]");
+          const pauseIcon = button.querySelector("[data-video-pause]");
+          if (playIcon) playIcon.hidden = !paused;
+          if (pauseIcon) pauseIcon.hidden = paused;
           button.setAttribute("aria-label", `${paused ? "Play" : "Pause"} video`);
         };
         button.addEventListener("click", () => {
@@ -425,6 +431,7 @@ class TactTheme {
         const label = button.querySelector("[data-quick-add-label]");
         const status = form.querySelector("[data-quick-add-status]");
         const defaultLabel = label?.textContent || "";
+        let resetDelay = 1300;
         const setState = (state, message) => {
           form.classList.remove("is-loading", "is-added", "is-error");
           button.classList.remove("is-loading", "is-added", "is-error");
@@ -444,27 +451,14 @@ class TactTheme {
             body: new FormData(form),
           });
 
-          setState("is-added", "Added to bag");
+          setState("is-added", "Added");
           button.removeAttribute("aria-busy");
-
-          this.fetchCart()
-            .then((cart) => {
-              document.querySelectorAll("[data-cart-open]").forEach((bag) => {
-                let count = bag.querySelector(".t-header__count");
-                if (!count) {
-                  count = document.createElement("span");
-                  count.className = "t-header__count";
-                  bag.appendChild(count);
-                }
-                count.textContent = cart.item_count;
-                count.hidden = cart.item_count === 0;
-                bag.setAttribute("aria-label", `Bag with ${cart.item_count} items`);
-              });
-              document.dispatchEvent(new CustomEvent("tact:cart-updated", { detail: cart }));
-            })
-            .catch(() => {});
+          const cart = await this.fetchCart();
+          this.updateCartIndicators(cart);
+          document.dispatchEvent(new CustomEvent("tact:cart-updated", { detail: { cart, open: false } }));
         } catch (error) {
-          setState("is-error", error?.name === "AbortError" ? "Timed out" : "Try again");
+          resetDelay = 2400;
+          setState("is-error", this.friendlyCartError(error));
         } finally {
           window.setTimeout(() => {
             button.disabled = false;
@@ -473,7 +467,7 @@ class TactTheme {
             button.removeAttribute("aria-busy");
             if (label) label.textContent = defaultLabel;
             if (status) status.textContent = "";
-          }, 1800);
+          }, resetDelay);
         }
       });
     });
@@ -504,16 +498,18 @@ class TactTheme {
             body: new FormData(form),
           });
 
-          if (label) label.textContent = "Added to bag";
+          if (label) label.textContent = "Added";
           button.classList.remove("is-loading");
           button.classList.add("is-added");
           if (message) message.textContent = "Added to your bag.";
-          document.dispatchEvent(new CustomEvent("tact:cart-updated", { detail: await this.fetchCart() }));
+          const cart = await this.fetchCart();
+          this.updateCartIndicators(cart);
+          document.dispatchEvent(new CustomEvent("tact:cart-updated", { detail: { cart, open: false } }));
         } catch (error) {
           button.classList.remove("is-loading");
           button.classList.add("is-error");
-          if (label) label.textContent = "Try again";
-          if (message) message.textContent = error?.message || "We couldn’t add this item.";
+          if (label) label.textContent = this.friendlyCartError(error);
+          if (message) message.textContent = error?.message || "This item could not be added.";
         } finally {
           button.removeAttribute("aria-busy");
           window.setTimeout(() => {
@@ -591,14 +587,50 @@ class TactTheme {
     });
 
     document.addEventListener("tact:cart-updated", (event) => {
-      if (!event.detail) return;
-      this.renderCartDrawer(event.detail);
-      this.openCart(false);
+      const cart = event.detail?.cart || event.detail;
+      if (!cart) return;
+      this.renderCartDrawer(cart);
+      if (event.detail?.open === true) this.openCart(false);
     });
   }
 
   async fetchCart() {
     return this.requestJson("cart.js");
+  }
+
+  async hydrateCart() {
+    try {
+      const cart = await this.fetchCart();
+      this.updateCartIndicators(cart);
+      this.renderCartDrawer(cart);
+    } catch {
+      // Keep native cart links usable when the Ajax endpoint is temporarily unavailable.
+    }
+  }
+
+  friendlyCartError(error) {
+    const message = String(error?.message || "").toLowerCase();
+    if (error?.name === "AbortError") return "Connection slow";
+    if (error?.status === 422 || /sold out|unavailable|not available|inventory/.test(message)) {
+      return "Unavailable";
+    }
+    return "Couldn’t add";
+  }
+
+  updateCartIndicators(cart) {
+    const countValue = Math.max(0, Number(cart?.item_count) || 0);
+    document.querySelectorAll("[data-cart-open]").forEach((bag) => {
+      let count = bag.querySelector("[data-cart-count]");
+      if (!count) {
+        count = document.createElement("span");
+        count.className = "t-header__count";
+        count.dataset.cartCount = "";
+        bag.appendChild(count);
+      }
+      count.textContent = String(countValue);
+      count.hidden = countValue === 0;
+      bag.setAttribute("aria-label", `Bag with ${countValue} ${countValue === 1 ? "item" : "items"}`);
+    });
   }
 
   async openCart(refresh = false) {
@@ -718,19 +750,7 @@ class TactTheme {
     this.cartDrawer.querySelectorAll("[data-cart-drawer-count]").forEach((count) => {
       count.textContent = `(${cart.item_count})`;
     });
-    document.querySelectorAll("[data-cart-open]").forEach((bag) => {
-      let count = bag.querySelector(".t-header__count");
-      if (!count && cart.item_count > 0) {
-        count = document.createElement("span");
-        count.className = "t-header__count";
-        bag.appendChild(count);
-      }
-      if (count) {
-        count.textContent = cart.item_count;
-        count.hidden = cart.item_count === 0;
-      }
-      bag.setAttribute("aria-label", `Bag with ${cart.item_count} items`);
-    });
+    this.updateCartIndicators(cart);
 
     if (body) {
       body.replaceChildren();

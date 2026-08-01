@@ -2,7 +2,7 @@
 
 Last verified: 2026-08-01
 
-Known-good package: `tact-editorial-catalog-ready-1.4.4.zip`
+Known-good package: `tact-editorial-catalog-ready-1.4.6.zip`
 
 Source of truth: `shopify-theme/`
 Shopify draft used for verification: `157168992421`

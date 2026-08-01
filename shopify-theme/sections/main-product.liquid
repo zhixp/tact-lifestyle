@@ -168,14 +168,16 @@
         <h2>{{ section.settings.value_heading }}</h2>
         <div class="t-product__value-list">
           {% for block in section.blocks %}
-            <article {{ block.shopify_attributes }}>
-              {% if block.settings.icon != blank %}
-                {{ block.settings.icon | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
-              {% else %}
-                {% render 'icon', icon: block.settings.fallback_icon %}
-              {% endif %}
-              <div><strong>{{ block.settings.heading }}</strong><span>{{ block.settings.copy }}</span></div>
-            </article>
+            {% if block.type == 'value_highlight' %}
+              <article {{ block.shopify_attributes }}>
+                {% if block.settings.icon != blank %}
+                  {{ block.settings.icon | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
+                {% else %}
+                  {% render 'icon', icon: block.settings.fallback_icon %}
+                {% endif %}
+                <div><strong>{{ block.settings.heading }}</strong><span>{{ block.settings.copy }}</span></div>
+              </article>
+            {% endif %}
           {% endfor %}
         </div>
       </section>
@@ -214,6 +216,14 @@
         </div>
       </section>
     {% endif %}
+
+    {% for block in section.blocks %}
+      {% if block.type == '@app' %}
+        <div class="t-product__app-block" {{ block.shopify_attributes }}>
+          {% render block %}
+        </div>
+      {% endif %}
+    {% endfor %}
   </div>
 </section>
 
@@ -323,8 +333,11 @@
     {"type": "range", "id": "complementary_title_size", "label": "Heading size", "min": 34, "max": 90, "step": 2, "unit": "px", "default": 56},
     {"type": "color", "id": "complementary_background", "label": "Background", "default": "#f3f3f1"}
   ],
-  "max_blocks": 4,
+  "max_blocks": 12,
   "blocks": [
+    {
+      "type": "@app"
+    },
     {
       "type": "value_highlight",
       "name": "Value highlight",

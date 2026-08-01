@@ -1,13 +1,13 @@
 # TACT Shopify theme handoff
 
-`tact-editorial-catalog-ready-1.4.4.zip` is the canonical Shopify CLI-built
+`tact-editorial-catalog-ready-1.4.6.zip` is the canonical Shopify CLI-built
 Online Store 2.0 package for Shopify Basic. Its source of truth is the
 `shopify-theme` directory. Do not reuse older rebuilt, recovery, 1.6.x or
 `tact-shopify-theme.zip` uploads.
 
 Upload it from **Shopify admin → Online Store → Themes → Import theme → Upload zip file**. Keep it unpublished while testing.
 
-After uploading, verify the draft is the new **TACT Editorial 1.4.4** package.
+After uploading, verify the draft is the new **TACT Editorial 1.4.6** package.
 In the Theme Editor, choose **Home page** from the page selector. The left
 sidebar should show the editable header, eight homepage sections and footer.
 If it does not, the wrong archive or an older draft theme is open.
@@ -48,7 +48,7 @@ blindly:
 
 ```powershell
 shopify theme list --store your-store.myshopify.com
-shopify theme pull --store your-store.myshopify.com --theme "TACT Editorial 1.4.4" --path remote-theme
+shopify theme pull --store your-store.myshopify.com --theme "TACT Editorial 1.4.6" --path remote-theme
 ```
 
 Compare `remote-theme/templates/index.json`, `templates/404.json`,
@@ -146,6 +146,34 @@ The account icon uses Shopify’s native `routes.account_url`. The package inclu
 For current Shopify customer accounts, enable them in **Settings → Customer accounts** and turn on **Show sign-in links**. Shopify can host the account experience and still use the theme’s account link. If TACT keeps KiwiPass for phone OTP, re-enable its app embed after changing themes; KiwiPass—not the theme—owns that modal and authentication data.
 
 The header editor includes independent toggles for the account, search, wishlist, cart and mobile navigation dock. Hiding the account icon does not delete customer data.
+
+## Judge.me reviews
+
+Judge.me is the review system, not a replacement for Shopify products or the
+theme. It collects verified customer reviews, can send review-request emails,
+and supplies Shopify app blocks such as the product star badge, full review
+widget and review carousel. The hand-written homepage review marquee remains an
+editable editorial section; Judge.me should be the source of truth for verified
+product reviews.
+
+After installing Judge.me:
+
+1. Open **Online Store > Themes > Customize > App embeds** and enable Judge.me.
+2. Open **Products > Default product** in the page selector.
+3. In **Product information**, choose **Add block > Apps > Judge.me Star Rating
+   Badge** and place it directly under the product title.
+4. Use the existing **App integrations** section beneath Product information,
+   choose **Add block > Apps > Judge.me Review Widget**, and keep it below the
+   product purchase and description area.
+5. For a verified-review carousel on the homepage, choose **Add section > App
+   integrations**, add Judge.me's Cards Carousel, and disable the theme's
+   editorial review marquee if both together feel repetitive.
+6. Confirm only one full review widget exists on the product template. Duplicate
+   widgets create duplicate IDs, slower pages and a confusing review flow.
+
+The theme deliberately supports Shopify `@app` blocks in both Product
+information and the reusable App integrations section. No Judge.me API key or
+secret belongs in Liquid, JavaScript, theme settings or Git.
 
 ## Cart and checkout
 

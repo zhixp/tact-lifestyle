@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "theme:check": "pnpm dlx @shopify/cli@latest theme check --path shopify-theme",
     "theme:dev": "pnpm dlx @shopify/cli@latest theme dev --path shopify-theme --environment development --theme-editor-sync",
-    "theme:package": "powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1 -SourceDirectory shopify-theme -DestinationFile tact-editorial-catalog-ready-1.4.5.zip",
+    "theme:package": "powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1 -SourceDirectory shopify-theme -DestinationFile tact-editorial-catalog-ready-1.4.6.zip",
     "theme:push:draft": "pnpm dlx @shopify/cli@latest theme push --path shopify-theme --environment development --unpublished"
   },
   "dependencies": {

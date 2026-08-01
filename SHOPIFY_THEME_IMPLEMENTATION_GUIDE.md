@@ -2,7 +2,7 @@
 
 Last verified: 2026-08-01
 
-Theme version: 1.4.5
+Theme version: 1.4.6
 Production source: `shopify-theme/`
 
 This document explains how the working storefront elements are built, where

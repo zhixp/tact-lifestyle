@@ -60,7 +60,8 @@
         <div class="t-video-story__shade"></div>
         <span>0{{ forloop.index }} / {{ block.settings.label }}</span>
         <button class="t-video-story__toggle" type="button" data-video-toggle aria-label="Pause {{ block.settings.label | escape }}">
-          <span aria-hidden="true">Ⅱ</span>
+          <span class="t-video-story__toggle-icon" data-video-pause aria-hidden="true">{% render 'icon', icon: 'pause' %}</span>
+          <span class="t-video-story__toggle-icon" data-video-play aria-hidden="true" hidden>{% render 'icon', icon: 'play' %}</span>
         </button>
         {% if product_one != blank or product_two != blank %}
           <div class="t-video-story__products">
