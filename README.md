@@ -32,8 +32,15 @@ The demo now includes:
 ## Shopify delivery
 
 The production Shopify theme is in `shopify-theme`. Upload
-`tact-editorial-catalog-ready-1.4.3.zip` to Shopify Basic and follow
+`tact-editorial-catalog-ready-1.4.4.zip` to Shopify Basic and follow
 `SHOPIFY_HANDOFF.md`.
+
+Reusable engineering documentation:
+
+- `SHOPIFY_THEME_BUILD_PLAYBOOK.md` records the installation failures, root
+  causes, fixes, safe packaging workflow and recovery checklist.
+- `SHOPIFY_THEME_IMPLEMENTATION_GUIDE.md` maps every working storefront element
+  to its Liquid, JavaScript, CSS, Shopify data source and merchant controls.
 
 This exact source is also deployed to unpublished Shopify draft `157168992421`.
 It has passed Shopify Theme Check and desktop/mobile storefront QA against the
@@ -49,7 +56,8 @@ The client can manage without touching code:
 - announcement ticker content and mega-menu promotion media/product;
 - native cart drawer content, free-shipping target, empty-bag copy and
   collection-based "Pairs well with" quick adds;
-- light/dark palettes and the customer-facing theme switcher;
+- complete semantic light/dark palettes, editable contrast-safe action colors
+  and the persistent customer-facing theme switcher;
 - product images, descriptions, prices, sizes, stock and variants;
 - product-page offer copy, benefit copy, size guide, care, shipping and return
   summaries;

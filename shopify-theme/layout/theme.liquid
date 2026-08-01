@@ -60,6 +60,10 @@
         --tact-accent: {{ settings.color_accent }};
         --tact-button: {{ settings.color_button }};
         --tact-button-text: {{ settings.color_button_text }};
+        --tact-line: color-mix(in srgb, var(--tact-ink) 15%, transparent);
+        --tact-soft: color-mix(in srgb, var(--tact-surface) 82%, var(--tact-paper));
+        --tact-on-strong: var(--tact-paper);
+        --tact-shadow: rgb(0 0 0 / 14%);
         --tact-radius: {{ settings.card_radius }}px;
         --tact-button-radius: {{ settings.button_radius }}px;
         --tact-button-height: {{ settings.button_height }}px;
@@ -84,6 +88,10 @@
         --tact-paper: {{ settings.dark_color_paper }};
         --tact-surface: {{ settings.dark_color_surface }};
         --tact-muted: {{ settings.dark_color_muted }};
+        --tact-accent: {{ settings.dark_color_accent }};
+        --tact-button: {{ settings.dark_color_button }};
+        --tact-button-text: {{ settings.dark_color_button_text }};
+        --tact-shadow: rgb(0 0 0 / 42%);
       }
       @media (max-width: 749px) {
         :root { --tact-page: {{ settings.page_padding_mobile }}px; }

@@ -1,13 +1,13 @@
 # TACT Shopify theme handoff
 
-`tact-editorial-catalog-ready-1.4.3.zip` is the canonical Shopify CLI-built
+`tact-editorial-catalog-ready-1.4.4.zip` is the canonical Shopify CLI-built
 Online Store 2.0 package for Shopify Basic. Its source of truth is the
 `shopify-theme` directory. Do not reuse older rebuilt, recovery, 1.6.x or
 `tact-shopify-theme.zip` uploads.
 
 Upload it from **Shopify admin → Online Store → Themes → Import theme → Upload zip file**. Keep it unpublished while testing.
 
-After uploading, verify the draft is the new **TACT Editorial 1.4.3** package.
+After uploading, verify the draft is the new **TACT Editorial 1.4.4** package.
 In the Theme Editor, choose **Home page** from the page selector. The left
 sidebar should show the editable header, eight homepage sections and footer.
 If it does not, the wrong archive or an older draft theme is open.
@@ -48,7 +48,7 @@ blindly:
 
 ```powershell
 shopify theme list --store your-store.myshopify.com
-shopify theme pull --store your-store.myshopify.com --theme "TACT Editorial 1.4.3" --path remote-theme
+shopify theme pull --store your-store.myshopify.com --theme "TACT Editorial 1.4.4" --path remote-theme
 ```
 
 Compare `remote-theme/templates/index.json`, `templates/404.json`,

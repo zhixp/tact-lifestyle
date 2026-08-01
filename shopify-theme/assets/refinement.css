@@ -1873,3 +1873,226 @@ html[data-theme=dark] .t-product__tab-list button.is-active{background:var(--tac
 @media(prefers-reduced-motion:reduce){
   .t-collection-tile,.t-collection-tile>img,.t-category-deck__progress i{transition:none}
 }
+
+/* Complete semantic colour mode
+   Campaign media keeps its authored colours. Every UI and reading surface uses
+   the merchant-controlled palette, so dark mode never relies on inversion. */
+html[data-theme=dark] body,
+html[data-theme=dark] #MainContent{
+  background:var(--tact-paper);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] ::selection{
+  background:var(--tact-accent);
+  color:#fff
+}
+html[data-theme=dark] input::placeholder,
+html[data-theme=dark] textarea::placeholder{color:var(--tact-muted);opacity:1}
+
+html[data-theme=dark] .t-collection-tiles{
+  --category-background:var(--tact-paper)!important;
+  --category-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-product-showcase{
+  --products-background:var(--tact-paper)!important;
+  --products-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-review-marquee{
+  --review-background:var(--tact-soft)!important;
+  --review-text:var(--tact-ink)!important;
+  --review-card-background:var(--tact-surface)!important;
+  --review-card-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-editorial{
+  --editorial-background:var(--tact-surface)!important;
+  --editorial-text:var(--tact-ink)!important;
+  --editorial-media-background:var(--tact-paper)!important
+}
+html[data-theme=dark] .t-services{
+  --services-background:var(--tact-surface)!important;
+  --services-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-contact{
+  --contact-background:var(--tact-paper)!important;
+  --contact-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-blog{
+  --blog-background:var(--tact-paper)!important;
+  --blog-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-article{
+  --article-background:var(--tact-paper)!important;
+  --article-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-cart{
+  --cart-background:var(--tact-paper)!important;
+  --cart-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-legal-page{
+  --legal-background:var(--tact-paper)!important;
+  --legal-text:var(--tact-ink)!important
+}
+html[data-theme=dark] .t-order-tracker{
+  --tracker-background:var(--tact-paper)!important;
+  --tracker-text:var(--tact-ink)!important;
+  --tracker-accent:var(--tact-accent)!important
+}
+html[data-theme=dark] .t-product--conversion{
+  --product-background:var(--tact-paper)!important;
+  --product-panel-background:var(--tact-surface)!important;
+  background:var(--tact-paper);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-complementary{
+  --complementary-background:var(--tact-soft)!important;
+  color:var(--tact-ink)
+}
+
+html[data-theme=dark] .t-menu{
+  --menu-background:var(--tact-paper)!important;
+  --menu-color:var(--tact-ink)!important;
+  background:var(--tact-paper);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-menu__panel,
+html[data-theme=dark] .t-menu__bar>button{
+  background:var(--tact-surface);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-menu__primary a{border-color:var(--tact-line)}
+
+html[data-theme=dark] .t-product--conversion .t-product__gallery,
+html[data-theme=dark] .t-product--conversion .t-product__gallery figure,
+html[data-theme=dark] .t-product-card__media{
+  background:var(--tact-soft)
+}
+html[data-theme=dark] .t-product--conversion .t-product__detail,
+html[data-theme=dark] .t-size-guide,
+html[data-theme=dark] .t-cart__summary,
+html[data-theme=dark] .t-cart-empty__copy,
+html[data-theme=dark] .t-cart-drawer,
+html[data-theme=dark] .t-cart-drawer__footer,
+html[data-theme=dark] .t-wishlist,
+html[data-theme=dark] .t-wishlist__bar{
+  background:var(--tact-surface);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-product__gallery figcaption,
+html[data-theme=dark] .t-product-card__badge{
+  background:color-mix(in srgb,var(--tact-surface) 90%,transparent);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-product__wishlist,
+html[data-theme=dark] .t-product__tab-list button,
+html[data-theme=dark] .t-product__purchase .t-product__add{
+  background:var(--tact-surface);
+  border-color:var(--tact-line);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-product__purchase .t-product__add:hover,
+html[data-theme=dark] .t-product__tab-list button.is-active,
+html[data-theme=dark] .t-variant-list input:checked+span,
+html[data-theme=dark] .t-product__wishlist[aria-pressed=true],
+html[data-theme=dark] .t-product-card__wishlist[aria-pressed=true]{
+  background:var(--tact-button);
+  border-color:var(--tact-button);
+  color:var(--tact-button-text)
+}
+html[data-theme=dark] .t-product__buy .shopify-payment-button__button,
+html[data-theme=dark] .t-product__buy .shopify-payment-button__button--unbranded{
+  background:var(--tact-button)!important;
+  border-color:var(--tact-button)!important;
+  color:var(--tact-button-text)!important
+}
+html[data-theme=dark] .t-product__offer-card{
+  background:var(--tact-button);
+  color:var(--tact-button-text)
+}
+html[data-theme=dark] .t-product__offer-card span{
+  color:color-mix(in srgb,var(--tact-button-text) 64%,transparent)
+}
+html[data-theme=dark] .t-product__tab-panel{color:var(--tact-muted)}
+
+html[data-theme=dark] .t-card-quick-add,
+html[data-theme=dark] .t-product-card__quick-trigger,
+html[data-theme=dark] .t-video-product,
+html[data-theme=dark] .t-video-stories__edge{
+  background:color-mix(in srgb,var(--tact-surface) 90%,transparent);
+  border-color:var(--tact-line);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-video-product form button{
+  background:var(--tact-button);
+  color:var(--tact-button-text)
+}
+
+html[data-theme=dark] .t-button:not(.t-button--light),
+html[data-theme=dark] .t-button--interactive,
+html[data-theme=dark] .t-button--light{
+  background:var(--tact-button);
+  border-color:var(--tact-button);
+  color:var(--tact-button-text)
+}
+html[data-theme=dark] .t-button--interactive i{
+  background:var(--tact-button-text);
+  color:var(--tact-button)
+}
+html[data-theme=dark] .t-header__actions [data-wishlist-count],
+html[data-theme=dark] .t-header__actions .t-icon-button>.t-header__count{
+  background:var(--tact-ink);
+  color:var(--tact-paper)
+}
+
+html[data-theme=dark] .t-faq,
+html[data-theme=dark] .t-page,
+html[data-theme=dark] .t-search-page,
+html[data-theme=dark] .t-not-found,
+html[data-theme=dark] .t-list-collections,
+html[data-theme=dark] .t-account,
+html[data-theme=dark] .t-register,
+html[data-theme=dark] .t-customer-page,
+html[data-theme=dark] .t-account-login{
+  background:var(--tact-paper);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-faq__questions,
+html[data-theme=dark] .t-account__empty,
+html[data-theme=dark] .t-address-list>article{
+  background:var(--tact-surface);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-footer__help{
+  background:var(--tact-surface);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-collection-toolbar select,
+html[data-theme=dark] .t-contact__form input,
+html[data-theme=dark] .t-contact__form textarea,
+html[data-theme=dark] .t-account-login form input,
+html[data-theme=dark] .t-register form input,
+html[data-theme=dark] .t-customer-page form input,
+html[data-theme=dark] .t-cart__line input,
+html[data-theme=dark] .t-cart__note textarea{
+  background:var(--tact-surface);
+  border-color:var(--tact-line);
+  color:var(--tact-ink)
+}
+html[data-theme=dark] .t-collection-toolbar option{background:var(--tact-surface);color:var(--tact-ink)}
+
+html[data-theme=dark] .t-services article+article,
+html[data-theme=dark] .t-footer__help-links a{border-color:var(--tact-line)}
+html[data-theme=dark] .t-services p,
+html[data-theme=dark] .t-editorial__copy>div{
+  color:var(--tact-muted)
+}
+html[data-theme=dark] .t-order-tracker__guest>div{
+  background:var(--tact-button);
+  color:var(--tact-button-text)
+}
+
+html[data-theme=dark] .shopify-policy__container,
+html[data-theme=dark] .shopify-policy__title,
+html[data-theme=dark] .shopify-policy__body{
+  background:var(--tact-paper);
+  color:var(--tact-ink)
+}

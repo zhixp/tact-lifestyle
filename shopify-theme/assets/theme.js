@@ -885,9 +885,13 @@ class TactTheme {
     };
     const apply = (theme) => {
       root.dataset.theme = theme;
+      root.style.colorScheme = theme;
+      const pageColor = getComputedStyle(root)
+        .getPropertyValue("--tact-paper")
+        .trim();
       document.querySelector('meta[name="theme-color"]')?.setAttribute(
         "content",
-        theme === "dark" ? "#0c0c0d" : "#0b0b0c",
+        pageColor || (theme === "dark" ? "#0c0c0d" : "#f3f3f1"),
       );
       document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
         const next = theme === "dark" ? "light" : "dark";
@@ -895,6 +899,9 @@ class TactTheme {
         const label = button.querySelector("[data-theme-toggle-label]");
         if (label) label.textContent = `${next[0].toUpperCase()}${next.slice(1)} mode`;
       });
+      window.dispatchEvent(
+        new CustomEvent("tact:theme-changed", { detail: { theme } }),
+      );
     };
     const stored = readStored();
     const preferred =
