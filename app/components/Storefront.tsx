@@ -33,6 +33,52 @@ type CartLine = {
   quantity: number;
 };
 
+type StoredCartLine = {
+  handle: string;
+  size: string;
+  quantity: number;
+};
+
+const PRODUCT_HANDLE = /^[a-z0-9][a-z0-9-]{0,254}$/;
+const MEMBER_KEY = /^[a-f0-9]{64}$/;
+
+function readStoredCart(value: string | null): StoredCartLine[] {
+  if (!value || value.length > 20_000) return [];
+  const parsed: unknown = JSON.parse(value);
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed.slice(0, 50).flatMap((candidate) => {
+    if (!candidate || typeof candidate !== "object") return [];
+    const line = candidate as Partial<StoredCartLine>;
+    const handle = String(line.handle ?? "").trim().toLowerCase();
+    const size = String(line.size ?? "").trim().slice(0, 32);
+    const quantity = Math.min(25, Math.max(1, Number(line.quantity) || 1));
+    return PRODUCT_HANDLE.test(handle) ? [{ handle, size, quantity }] : [];
+  });
+}
+
+function readStoredWishlist(value: string | null): string[] {
+  if (!value || value.length > 10_000) return [];
+  const parsed: unknown = JSON.parse(value);
+  if (!Array.isArray(parsed)) return [];
+  return Array.from(
+    new Set(
+      parsed
+        .slice(0, 100)
+        .map((handle) => String(handle).trim().toLowerCase())
+        .filter((handle) => PRODUCT_HANDLE.test(handle)),
+    ),
+  );
+}
+
+async function createMemberStorageKey(phone: string): Promise<string> {
+  const bytes = new TextEncoder().encode(`tact-preview:${phone}`);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
 type StoreContextValue = {
   cart: CartLine[];
   cartCount: number;
@@ -83,15 +129,21 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const savedCart = JSON.parse(
-        window.localStorage.getItem("tact-cart") ?? "[]",
-      ) as Array<{ handle: string; size: string; quantity: number }>;
-      const savedCustomerId = window.localStorage.getItem("tact-customer-id");
+      const savedCart = readStoredCart(
+        window.localStorage.getItem("tact-cart"),
+      );
+      const storedCustomerId = window.localStorage.getItem("tact-customer-id");
+      const savedCustomerId =
+        storedCustomerId && MEMBER_KEY.test(storedCustomerId)
+          ? storedCustomerId
+          : null;
+      if (storedCustomerId && !savedCustomerId) {
+        window.localStorage.removeItem("tact-customer-id");
+      }
       const savedWishlist = savedCustomerId
-        ? (JSON.parse(
-            window.localStorage.getItem(`tact-wishlist:${savedCustomerId}`) ??
-              "[]",
-          ) as string[])
+        ? readStoredWishlist(
+            window.localStorage.getItem(`tact-wishlist:${savedCustomerId}`),
+          )
         : [];
       const savedTheme = window.localStorage.getItem("tact-theme");
 
@@ -321,15 +373,16 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     );
   }
 
-  function completeLogin() {
-    const memberId = accountPhone.replace(/\D/g, "");
-    if (memberId.length !== 10) return;
+  async function completeLogin() {
+    const phone = accountPhone.replace(/\D/g, "");
+    if (phone.length !== 10) return;
+    const memberId = await createMemberStorageKey(phone);
 
     let saved: string[] = [];
     try {
-      saved = JSON.parse(
-        window.localStorage.getItem(`tact-wishlist:${memberId}`) ?? "[]",
-      ) as string[];
+      saved = readStoredWishlist(
+        window.localStorage.getItem(`tact-wishlist:${memberId}`),
+      );
     } catch {
       saved = [];
     }
@@ -340,6 +393,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
     window.localStorage.setItem("tact-customer-id", memberId);
     setCustomerId(memberId);
     setWishlist(saved);
+    setAccountPhone("");
     setAccountOpen(false);
     setPendingWishlist(null);
     if (accountIntent === "wishlist") setWishlistOpen(true);

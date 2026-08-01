@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-track-order",
+      "settings": {
+        "eyebrow": "Customer care / Orders",
+        "heading": "Track your order"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

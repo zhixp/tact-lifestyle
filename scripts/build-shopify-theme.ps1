@@ -19,53 +19,81 @@ if (-not $themeInfo.theme_name -or -not $themeInfo.theme_version) {
   throw "Theme name and version are required in config/settings_schema.json."
 }
 
-$generatedName = "$($themeInfo.theme_name)-$($themeInfo.theme_version).zip"
-$generated = Join-Path $source $generatedName
-
 if (-not $DestinationFile) {
   $slug = ($themeInfo.theme_name.ToLowerInvariant() -replace "[^a-z0-9]+", "-").Trim("-")
   $DestinationFile = "$slug-$($themeInfo.theme_version).zip"
 }
 
 $destination = Join-Path $repository $DestinationFile
-if (Test-Path -LiteralPath $generated) {
-  Remove-Item -LiteralPath $generated -Force
-}
-
-$shopify = Get-Command shopify -ErrorAction SilentlyContinue
-$pnpm = Get-Command pnpm -ErrorAction SilentlyContinue
-$npx = Get-Command npx -ErrorAction SilentlyContinue
-
-if ($shopify) {
-  & $shopify.Source theme package --path $source
-} elseif ($pnpm) {
-  & $pnpm.Source dlx @shopify/cli@latest theme package --path $source
-} elseif ($npx) {
-  & $npx.Source --yes @shopify/cli@latest theme package --path $source
-} else {
-  throw "Shopify CLI is required. Install it or make pnpm/npx available."
-}
-
-if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $generated)) {
-  throw "Shopify CLI did not create $generatedName."
-}
-
 if (Test-Path -LiteralPath $destination) {
   Remove-Item -LiteralPath $destination -Force
 }
-Move-Item -LiteralPath $generated -Destination $destination
 
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+$allowedDirectories = @(
+  "assets",
+  "config",
+  "layout",
+  "locales",
+  "sections",
+  "snippets",
+  "templates"
+)
+$output = [System.IO.File]::Open(
+  $destination,
+  [System.IO.FileMode]::CreateNew
+)
+$createdArchive = [System.IO.Compression.ZipArchive]::new(
+  $output,
+  [System.IO.Compression.ZipArchiveMode]::Create,
+  $false
+)
+
+try {
+  foreach ($directoryName in $allowedDirectories) {
+    $directory = Join-Path $source $directoryName
+    if (-not (Test-Path -LiteralPath $directory)) {
+      continue
+    }
+
+    foreach ($themeFile in Get-ChildItem -LiteralPath $directory -File -Recurse) {
+      $entryName = (
+        $themeFile.FullName.Substring($source.Length + 1)
+      ).Replace([System.IO.Path]::DirectorySeparatorChar, "/")
+      [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+        $createdArchive,
+        $themeFile.FullName,
+        $entryName,
+        [System.IO.Compression.CompressionLevel]::Optimal
+      ) | Out-Null
+    }
+  }
+} finally {
+  $createdArchive.Dispose()
+  $output.Dispose()
+}
+
+if (-not (Test-Path -LiteralPath $destination)) {
+  throw "Theme package was not created."
+}
+
 $archive = [System.IO.Compression.ZipFile]::OpenRead($destination)
 try {
   $requiredEntries = @(
     "layout/theme.liquid",
+    "assets/editorial-system.css",
+    "assets/theme.js",
     "config/settings_schema.json",
     "config/settings_data.json",
     "sections/main-404.liquid",
+    "sections/main-track-order.liquid",
     "sections/product-grid.liquid",
     "templates/index.json",
-    "templates/404.json"
+    "templates/404.json",
+    "templates/product.json",
+    "templates/search.track-order.json"
   )
 
   foreach ($entryName in $requiredEntries) {

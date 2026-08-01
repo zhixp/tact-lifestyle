@@ -10,20 +10,22 @@
     "typecheck": "tsc --noEmit",
     "theme:check": "pnpm dlx @shopify/cli@latest theme check --path shopify-theme",
     "theme:dev": "pnpm dlx @shopify/cli@latest theme dev --path shopify-theme --environment development --theme-editor-sync",
-    "theme:package": "powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1 -SourceDirectory shopify-theme -DestinationFile tact-editorial-catalog-ready-1.4.4.zip",
+    "theme:package": "powershell -ExecutionPolicy Bypass -File scripts/build-shopify-theme.ps1 -SourceDirectory shopify-theme -DestinationFile tact-editorial-catalog-ready-1.4.5.zip",
     "theme:push:draft": "pnpm dlx @shopify/cli@latest theme push --path shopify-theme --environment development --unpublished"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.2",
     "next": "^16.2.11",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
-    "@types/node": "^26.1.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@types/sanitize-html": "^2.16.1",
     "typescript": "^5.9.3",
-    "wrangler": "^4.114.0"
+    "wrangler": "^4.116.0"
   }
 }

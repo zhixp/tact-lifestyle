@@ -85,7 +85,7 @@
       assign track_url = track_page.url
     endif
     if track_url == blank
-      assign track_url = routes.account_url
+      assign track_url = routes.search_url | append: '?q=order&view=track-order'
     endif
 
     assign privacy_url = section.settings.privacy_link

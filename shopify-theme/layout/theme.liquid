@@ -45,6 +45,7 @@
     %}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'refinement.css' | asset_url | stylesheet_tag }}
+    {{ 'editorial-system.css' | asset_url | stylesheet_tag }}
     <style>
       {{ settings.body_font | font_face: font_display: 'swap' }}
       {{ body_font_bold | font_face: font_display: 'swap' }}
@@ -103,7 +104,7 @@
   <body
     class="template-{{ template.name }}"
     data-customer-authenticated="{% if customer %}true{% else %}false{% endif %}"
-    data-customer-id="{% if customer %}{{ customer.id }}{% else %}guest{% endif %}"
+    data-customer-id="{% if customer %}{{ customer.id | append: ':' | append: shop.permanent_domain | sha256 }}{% else %}guest{% endif %}"
     data-account-login-url="{{ routes.account_login_url }}"
   >
     <a class="skip-link" href="#MainContent">Skip to content</a>

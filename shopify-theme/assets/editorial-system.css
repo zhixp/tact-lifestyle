@@ -1,0 +1,416 @@
+/*
+ * TACT editorial design system
+ * ----------------------------
+ * This file is the final visual contract for the Shopify storefront. Keep
+ * merchant-editable values in section settings and global tokens; use this
+ * layer only for composition, interaction and responsive behaviour.
+ */
+
+/* Shared surfaces and motion */
+body,
+#MainContent {
+  background: var(--tact-paper);
+  color: var(--tact-ink);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--tact-accent);
+  outline-offset: 3px;
+}
+
+/* Header: invisible over the campaign, calm glass after scroll */
+.t-header {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, transparent);
+  box-shadow: none;
+  padding-inline: clamp(16px, 2.4vw, 42px);
+}
+
+.t-header--overlay:not(.is-scrolled) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+.t-header.is-scrolled,
+.t-header:not(.t-header--overlay) {
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  background: color-mix(in srgb, var(--tact-paper) 92%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--tact-ink) 10%, transparent);
+  color: var(--tact-ink);
+}
+
+.t-header__links a,
+.t-header__actions button,
+.t-header__actions a {
+  transition:
+    background-color 180ms ease,
+    opacity 180ms ease,
+    transform 260ms var(--tact-ease);
+}
+
+.t-header__links a:hover {
+  opacity: .56;
+}
+
+.t-header__actions button:active,
+.t-header__actions a:active {
+  transform: scale(.92);
+}
+
+/* Hero: spacious Vercel composition with Shopify-editable media */
+.t-hero-carousel {
+  background: var(--tact-paper);
+  isolation: isolate;
+}
+
+.t-hero-slide__shade {
+  background: linear-gradient(0deg, var(--slide-overlay) 0%, transparent 52%);
+}
+
+.t-hero-slide__copy h1,
+.t-hero-slide__copy h2 {
+  letter-spacing: -.065em;
+  line-height: .86;
+}
+
+.t-hero-slide__copy a {
+  transition: gap 300ms var(--tact-ease), opacity 180ms ease;
+}
+
+.t-hero-slide__copy a:hover {
+  gap: 52px;
+  opacity: .68;
+}
+
+.t-hero-carousel__navigation {
+  color: #fff;
+}
+
+.t-hero-carousel[data-active-tone="dark"] .t-hero-carousel__navigation {
+  color: #0a0a0b;
+}
+
+.t-hero-carousel__navigation > span {
+  color: currentColor;
+}
+
+.t-hero-carousel__dots button {
+  background: color-mix(in srgb, currentColor 34%, transparent);
+}
+
+.t-hero-carousel__dots button::after {
+  background: currentColor;
+}
+
+.t-hero-carousel__arrows button {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--tact-paper) 82%, transparent);
+  border-color: color-mix(in srgb, var(--tact-ink) 12%, transparent);
+  color: var(--tact-ink);
+}
+
+/* Category and product rails remain one deck at every width */
+.t-collection-tiles__grid {
+  display: flex;
+  gap: clamp(8px, 1vw, 14px);
+  grid-template-columns: none;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-bottom: 10px;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
+}
+
+.t-collection-tiles__grid::-webkit-scrollbar,
+.t-product-showcase--mobile-scroll .t-product-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.t-collection-tile {
+  flex: 0 0 min(var(--category-desktop-width), 30vw);
+  scroll-snap-align: start;
+}
+
+.t-collection-tile > img {
+  transition: transform 700ms var(--tact-ease), filter 260ms ease;
+}
+
+.t-collection-tile:hover > img {
+  filter: saturate(1.03);
+  transform: scale(1.035);
+}
+
+/* Product cards: tactile, lightweight quick add */
+.t-product-card {
+  min-width: 0;
+  position: relative;
+  transition: transform 420ms var(--tact-ease);
+}
+
+.t-product-card__media {
+  background: var(--tact-soft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tact-ink) 5%, transparent);
+  transition: box-shadow 420ms var(--tact-ease);
+}
+
+.t-product-card__media > img {
+  transition: opacity 360ms ease, transform 720ms var(--tact-ease);
+}
+
+.t-product-card__wishlist,
+.t-product-card__quick-trigger {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--tact-surface) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tact-ink) 10%, transparent);
+  color: var(--tact-ink);
+}
+
+.t-card-quick-add {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--tact-surface) 90%, transparent);
+  color: var(--tact-ink);
+}
+
+.t-card-quick-add > button {
+  background: var(--tact-button);
+  color: var(--tact-button-text);
+}
+
+.t-card-quick-add > button.is-added {
+  background: var(--tact-accent);
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .t-product-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .t-product-card:hover .t-product-card__media {
+    box-shadow: 0 20px 44px var(--tact-shadow);
+  }
+}
+
+/* Product page: rich media, compact choices and clear conversion hierarchy */
+.t-product--conversion {
+  background: var(--product-background);
+  color: var(--tact-ink);
+  grid-template-columns: minmax(0, 1.55fr) minmax(390px, .72fr);
+}
+
+.t-product--conversion .t-product__gallery,
+.t-product--conversion .t-product__gallery figure {
+  background: var(--tact-soft);
+}
+
+.t-product--conversion .t-product__detail {
+  background: var(--product-panel-background);
+  color: var(--tact-ink);
+  scrollbar-width: thin;
+}
+
+.t-product__heading h1 {
+  font-size: min(var(--product-title-size), 54px);
+  letter-spacing: -.06em;
+  line-height: .94;
+}
+
+.t-variant-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.t-variant-list label {
+  flex: 0 0 auto;
+}
+
+.t-variant-list span {
+  min-height: 40px;
+  min-width: 52px;
+  padding-inline: 14px;
+}
+
+.t-product__quantity input,
+.t-product__tab-list button,
+.t-product__purchase .t-product__add {
+  background: var(--tact-surface);
+  color: var(--tact-ink);
+}
+
+.t-product__purchase .t-product__add:hover,
+.t-product__tab-list button.is-active,
+.t-variant-list input:checked + span {
+  background: var(--tact-button);
+  border-color: var(--tact-button);
+  color: var(--tact-button-text);
+}
+
+.t-product__tab-panel {
+  color: var(--tact-muted);
+}
+
+/* Review cards are editorial accents, not full-screen obstacles */
+.t-review-marquee {
+  background: var(--review-background);
+  color: var(--review-text);
+}
+
+.t-review-card {
+  background: var(--review-card-background);
+  color: var(--review-card-text);
+  transition: box-shadow 380ms var(--tact-ease), transform 420ms var(--tact-ease);
+}
+
+.t-review-card blockquote {
+  text-wrap: balance;
+}
+
+/* Semantic dark mode: authored photography is never inverted */
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] .t-header.is-scrolled,
+html[data-theme="dark"] .t-header:not(.t-header--overlay) {
+  background: color-mix(in srgb, var(--tact-paper) 90%, transparent);
+}
+
+html[data-theme="dark"] .t-product-card__media,
+html[data-theme="dark"] .t-product--conversion .t-product__gallery,
+html[data-theme="dark"] .t-product--conversion .t-product__gallery figure {
+  background: var(--tact-soft);
+}
+
+html[data-theme="dark"] .t-card-quick-add,
+html[data-theme="dark"] .t-product-card__wishlist,
+html[data-theme="dark"] .t-product-card__quick-trigger,
+html[data-theme="dark"] .t-product--conversion .t-product__detail {
+  background: color-mix(in srgb, var(--tact-surface) 92%, transparent);
+  color: var(--tact-ink);
+}
+
+@media (max-width: 749px) {
+  .t-header {
+    padding-inline: 10px;
+  }
+
+  .t-hero-carousel {
+    min-height: 650px;
+  }
+
+  .t-hero-carousel[data-active-mobile-tone="dark"] .t-hero-carousel__navigation {
+    color: #0a0a0b;
+  }
+
+  .t-hero-carousel[data-active-mobile-tone="light"] .t-hero-carousel__navigation {
+    color: #fff;
+  }
+
+  .t-hero-slide__copy,
+  .t-hero-slide--split .t-hero-slide__copy--center {
+    bottom: 132px;
+  }
+
+  .t-hero-slide__copy h1,
+  .t-hero-slide__copy h2 {
+    line-height: .9;
+    margin-bottom: 22px;
+    max-width: 9ch;
+  }
+
+  .t-hero-carousel__navigation {
+    bottom: 72px;
+  }
+
+  .t-collection-tiles {
+    padding-inline: 18px;
+  }
+
+  .t-collection-tile {
+    flex-basis: min(var(--category-mobile-width), 76vw);
+  }
+
+  .t-product-showcase--mobile-scroll .t-product-grid {
+    display: flex;
+    gap: 9px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: inline mandatory;
+  }
+
+  .t-product-showcase--mobile-scroll .t-product-card {
+    flex: 0 0 76vw;
+    scroll-snap-align: start;
+  }
+
+  .t-product--conversion {
+    display: block;
+  }
+
+  .t-product--conversion .t-product__detail {
+    max-height: none;
+    overflow: visible;
+    padding: 30px 18px 52px;
+    position: static;
+  }
+
+  .t-product__heading h1 {
+    font-size: min(var(--product-title-mobile), 42px);
+    max-width: 13ch;
+  }
+
+  .t-variant-list {
+    gap: 6px;
+  }
+
+  .t-variant-list span {
+    min-height: 38px;
+    min-width: 46px;
+    padding-inline: 12px;
+  }
+
+  .t-product__purchase {
+    grid-template-columns: 94px minmax(0, 1fr);
+  }
+
+  .t-review-card {
+    flex-basis: min(var(--review-card-width), 76vw);
+    height: min(var(--review-card-height), 286px);
+  }
+
+  .t-review-card blockquote {
+    display: -webkit-box;
+    font-size: 24px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-height: 1.02;
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .t-product-card,
+  .t-product-card__media,
+  .t-product-card__media > img,
+  .t-collection-tile > img,
+  .t-hero-slide__copy a,
+  .t-review-card {
+    transition-duration: 1ms !important;
+  }
+}

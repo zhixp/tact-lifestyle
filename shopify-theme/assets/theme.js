@@ -30,6 +30,63 @@ class TactTheme {
     this.onScroll();
   }
 
+  shopifyPath(path) {
+    const root = window.Shopify?.routes?.root || "/";
+    return `${root}${String(path || "").replace(/^\/+/, "")}`;
+  }
+
+  async requestJson(path, options = {}, timeoutMs = 10000) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(this.shopifyPath(path), {
+        ...options,
+        headers: { Accept: "application/json", ...options.headers },
+        signal: controller.signal,
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.description || payload?.message || "The request could not be completed.");
+      }
+      return payload;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
+  safeStoreUrl(value, fallback = "#") {
+    try {
+      const url = new URL(String(value || ""), window.location.origin);
+      if (url.origin !== window.location.origin) return fallback;
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return fallback;
+    }
+  }
+
+  safeImageUrl(value) {
+    try {
+      const url = new URL(String(value || ""), window.location.origin);
+      if (url.protocol !== "https:" && url.origin !== window.location.origin) return "";
+      return url.href;
+    } catch {
+      return "";
+    }
+  }
+
+  normalizeWishlistItem(candidate) {
+    if (!candidate || typeof candidate !== "object") return null;
+    const handle = String(candidate.handle || "").trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9-]{0,254}$/.test(handle)) return null;
+    return {
+      handle,
+      title: String(candidate.title || "").trim().slice(0, 160),
+      price: String(candidate.price || "").trim().slice(0, 48),
+      url: this.safeStoreUrl(candidate.url, `/products/${handle}`),
+      image: this.safeImageUrl(candidate.image),
+    };
+  }
+
   bind() {
     window.addEventListener("scroll", () => this.onScroll(), { passive: true });
 
@@ -239,12 +296,13 @@ class TactTheme {
 
       const show = (index) => {
         active = (index + slides.length) % slides.length;
+        carousel.dataset.activeTone = slides[active]?.dataset.headerTone || "light";
+        carousel.dataset.activeMobileTone =
+          slides[active]?.dataset.mobileHeaderTone ||
+          carousel.dataset.activeTone;
         if (this.header) {
-          this.header.dataset.heroTone = slides[active]?.dataset.headerTone || "light";
-          this.header.dataset.mobileHeroTone =
-            slides[active]?.dataset.mobileHeaderTone ||
-            slides[active]?.dataset.headerTone ||
-            "light";
+          this.header.dataset.heroTone = carousel.dataset.activeTone;
+          this.header.dataset.mobileHeroTone = carousel.dataset.activeMobileTone;
         }
         slides.forEach((slide, slideIndex) => {
           const selected = slideIndex === active;
@@ -367,8 +425,6 @@ class TactTheme {
         const label = button.querySelector("[data-quick-add-label]");
         const status = form.querySelector("[data-quick-add-status]");
         const defaultLabel = label?.textContent || "";
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 10000);
         const setState = (state, message) => {
           form.classList.remove("is-loading", "is-added", "is-error");
           button.classList.remove("is-loading", "is-added", "is-error");
@@ -383,23 +439,15 @@ class TactTheme {
         button.setAttribute("aria-busy", "true");
 
         try {
-          const root = window.Shopify?.routes?.root || "/";
-          const response = await fetch(`${root}cart/add.js`, {
+          await this.requestJson("cart/add.js", {
             method: "POST",
-            headers: { Accept: "application/json" },
             body: new FormData(form),
-            signal: controller.signal,
           });
-          if (!response.ok) throw new Error("Unable to add product");
 
           setState("is-added", "Added to bag");
           button.removeAttribute("aria-busy");
 
-          fetch(`${root}cart.js`, { headers: { Accept: "application/json" } })
-            .then((result) => {
-              if (!result.ok) throw new Error("Unable to refresh cart");
-              return result.json();
-            })
+          this.fetchCart()
             .then((cart) => {
               document.querySelectorAll("[data-cart-open]").forEach((bag) => {
                 let count = bag.querySelector(".t-header__count");
@@ -418,7 +466,6 @@ class TactTheme {
         } catch (error) {
           setState("is-error", error?.name === "AbortError" ? "Timed out" : "Try again");
         } finally {
-          window.clearTimeout(timeout);
           window.setTimeout(() => {
             button.disabled = false;
             form.classList.remove("is-loading", "is-added", "is-error");
@@ -452,16 +499,10 @@ class TactTheme {
         if (message) message.textContent = "";
 
         try {
-          const root = window.Shopify?.routes?.root || "/";
-          const response = await fetch(`${root}cart/add.js`, {
+          await this.requestJson("cart/add.js", {
             method: "POST",
-            headers: { Accept: "application/json" },
             body: new FormData(form),
           });
-          if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.description || "Unable to add this size");
-          }
 
           if (label) label.textContent = "Added to bag";
           button.classList.remove("is-loading");
@@ -557,10 +598,7 @@ class TactTheme {
   }
 
   async fetchCart() {
-    const root = window.Shopify?.routes?.root || "/";
-    const response = await fetch(`${root}cart.js`, { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error("Unable to refresh bag");
-    return response.json();
+    return this.requestJson("cart.js");
   }
 
   async openCart(refresh = false) {
@@ -596,14 +634,11 @@ class TactTheme {
     if (!key || !this.cartDrawer) return;
     this.cartDrawer.classList.add("is-busy");
     try {
-      const root = window.Shopify?.routes?.root || "/";
-      const response = await fetch(`${root}cart/change.js`, {
+      const cart = await this.requestJson("cart/change.js", {
         method: "POST",
-        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: key, quantity }),
       });
-      if (!response.ok) throw new Error("Unable to update bag");
-      const cart = await response.json();
       this.renderCartDrawer(cart);
       document.dispatchEvent(new CustomEvent("tact:cart-changed", { detail: cart }));
     } finally {
@@ -613,18 +648,69 @@ class TactTheme {
 
   renderCartDrawer(cart) {
     if (!this.cartDrawer || !cart) return;
-    const escape = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;",
-    })[character]);
     const formatMoney = (cents) => new Intl.NumberFormat(document.documentElement.lang || "en-IN", {
       style: "currency",
       currency: cart.currency || "INR",
       maximumFractionDigits: 0,
     }).format(Number(cents || 0) / 100);
+    const element = (tag, className, text) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    };
+    const cartLine = (item) => {
+      const article = element("article", "t-cart-drawer__line");
+      article.dataset.cartLine = String(item.key || "");
+
+      const productUrl = this.safeStoreUrl(item.url);
+      const mediaLink = element("a");
+      mediaLink.href = productUrl;
+      const imageUrl = this.safeImageUrl(item.image);
+      if (imageUrl) {
+        const image = element("img");
+        const sizedImage = new URL(imageUrl);
+        sizedImage.searchParams.set("width", "180");
+        image.src = sizedImage.href;
+        image.alt = String(item.product_title || "");
+        image.loading = "lazy";
+        mediaLink.append(image);
+      }
+
+      const details = element("div");
+      const titleLink = element("a");
+      titleLink.href = productUrl;
+      titleLink.append(element("strong", "", String(item.product_title || "")));
+      details.append(titleLink);
+      if (item.variant_title && item.variant_title !== "Default Title") {
+        details.append(element("small", "", String(item.variant_title)));
+      }
+      details.append(element("span", "", formatMoney(item.final_line_price)));
+
+      const quantity = element("div", "t-cart-drawer__quantity");
+      const decrease = element("button", "", "−");
+      decrease.type = "button";
+      decrease.dataset.cartQuantity = "-1";
+      decrease.dataset.cartKey = String(item.key || "");
+      decrease.setAttribute("aria-label", "Reduce quantity");
+      const amount = element("b", "", String(Math.max(0, Number(item.quantity) || 0)));
+      const increase = element("button", "", "+");
+      increase.type = "button";
+      increase.dataset.cartQuantity = "1";
+      increase.dataset.cartKey = String(item.key || "");
+      increase.setAttribute("aria-label", "Increase quantity");
+      quantity.append(decrease, amount, increase);
+      details.append(quantity);
+
+      const remove = element("button", "t-cart-drawer__remove", "×");
+      remove.type = "button";
+      remove.dataset.cartRemove = "";
+      remove.dataset.cartKey = String(item.key || "");
+      remove.setAttribute("aria-label", `Remove ${String(item.product_title || "item")}`);
+
+      article.append(mediaLink, details, remove);
+      return article;
+    };
     const body = this.cartDrawer.querySelector("[data-cart-drawer-body]");
     const footer = this.cartDrawer.querySelector("[data-cart-drawer-footer]");
     const empty = this.cartDrawer.querySelector("[data-cart-empty-template]");
@@ -647,25 +733,13 @@ class TactTheme {
     });
 
     if (body) {
+      body.replaceChildren();
       if (!cart.items?.length) {
-        body.innerHTML = empty?.innerHTML || "";
+        if (empty?.content) body.append(empty.content.cloneNode(true));
       } else {
-        body.innerHTML = `<div class="t-cart-drawer__lines">${cart.items.map((item) => `
-          <article class="t-cart-drawer__line" data-cart-line="${escape(item.key)}">
-            <a href="${escape(item.url)}">${item.image ? `<img src="${escape(item.image)}&width=180" alt="${escape(item.product_title)}">` : ""}</a>
-            <div>
-              <a href="${escape(item.url)}"><strong>${escape(item.product_title)}</strong></a>
-              ${item.variant_title && item.variant_title !== "Default Title" ? `<small>${escape(item.variant_title)}</small>` : ""}
-              <span>${formatMoney(item.final_line_price)}</span>
-              <div class="t-cart-drawer__quantity">
-                <button type="button" data-cart-quantity="-1" data-cart-key="${escape(item.key)}" aria-label="Reduce quantity">−</button>
-                <b>${item.quantity}</b>
-                <button type="button" data-cart-quantity="1" data-cart-key="${escape(item.key)}" aria-label="Increase quantity">+</button>
-              </div>
-            </div>
-            <button class="t-cart-drawer__remove" type="button" data-cart-remove data-cart-key="${escape(item.key)}" aria-label="Remove ${escape(item.product_title)}">×</button>
-          </article>
-        `).join("")}</div>`;
+        const lines = element("div", "t-cart-drawer__lines");
+        cart.items.slice(0, 100).forEach((item) => lines.append(cartLine(item)));
+        body.append(lines);
       }
     }
     if (footer) footer.hidden = cart.item_count === 0;
@@ -693,8 +767,12 @@ class TactTheme {
     const read = () => {
       if (!authenticated) return [];
       try {
-        const stored = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
-        return Array.isArray(stored) ? stored : [];
+        const raw = window.localStorage.getItem(storageKey) || "[]";
+        if (raw.length > 100000) return [];
+        const stored = JSON.parse(raw);
+        return Array.isArray(stored)
+          ? stored.map((item) => this.normalizeWishlistItem(item)).filter(Boolean).slice(0, 48)
+          : [];
       } catch {
         return [];
       }
@@ -702,16 +780,44 @@ class TactTheme {
     const write = (items) => {
       if (!authenticated) return;
       try {
-        window.localStorage.setItem(storageKey, JSON.stringify(items));
+        const safeItems = items
+          .map((item) => this.normalizeWishlistItem(item))
+          .filter(Boolean)
+          .slice(0, 48);
+        window.localStorage.setItem(storageKey, JSON.stringify(safeItems));
       } catch {}
     };
-    const escapeHtml = (value = "") => value.replace(/[&<>"']/g, (character) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;",
-    })[character]);
+    const wishlistItem = (item) => {
+      const article = document.createElement("article");
+      article.className = "t-wishlist__item";
+      const link = document.createElement("a");
+      link.href = item.url;
+      if (item.image) {
+        const image = document.createElement("img");
+        image.src = item.image;
+        image.alt = "";
+        image.loading = "lazy";
+        link.append(image);
+      }
+      const copy = document.createElement("span");
+      const title = document.createElement("strong");
+      title.textContent = item.title;
+      const price = document.createElement("small");
+      price.textContent = item.price;
+      copy.append(title, price);
+      link.append(copy);
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.dataset.wishlistRemove = item.handle;
+      remove.setAttribute("aria-label", `Remove ${item.title || "item"}`);
+      const icon = document.createElement("span");
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = "×";
+      remove.append(icon);
+      article.append(link, remove);
+      return article;
+    };
     const render = () => {
       const items = read();
       document.querySelectorAll("[data-wishlist-count]").forEach((count) => {
@@ -723,17 +829,7 @@ class TactTheme {
         button.setAttribute("aria-pressed", String(saved));
       });
       document.querySelectorAll("[data-wishlist-items]").forEach((container) => {
-        container.innerHTML = items.map((item) => `
-          <article class="t-wishlist__item">
-            <a href="${escapeHtml(item.url)}">
-              ${item.image ? `<img src="${escapeHtml(item.image)}" alt="">` : ""}
-              <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.price)}</small></span>
-            </a>
-            <button type="button" data-wishlist-remove="${escapeHtml(item.handle)}" aria-label="Remove ${escapeHtml(item.title)}">
-              <span aria-hidden="true">×</span>
-            </button>
-          </article>
-        `).join("");
+        container.replaceChildren(...items.map(wishlistItem));
       });
       document.querySelectorAll("[data-wishlist-empty]").forEach((empty) => {
         empty.hidden = items.length > 0;
@@ -742,8 +838,11 @@ class TactTheme {
 
     if (authenticated) {
       try {
-        const pending = JSON.parse(window.localStorage.getItem(pendingKey) || "null");
-        if (pending?.handle) {
+        const pendingRaw = window.localStorage.getItem(pendingKey) || "";
+        const pending = pendingRaw.length < 10000
+          ? this.normalizeWishlistItem(JSON.parse(pendingRaw || "null"))
+          : null;
+        if (pending) {
           const items = read();
           if (!items.some((item) => item.handle === pending.handle)) items.unshift(pending);
           write(items.slice(0, 48));
@@ -762,28 +861,31 @@ class TactTheme {
           event.preventDefault();
           if (!authenticated) {
             try {
-              window.localStorage.setItem(pendingKey, JSON.stringify({
+              const pending = this.normalizeWishlistItem({
                 handle: toggle.dataset.wishlistHandle,
                 title: toggle.dataset.wishlistTitle || "",
                 url: toggle.dataset.wishlistUrl || "#",
                 image: toggle.dataset.wishlistImage || "",
                 price: toggle.dataset.wishlistPrice || "",
-              }));
+              });
+              if (pending) window.localStorage.setItem(pendingKey, JSON.stringify(pending));
             } catch {}
             this.openWishlist();
             return;
           }
           const items = read();
-          const handle = toggle.dataset.wishlistHandle;
-          const index = items.findIndex((item) => item.handle === handle);
-          if (index >= 0) items.splice(index, 1);
-          else items.unshift({
-            handle,
+          const candidate = this.normalizeWishlistItem({
+            handle: toggle.dataset.wishlistHandle,
             title: toggle.dataset.wishlistTitle || "",
             url: toggle.dataset.wishlistUrl || "#",
             image: toggle.dataset.wishlistImage || "",
             price: toggle.dataset.wishlistPrice || "",
           });
+          if (!candidate) return;
+          const handle = candidate.handle;
+          const index = items.findIndex((item) => item.handle === handle);
+          if (index >= 0) items.splice(index, 1);
+          else items.unshift(candidate);
           write(items.slice(0, 48));
           render();
         }
@@ -985,7 +1087,16 @@ class TactTheme {
     const price = document.querySelector("[data-product-price]");
     if (!price) return;
     const compare = input.dataset.compare;
-    price.innerHTML = `${compare ? `<s>${compare}</s>` : ""}<strong>${input.dataset.price || ""}</strong>`;
+    const nodes = [];
+    if (compare) {
+      const original = document.createElement("s");
+      original.textContent = compare;
+      nodes.push(original);
+    }
+    const current = document.createElement("strong");
+    current.textContent = input.dataset.price || "";
+    nodes.push(current);
+    price.replaceChildren(...nodes);
   }
 
   changeQuantity(button, amount) {

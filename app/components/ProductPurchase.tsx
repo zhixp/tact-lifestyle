@@ -19,6 +19,7 @@ import {
 } from "./Icons";
 import { ProductCard, useStore } from "./Storefront";
 import { storeReviews } from "../reviews";
+import { sanitizeRichHtml } from "../lib/sanitizeRichHtml";
 
 const sizeMeasurements: Record<
   string,
@@ -64,6 +65,10 @@ export function ProductPurchase({
     );
     return direct.length ? direct : storeReviews.slice(2, 5);
   }, [product.handle]);
+  const safeDescriptionHtml = useMemo(
+    () => sanitizeRichHtml(product.descriptionHtml),
+    [product.descriptionHtml],
+  );
 
   useEffect(() => {
     const target = purchaseActionsRef.current;
@@ -129,7 +134,7 @@ export function ProductPurchase({
         <h3>Product details</h3>
         <div
           className="product-description-rich"
-          dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+          dangerouslySetInnerHTML={{ __html: safeDescriptionHtml }}
         />
       </>
     ),

@@ -47,9 +47,9 @@ The repository contains two different products:
 - `app/` is the Next.js demonstration storefront.
 - `shopify-theme/` is the production Shopify theme.
 
-Only `shopify-theme/` is passed to Shopify CLI. Do not connect the repository
-root directly to Shopify's GitHub theme integration because the repository root
-is not a theme root.
+Only `shopify-theme/` is packaged or passed to Shopify CLI. Do not connect the
+repository root directly to Shopify's GitHub theme integration because the
+repository root is not a theme root.
 
 The production theme root is:
 
@@ -92,20 +92,17 @@ layout/theme.liquid
 
 **Fix**
 
-Package from inside the theme directory with Shopify CLI:
-
-```powershell
-shopify theme package --path shopify-theme
-```
-
-This repository wraps that command in:
+Package the contents of the theme root, never the wrapper directory. This
+repository does that deterministically with:
 
 ```powershell
 pnpm run theme:package
 ```
 
-The build script verifies the archive after packaging and rejects it if required
-files are absent or nested under a wrapper directory.
+The build script includes only Shopify's supported theme directories, then
+reopens the archive and rejects it if required files are absent or nested under
+a wrapper directory. Shopify CLI is still used for Theme Check, development
+preview and draft upload.
 
 ### 2. Theme uploaded, but Shopify showed its generic 404 page
 
@@ -241,6 +238,12 @@ the canonical public URL.
 5. Add both pages to the footer menu.
 6. Put the real tracking provider URL or app embed into the tracking section
    settings.
+
+The theme also includes a no-page fallback at
+`/search?q=order&view=track-order`. Keep the non-empty `q` parameter: Shopify's
+search endpoint can return a 503 response when an alternate search template is
+requested without a query. The canonical merchant page remains
+`/pages/track-your-order`.
 
 ### 7. Theme editor said the page was incompatible
 
@@ -398,14 +401,13 @@ execution environment.
 
 **Fix**
 
-- run the command from a normal developer terminal with access to the user's
-  package cache;
-- or install Shopify CLI once so packaging does not require a fresh `dlx`;
+- the package script no longer downloads or invokes Shopify CLI;
+- it creates a deterministic archive from the seven supported theme directories
+  and validates the archive before success;
+- Theme Check and draft push can use an installed Shopify CLI from a normal
+  developer terminal;
 - keep the repository and package cache out of over-restrictive synced folders
   when possible.
-
-The semantic validator still ran before the CLI failure, which prevented a bad
-ZIP from being produced.
 
 ### 13. Git failed to create `.git/index.lock`
 
@@ -445,10 +447,10 @@ The package command performs this sequence:
 1. resolve `shopify-theme/`;
 2. run the custom semantic validator;
 3. read theme name/version from `config/settings_schema.json`;
-4. call `shopify theme package`;
-5. move the generated ZIP to the repository root;
-6. open the ZIP and verify required entries;
-7. print entry count, file size and SHA-256.
+4. create an archive from `assets`, `config`, `layout`, `locales`, `sections`,
+   `snippets` and `templates`;
+5. open the ZIP and verify required entries;
+6. print entry count, file size and SHA-256.
 
 Expected final checks:
 
@@ -549,7 +551,7 @@ Before every delivery:
 - [ ] Bump the theme version.
 - [ ] Run custom semantic validation.
 - [ ] Run Shopify Theme Check.
-- [ ] Package with Shopify CLI.
+- [ ] Package with `pnpm run theme:package`.
 - [ ] Inspect ZIP root and required entries.
 - [ ] Record SHA-256.
 - [ ] Push to an unpublished draft.

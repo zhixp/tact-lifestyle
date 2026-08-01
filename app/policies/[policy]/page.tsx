@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPolicy, PolicyKey } from "../../content";
+import { sanitizeRichHtml } from "../../lib/sanitizeRichHtml";
 
 const policyRoutes: Record<string, PolicyKey> = {
   "privacy-policy": "privacy",
@@ -22,6 +23,7 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
   if (!key) notFound();
 
   const entry = getPolicy(key);
+  const safePolicyHtml = sanitizeRichHtml(entry.html);
 
   return (
     <main id="main" className="inner-main policy-page">
@@ -32,7 +34,7 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
       </header>
       <section
         className="policy-content"
-        dangerouslySetInnerHTML={{ __html: entry.html }}
+        dangerouslySetInnerHTML={{ __html: safePolicyHtml }}
       />
     </main>
   );

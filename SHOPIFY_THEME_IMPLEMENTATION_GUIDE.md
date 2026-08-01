@@ -2,7 +2,7 @@
 
 Last verified: 2026-08-01
 
-Theme version: 1.4.4
+Theme version: 1.4.5
 Production source: `shopify-theme/`
 
 This document explains how the working storefront elements are built, where
@@ -23,7 +23,7 @@ footer
 It also:
 
 - renders Shopify's required `content_for_header`;
-- loads `base.css`, then `refinement.css`;
+- loads `base.css`, `refinement.css`, then `editorial-system.css`;
 - defines editable global design tokens;
 - loads `theme.js` with `defer`;
 - stores customer/authentication context in body data attributes;
@@ -34,7 +34,10 @@ The CSS order is intentional:
 1. `base.css` contains the foundational layout and component styling.
 2. `refinement.css` contains current responsive polish, motion, commerce
    refinements and semantic dark-mode mappings.
-3. the merchant's Theme settings custom CSS is emitted last.
+3. `editorial-system.css` is the concise final visual contract shared by the
+   hero, header, rails, product page, reviews and mobile dock. New visual
+   overrides belong here so they do not become scattered across old selectors.
+4. the merchant's Theme settings custom CSS is emitted last.
 
 Do not reorder these files without retesting the whole storefront.
 
